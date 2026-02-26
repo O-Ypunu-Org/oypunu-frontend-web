@@ -5,10 +5,10 @@
   .conversations-header {
     position: sticky;
     top: 0;
-    background: #030712;
+    background: var(--surface-bg); // Ébène chaud O'Ypunu
     z-index: 10;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(75, 85, 99, 0.3);
+    border-bottom: 1px solid rgba(93, 68, 52, 0.3); // Brun chaud
   }
 
   .conversations-list {
@@ -17,7 +17,7 @@
     .conversation-item {
       &:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(31, 20, 16, 0.3); // Ombre ébène chaud
       }
 
       &:active {
@@ -27,21 +27,21 @@
   }
 }
 
-/* Scrollbar personnalisé */
+/* Scrollbar personnalisé — tons chauds O'Ypunu */
 .conversations-container::-webkit-scrollbar {
   width: 6px;
 }
 
 .conversations-container::-webkit-scrollbar-track {
-  background: rgba(31, 41, 55, 0.3);
+  background: rgba(31, 20, 16, 0.3);
   border-radius: 3px;
 }
 
 .conversations-container::-webkit-scrollbar-thumb {
-  background: rgba(107, 114, 128, 0.5);
+  background: rgba(90, 60, 40, 0.5);
   border-radius: 3px;
 }
 
 .conversations-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.7);
+  background: rgba(90, 60, 40, 0.7);
 }

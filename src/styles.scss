@@ -1,8 +1,28 @@
-/* You can add global styles to this file, and also import other style files */
+/* O'Ypunu Design System — Terre & Or Pan-Africaine */
+@import './styles/tokens';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ── Transition douce au changement de thème ──────────────────── */
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
 body {
-  background-color: #030712;
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* ── text-white en light mode → texte primaire (brun foncé) ───── */
+/* Nécessaire car bg-gray-900 devient ivoire en light mode          */
+[data-theme="light"] .text-white {
+  color: var(--text-primary) !important;
+}
+
+/* ── Transition sur les éléments interactifs ─────────────────── */
+button, a, input, select, textarea {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }

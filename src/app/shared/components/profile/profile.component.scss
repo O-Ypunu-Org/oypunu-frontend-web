@@ -1,29 +1,29 @@
-// Styles pour le menu profil
+// Styles pour le menu profil — Design System Terre & Or Pan-Africaine
 .profile-dropdown {
   .dropdown-link {
     transition: all 0.2s ease-in-out;
     position: relative;
 
     &:hover {
-      background-color: #374151; // gray-700
+      background-color: var(--surface-elevated); // Brun chaud
       transform: translateX(2px);
     }
 
     // Style spécial pour le lien Administration
     &.admin-link {
-      border-top: 1px solid #374151;
+      border-top: 1px solid var(--surface-border);
       margin-top: 0.25rem;
 
       svg {
-        color: #60a5fa; // blue-400
+        color: var(--oy-blue-400); // Bleu Nil
       }
 
       &:hover {
-        background-color: rgba(59, 130, 246, 0.1);
-        color: #93c5fd; // blue-300
+        background-color: rgba(30, 107, 140, 0.1); // Bleu Nil 10%
+        color: var(--oy-blue-400);
 
         svg {
-          color: #93c5fd;
+          color: var(--oy-blue-400);
           transform: rotate(90deg);
         }
       }
@@ -53,7 +53,7 @@
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: #4b5563; // gray-600
+    background-color: var(--surface-border); // Brun chaud
     transform: scale(1.05);
   }
 }
@@ -65,7 +65,7 @@
   right: -2px;
   width: 8px;
   height: 8px;
-  background-color: #ef4444; // red-500
+  background-color: #C0392B; // Rouge profond O'Ypunu
   border-radius: 50%;
-  border: 2px solid #1f2937; // gray-800
+  border: 2px solid var(--surface-bg);
 }

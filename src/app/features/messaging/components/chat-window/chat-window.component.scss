@@ -1,5 +1,5 @@
 .chat-window {
-  background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+  background: var(--surface-bg); // Ébène chaud O'Ypunu
 
   .chat-header {
     position: sticky;
@@ -11,23 +11,23 @@
   .messages-container {
     background: transparent;
 
-    /* Scrollbar personnalisé */
+    /* Scrollbar personnalisé — tons chauds O'Ypunu */
     &::-webkit-scrollbar {
       width: 6px;
     }
 
     &::-webkit-scrollbar-track {
-      background: rgba(31, 41, 55, 0.3);
+      background: rgba(31, 20, 16, 0.3);
       border-radius: 3px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba(107, 114, 128, 0.5);
+      background: rgba(90, 60, 40, 0.5);
       border-radius: 3px;
     }
 
     &::-webkit-scrollbar-thumb:hover {
-      background: rgba(107, 114, 128, 0.7);
+      background: rgba(90, 60, 40, 0.7);
     }
 
     /* Animation pour les messages */
@@ -45,7 +45,7 @@
       transition: all 0.2s ease;
 
       &:focus {
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        box-shadow: 0 0 0 3px rgba(200, 85, 40, 0.15); // Terracotta focus
       }
 
       /* Ajustement automatique de la hauteur */
@@ -59,7 +59,7 @@
 
       &:hover:not(:disabled) {
         transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 4px 12px rgba(200, 85, 40, 0.3); // Terracotta glow
       }
 
       &:active:not(:disabled) {
@@ -92,8 +92,8 @@
     right: 0;
     width: 8px;
     height: 8px;
-    background: #10b981;
-    border: 2px solid #1f2937;
+    background: #2E8B57; // Vert forêt O'Ypunu
+    border: 2px solid var(--surface-elevated);
     border-radius: 50%;
   }
 }

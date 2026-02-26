@@ -1,4 +1,4 @@
-// Dashboard Styles - Pure CSS, no external dependencies
+// Dashboard Styles — Design System Terre & Or Pan-Africaine
 
 .dashboard {
   // Animations personnalisées pour le dashboard
@@ -84,7 +84,7 @@
   .action-card {
     position: relative;
     overflow: hidden;
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -95,14 +95,14 @@
       background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
       transition: left 0.5s ease;
     }
-    
+
     &:hover::before {
       left: 100%;
     }
-    
+
     &:hover {
       transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 40px rgba(31, 20, 16, 0.3); // Ombre ébène chaud
     }
   }
 
@@ -110,7 +110,7 @@
   .stats-card {
     position: relative;
     backdrop-filter: blur(10px);
-    
+
     &::after {
       content: '';
       position: absolute;
@@ -125,7 +125,7 @@
       mask-composite: exclude;
       pointer-events: none;
     }
-    
+
     &:hover {
       transform: scale(1.05);
       transition: transform 0.3s ease;
@@ -136,18 +136,18 @@
   .recent-word-card {
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    
+
     &:hover {
       transform: translateX(8px);
-      
+
       .word-title {
-        background: linear-gradient(135deg, #a855f7, #3b82f6);
+        background: linear-gradient(135deg, var(--oy-purple-600), var(--oy-blue-400)); // Terracotta → Bleu Nil
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
       }
     }
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -155,11 +155,11 @@
       top: 0;
       bottom: 0;
       width: 3px;
-      background: linear-gradient(to bottom, #a855f7, #3b82f6);
+      background: linear-gradient(to bottom, var(--oy-purple-600), var(--oy-blue-400)); // Terracotta → Bleu Nil
       transform: scaleY(0);
       transition: transform 0.3s ease;
     }
-    
+
     &:hover::before {
       transform: scaleY(1);
     }
@@ -168,23 +168,23 @@
   // Recommandations avec effet spécial
   .recommendation-card {
     position: relative;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(59, 130, 246, 0.1));
-    
+    background: linear-gradient(135deg, rgba(200, 85, 40, 0.1), rgba(30, 107, 140, 0.1)); // Terracotta → Bleu Nil
+
     &::before {
       content: '';
       position: absolute;
       inset: 0;
       padding: 1px;
-      background: linear-gradient(135deg, #a855f7, #3b82f6);
+      background: linear-gradient(135deg, var(--oy-purple-600), var(--oy-blue-400));
       border-radius: inherit;
       mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       mask-composite: exclude;
     }
-    
+
     &:hover {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2));
+      background: linear-gradient(135deg, rgba(200, 85, 40, 0.2), rgba(30, 107, 140, 0.2));
       transform: translateY(-4px);
-      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
+      box-shadow: 0 10px 30px rgba(200, 85, 40, 0.3); // Terracotta glow
     }
   }
 
@@ -192,7 +192,7 @@
   .streak-badge {
     position: relative;
     overflow: hidden;
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -214,9 +214,9 @@
     }
   }
 
-  // Loading states personnalisés
+  // Loading states — tons chauds O'Ypunu
   .loading-shimmer {
-    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    background: linear-gradient(90deg, var(--surface-elevated) 25%, var(--surface-border) 50%, var(--surface-elevated) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
   }
@@ -237,15 +237,15 @@
         transform: none;
       }
     }
-    
+
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
     }
-    
+
     .stats-card {
       padding: 1rem;
-      
+
       .stat-number {
         font-size: 1.5rem;
       }
@@ -256,7 +256,7 @@
     .stats-grid {
       grid-template-columns: 1fr;
     }
-    
+
     .recent-word-card {
       &:hover {
         transform: none;
@@ -264,21 +264,21 @@
     }
   }
 
-  // Utilities pour les gradients
+  // Utilities pour les gradients — Palette O'Ypunu
   .gradient-purple-blue {
-    background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, var(--oy-purple-600) 0%, var(--oy-blue-400) 100%); // Terracotta → Bleu Nil
   }
 
   .gradient-red-pink {
-    background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+    background: linear-gradient(135deg, #C0392B 0%, #E8A000 100%); // Rouge profond → Or Kente
   }
 
   .gradient-green-teal {
-    background: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+    background: linear-gradient(135deg, #2E8B57 0%, #1E6B8C 100%); // Vert forêt → Bleu Nil
   }
 
   .gradient-orange-red {
-    background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
+    background: linear-gradient(135deg, #E07048 0%, #C0392B 100%); // Terracotta → Rouge profond
   }
 
   // Text utilities
@@ -296,10 +296,10 @@
     overflow: hidden;
   }
 
-  // Accessibility improvements
+  // Accessibility improvements — Terracotta focus
   .focus-ring {
     &:focus {
-      outline: 2px solid #a855f7;
+      outline: 2px solid var(--oy-purple-600);
       outline-offset: 2px;
       border-radius: 0.5rem;
     }

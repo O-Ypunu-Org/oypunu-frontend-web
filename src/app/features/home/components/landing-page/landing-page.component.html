@@ -1,5 +1,5 @@
 <!-- Landing Page pour Visiteurs Non-Inscrits -->
-<div class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white">
+<div class="min-h-screen bg-gradient-to-br from-gray-950 via-gray-800 to-gray-950 text-white">
 
   <!-- Hero Section avec Animation -->
   <section class="relative py-20 overflow-hidden">
@@ -118,26 +118,26 @@
               {{ formatNumber(statistics.wordsAdded) }}+
             </div>
             <div class="text-gray-400 text-sm">Mots ajoutés</div>
-            <div class="text-green-400 text-xs mt-1">📈 +{{ statistics.todayContributions }} aujourd'hui</div>
+            <div class="text-[#2E8B57] text-xs mt-1">📈 +{{ statistics.todayContributions }} aujourd'hui</div>
           </div>
 
           <div class="text-center p-6 bg-gray-800/50 rounded-xl border border-gray-700">
             <div class="text-3xl font-bold text-blue-400 mb-2 flex items-center justify-center">
               <span class="animate-pulse">{{ statistics.onlineUsers }}</span>
-              <span class="text-green-500 text-lg ml-2">●</span>
+              <span class="text-[#2E8B57] text-lg ml-2">●</span>
             </div>
             <div class="text-gray-400 text-sm">En ligne maintenant</div>
           </div>
 
           <div class="text-center p-6 bg-gray-800/50 rounded-xl border border-gray-700">
-            <div class="text-3xl font-bold text-green-400 mb-2">
+            <div class="text-3xl font-bold text-[#2E8B57] mb-2">
               {{ statistics.totalLanguages }}
             </div>
             <div class="text-gray-400 text-sm">Langues disponibles</div>
           </div>
 
           <div class="text-center p-6 bg-gray-800/50 rounded-xl border border-gray-700">
-            <div class="text-3xl font-bold text-yellow-400 mb-2">
+            <div class="text-3xl font-bold text-yellow-500 mb-2">
               100%
             </div>
             <div class="text-gray-400 text-sm">Gratuit</div>
@@ -148,7 +148,7 @@
         <div class="bg-gray-800/30 rounded-2xl p-6 border border-gray-700">
           <div class="flex items-center mb-6">
             <div class="flex items-center">
-              <span class="animate-pulse text-green-400 text-lg mr-3">●</span>
+              <span class="animate-pulse text-[#2E8B57] text-lg mr-3">●</span>
               <h3 class="text-xl font-semibold">Activité en Temps Réel</h3>
             </div>
           </div>
@@ -217,14 +217,14 @@
 
           <!-- Feature 3: Contribution -->
           <div
-            class="group p-8 bg-gray-800/30 rounded-2xl border border-gray-700 hover:border-green-500 transition-all duration-300 cursor-pointer"
+            class="group p-8 bg-gray-800/30 rounded-2xl border border-gray-700 hover:border-[#2E8B57] transition-all duration-300 cursor-pointer"
             (click)="exploreFeature('contribute')">
             <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">✨</div>
-            <h3 class="text-xl font-semibold mb-4 text-green-400">Contribution Valorisée</h3>
+            <h3 class="text-xl font-semibold mb-4 text-[#2E8B57]">Contribution Valorisée</h3>
             <p class="text-gray-300 mb-6">
               Chaque contribution enrichit la plateforme et aide des milliers d'apprenants.
             </p>
-            <div class="text-sm text-gray-500 group-hover:text-green-400 transition-colors">
+            <div class="text-sm text-gray-500 group-hover:text-[#2E8B57] transition-colors">
               → Commencer à contribuer
             </div>
           </div>
@@ -234,16 +234,16 @@
   </section>
 
   <!-- Storytelling Section -->
-  <section class="py-20 bg-gradient-to-r from-purple-900/20 to-blue-900/20">
+  <section class="py-20 bg-gray-900/30">
     <div class="container mx-auto px-4">
       <div class="max-w-4xl mx-auto text-center">
         <h2 class="text-3xl font-bold mb-12">Le problème que nous résolvons</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
           <!-- Problème -->
-          <div class="p-6 bg-red-900/20 rounded-xl border border-red-700/50">
+          <div class="p-6 bg-surface-card rounded-xl border border-red-500/50">
             <div class="text-4xl mb-4">😤</div>
-            <h3 class="text-lg font-semibold text-red-400 mb-4">Le Problème</h3>
+            <h3 class="text-lg font-semibold text-red-500 mb-4">Le Problème</h3>
             <p class="text-gray-300">
               "Je cherche 'saudade' en français... Aucun dictionnaire ne comprend vraiment le contexte culturel"
             </p>
@@ -254,9 +254,9 @@
           <div class="text-4xl text-purple-400 md:hidden rotate-90">↓</div>
 
           <!-- Solution -->
-          <div class="p-6 bg-green-900/20 rounded-xl border border-green-700/50">
+          <div class="p-6 bg-surface-card rounded-xl border border-[#2E8B57]/50">
             <div class="text-4xl mb-4">🎉</div>
-            <h3 class="text-lg font-semibold text-green-400 mb-4">Notre Solution</h3>
+            <h3 class="text-lg font-semibold text-[#2E8B57] mb-4">Notre Solution</h3>
             <p class="text-gray-300">
               "Sur O'Ypunu, Maria (native portugaise) a expliqué avec 3 exemples parfaits et le contexte émotionnel !"
             </p>

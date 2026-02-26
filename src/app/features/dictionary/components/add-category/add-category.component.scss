@@ -1,18 +1,17 @@
-// Styles pour le composant AddCategory
-// Utilise le même design pattern que AddWord
+// Styles pour le composant AddCategory — Design System Terre & Or Pan-Africaine
 
 .add-category-container {
   min-height: 100vh;
-  background-color: #f9fafb;
+  background-color: var(--surface-bg); // Ébène chaud (dark) / Ivoire (light)
 }
 
-// Override pour les styles de validation
+// Override pour les styles de validation Angular
 .ng-invalid.ng-touched {
-  border-color: #ef4444 !important;
+  border-color: #C0392B !important; // Rouge profond O'Ypunu
 }
 
 .ng-valid.ng-touched {
-  border-color: #10b981 !important;
+  border-color: #2E8B57 !important; // Vert forêt O'Ypunu
 }
 
 // Animation pour le loader

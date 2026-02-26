@@ -1,5 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
+import { ThemeService } from '../../../core/services/theme.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 
@@ -18,8 +19,17 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private _authService: AuthService,
-    private _router: Router
+    private _router: Router,
+    protected _themeService: ThemeService
   ) {}
+
+  get isDarkTheme(): boolean {
+    return this._themeService.isDark;
+  }
+
+  toggleTheme(): void {
+    this._themeService.toggle();
+  }
 
   ngOnInit(): void {
     this._authService.currentUser$.subscribe((user) => {

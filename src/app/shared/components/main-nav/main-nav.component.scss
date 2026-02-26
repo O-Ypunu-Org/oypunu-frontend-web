@@ -1,7 +1,7 @@
-// Styles pour la navigation principale
+// Styles pour la navigation principale — Design System Terre & Or Pan-Africaine
 .nav-link {
   // État par défaut
-  color: #d1d5db; // gray-300
+  color: var(--text-secondary);
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
   position: relative;
@@ -12,13 +12,13 @@
     transition: all 0.2s ease-in-out;
   }
 
-  // État hover
+  // État hover — Bleu Nil
   &:hover {
-    color: #60a5fa; // blue-400
-    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--oy-blue-400);
+    background-color: rgba(200, 85, 40, 0.08); // terracotta 8% opacity
 
     .nav-icon {
-      color: #60a5fa;
+      color: var(--oy-blue-400);
       transform: scale(1.1);
     }
   }
@@ -27,19 +27,19 @@
   transition: all 0.2s ease-in-out;
 }
 
-// État actif appliqué par routerLinkActive
+// État actif appliqué par routerLinkActive — Terracotta
 .nav-link-active {
-  color: #3b82f6 !important; // blue-500
-  background-color: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  color: var(--oy-purple-600) !important; // primary terracotta
+  background-color: rgba(200, 85, 40, 0.12);
+  border: 1px solid rgba(200, 85, 40, 0.3);
+  box-shadow: 0 2px 4px rgba(200, 85, 40, 0.15);
 
   .nav-icon {
-    color: #3b82f6; // blue-500
-    filter: drop-shadow(0 1px 2px rgba(59, 130, 246, 0.3));
+    color: var(--oy-purple-600);
+    filter: drop-shadow(0 1px 2px rgba(200, 85, 40, 0.3));
   }
 
-  // Indicateur visuel supplémentaire avec une barre en dessous
+  // Indicateur visuel : barre terracotta en dessous
   &::after {
     content: "";
     position: absolute;
@@ -48,18 +48,18 @@
     transform: translateX(-50%);
     width: 80%;
     height: 2px;
-    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    background: linear-gradient(90deg, var(--oy-purple-600), var(--oy-purple-700));
     border-radius: 1px;
   }
 
-  // Effet hover sur l'état actif
+  // Hover sur l'état actif
   &:hover {
-    color: #2563eb; // blue-600
-    background-color: rgba(59, 130, 246, 0.2);
+    color: var(--oy-purple-700) !important;
+    background-color: rgba(200, 85, 40, 0.18);
     transform: translateY(-1px);
 
     .nav-icon {
-      color: #2563eb;
+      color: var(--oy-purple-700);
       transform: scale(1.15);
     }
   }

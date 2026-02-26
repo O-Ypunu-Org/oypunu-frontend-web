@@ -1,0 +1,98 @@
+// ═══════════════════════════════════════════════════════════════
+// O'YPUNU — Design System Tokens (Terre & Or Pan-Africaine)
+// Source de vérité : oypunu-mobile/src/design-system/tokens/colors.ts
+// ═══════════════════════════════════════════════════════════════
+
+:root {
+  // ── Dark theme (défaut — cohérence avec mobile) ──────────────
+
+  // Échelle gray remappée → neutrals chauds O'Ypunu
+  // Valeurs légères (50–400) = texte en dark mode
+  // Valeurs foncées (700–950) = surfaces en dark mode
+  --oy-gray-50:  #FDF9F5; // Ivoire — rarement utilisé comme fond en dark
+  --oy-gray-100: #F5EDE3;
+  --oy-gray-200: #E8D5C4;
+  --oy-gray-300: #D4B896; // Texte primaire en dark mode
+  --oy-gray-400: #B89878; // Texte secondaire
+  --oy-gray-500: #9A7A5A; // Texte tertiaire
+  --oy-gray-600: #7A5C40;
+  --oy-gray-700: #5C4230; // Hover / borders
+  --oy-gray-800: #3D2A1E; // Surfaces élevées
+  --oy-gray-900: #1F1410; // Surface carte
+  --oy-gray-950: #120B05; // Surface principale (bg)
+
+  // Primary — Terracotta (latérite, empires sahéliens)
+  --oy-purple-400: #F4BFA0; // Accent léger en dark
+  --oy-purple-500: #EC9872; // Accent medium
+  --oy-purple-600: #E07048; // CTA principal (terracotta lumineux en dark)
+  --oy-purple-700: #C85528; // Hover CTA
+
+  // Info — Bleu Nil
+  --oy-blue-400: #5BA8CC; // Liens en dark (lumineux)
+  --oy-blue-500: #2E90BB;
+  --oy-blue-600: #1E6B8C; // Bleu Nil profond
+
+  // Sémantiques
+  --oy-yellow-500: #FBBF24; // Or Kente (warning / favoris, lumineux en dark)
+  --oy-red-500: #D64235;   // Rouge profond (lumineux en dark)
+
+  // Tokens sémantiques Surface
+  --surface-bg:        #120B05; // Fond de page entier
+  --surface-card:      #1E130C; // Fond de carte
+  --surface-elevated:  #2A1C12; // Surface surélevée (modals, dropdowns)
+  --surface-border:    #3D2A1E; // Bordures
+
+  // Tokens sémantiques Texte
+  --text-primary:    #FDF9F5; // Ivoire chaud — texte principal
+  --text-secondary:  #E8D5C4; // Brun clair — texte secondaire
+  --text-tertiary:   #B89878; // Brun moyen — texte tertiaire
+  --text-on-primary: #FFFFFF; // Texte sur fond coloré (boutons CTA)
+}
+
+// ── Light theme ──────────────────────────────────────────────────
+// Le gray-scale est inversé : les valeurs légères deviennent foncées
+// et vice-versa, pour que les mêmes classes Tailwind fonctionnent
+// dans les deux thèmes avec la sémantique correcte.
+
+[data-theme="light"] {
+  // Valeurs légères (50–400) = surfaces en light mode (inversées)
+  // Valeurs foncées (700–950) = texte en light mode (inversées)
+  --oy-gray-50:  #0F0A06;
+  --oy-gray-100: #1F1410;
+  --oy-gray-200: #3D2A1E;
+  --oy-gray-300: #5C4230; // Texte primaire en light mode
+  --oy-gray-400: #7A5C40; // Texte secondaire
+  --oy-gray-500: #9A7A5A; // Texte tertiaire (identique)
+  --oy-gray-600: #B89878;
+  --oy-gray-700: #D4B896; // Hover / borders en light
+  --oy-gray-800: #E8D5C4; // Surfaces élevées en light
+  --oy-gray-900: #F5EDE3; // Surface carte en light
+  --oy-gray-950: #FDF9F5; // Surface principale en light (ivoire)
+
+  // Primary — Terracotta (plus chaud en light)
+  --oy-purple-400: #E07048;
+  --oy-purple-500: #C85528; // Terracotta standard
+  --oy-purple-600: #C85528; // CTA principal
+  --oy-purple-700: #A84320; // Hover CTA
+
+  // Info — Bleu Nil (plus profond en light)
+  --oy-blue-400: #1E6B8C;
+  --oy-blue-500: #1E6B8C;
+  --oy-blue-600: #185778;
+
+  // Sémantiques
+  --oy-yellow-500: #E8A000; // Or Kente (saturé en light)
+  --oy-red-500: #C0392B;   // Rouge profond standard
+
+  // Tokens sémantiques Surface
+  --surface-bg:        #FDF9F5; // Ivoire — fond de page
+  --surface-card:      #FDF6EE; // Carte sur fond ivoire
+  --surface-elevated:  #F5EDE3; // Surface surélevée
+  --surface-border:    #E8D5C4; // Bordures douces
+
+  // Tokens sémantiques Texte
+  --text-primary:    #1F1410; // Brun ébène — texte principal
+  --text-secondary:  #5C4230; // Brun moyen — texte secondaire
+  --text-tertiary:   #9A7A5A; // Brun clair — texte tertiaire
+  --text-on-primary: #FFFFFF; // Texte sur fond coloré
+}

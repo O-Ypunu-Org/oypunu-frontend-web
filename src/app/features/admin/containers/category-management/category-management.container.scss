@@ -1,5 +1,6 @@
 /**
  * Styles pour le container de gestion des catégories
+ * Palette O'Ypunu — Terre & Or Pan-Africaine
  */
 
 .category-management-container {
@@ -14,13 +15,13 @@
     align-items: flex-start;
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid var(--surface-border);
 
     .header-content {
       flex: 1;
 
       .header-title {
-        color: #2c3e50;
+        color: var(--text-primary);
         font-size: 1.75rem;
         font-weight: 600;
         margin-bottom: 0.5rem;
@@ -29,13 +30,13 @@
         gap: 0.75rem;
 
         i {
-          color: #3498db;
+          color: var(--oy-purple-600); // Terracotta
           font-size: 1.5rem;
         }
       }
 
       .header-subtitle {
-        color: #6c757d;
+        color: var(--text-secondary);
         font-size: 1rem;
         margin-bottom: 0;
         line-height: 1.5;
@@ -58,7 +59,7 @@
 
         &:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 4px 8px rgba(31, 20, 16, 0.15);
         }
 
         &:disabled {
@@ -72,12 +73,12 @@
       }
 
       .btn-primary {
-        background: linear-gradient(135deg, #3498db, #2980b9);
+        background: linear-gradient(135deg, #C85528, #A84320); // Terracotta
         border: none;
         color: white;
 
         &:hover:not(:disabled) {
-          background: linear-gradient(135deg, #2980b9, #1f618d);
+          background: linear-gradient(135deg, #A84320, #853519);
         }
       }
     }
@@ -85,11 +86,11 @@
 
   // ===== FILTRES =====
   .filters-section {
-    background: #f8f9fa;
+    background: var(--surface-card);
     border-radius: 0.5rem;
     padding: 1.5rem;
     margin-bottom: 2rem;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--surface-border);
   }
 
   // ===== CONTENU PRINCIPAL =====
@@ -104,7 +105,7 @@
       align-items: center;
       justify-content: center;
       padding: 3rem;
-      color: #6c757d;
+      color: var(--text-tertiary);
 
       .spinner-border {
         width: 3rem;
@@ -139,12 +140,12 @@
       }
 
       &.alert-danger {
-        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        background: linear-gradient(135deg, #C0392B, #A93226); // Rouge profond
         color: white;
       }
 
       &.alert-success {
-        background: linear-gradient(135deg, #27ae60, #229954);
+        background: linear-gradient(135deg, #2E8B57, #267349); // Vert forêt
         color: white;
       }
     }
@@ -156,11 +157,11 @@
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    background: white;
+    background: var(--surface-elevated);
     border-radius: 0.75rem;
     padding: 1rem 1.5rem;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border: 1px solid #e9ecef;
+    box-shadow: 0 8px 25px rgba(31, 20, 16, 0.20);
+    border: 1px solid var(--surface-border);
     display: flex;
     align-items: center;
     gap: 1.5rem;
@@ -169,7 +170,7 @@
 
     .selected-count {
       font-weight: 600;
-      color: #2c3e50;
+      color: var(--text-primary);
       font-size: 0.95rem;
     }
 
@@ -202,42 +203,42 @@
       }
 
       .btn-outline-success {
-        border-color: #27ae60;
-        color: #27ae60;
+        border-color: #2E8B57; // Vert forêt
+        color: #2E8B57;
 
         &:hover:not(:disabled) {
-          background-color: #27ae60;
+          background-color: #2E8B57;
           color: white;
         }
       }
 
       .btn-outline-warning {
-        border-color: #f39c12;
-        color: #f39c12;
+        border-color: #E8A000; // Or Kente
+        color: #E8A000;
 
         &:hover:not(:disabled) {
-          background-color: #f39c12;
-          color: white;
+          background-color: #E8A000;
+          color: var(--text-primary);
         }
       }
 
       .btn-outline-danger {
-        border-color: #e74c3c;
-        color: #e74c3c;
+        border-color: #C0392B; // Rouge profond
+        color: #C0392B;
 
         &:hover:not(:disabled) {
-          background-color: #e74c3c;
+          background-color: #C0392B;
           color: white;
         }
       }
 
       .btn-outline-secondary {
-        border-color: #6c757d;
-        color: #6c757d;
+        border-color: var(--text-tertiary);
+        color: var(--text-tertiary);
 
         &:hover:not(:disabled) {
-          background-color: #6c757d;
-          color: white;
+          background-color: var(--oy-gray-700);
+          color: var(--text-primary);
         }
       }
     }
@@ -313,26 +314,12 @@
 
   // ===== FOCUS ET ACCESSIBILITÉ =====
   .btn:focus {
-    outline: 2px solid #3498db;
+    outline: 2px solid var(--oy-purple-600); // Terracotta
     outline-offset: 2px;
   }
 
   .alert:focus {
-    outline: 2px solid #3498db;
+    outline: 2px solid var(--oy-purple-600);
     outline-offset: 2px;
-  }
-
-  // ===== COULEURS PERSONNALISÉES =====
-  :root {
-    --primary-color: #3498db;
-    --primary-dark: #2980b9;
-    --success-color: #27ae60;
-    --warning-color: #f39c12;
-    --danger-color: #e74c3c;
-    --secondary-color: #6c757d;
-    --light-bg: #f8f9fa;
-    --border-color: #e9ecef;
-    --text-color: #2c3e50;
-    --text-muted: #6c757d;
   }
 }
