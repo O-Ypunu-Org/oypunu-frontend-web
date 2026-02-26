@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RegisterResponse } from '../../../../core/models/auth-response';
-import { Language } from '../../../../core/services/languages.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 @Component({
@@ -18,7 +17,8 @@ export class RegisterComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   contextMessage = '';
-  selectedLanguage: Language | null = null;
+  showPassword = false;
+  showConfirmPassword = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -39,10 +39,9 @@ export class RegisterComponent implements OnInit {
           ],
         ],
         email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
+        password: ['', [Validators.required, Validators.minLength(12)]],
         confirmPassword: ['', Validators.required],
-        nativeLanguage: [''],
-        hasAcceptedTerms: [false, Validators.requiredTrue],
+        hasAcceptedTerms: [false, [Validators.requiredTrue]],
       },
       { validators: this.passwordMatchValidator }
     );
@@ -77,16 +76,10 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { username, email, password, nativeLanguage, hasAcceptedTerms } =
-      this.registerForm.value;
-
-    // Utiliser l'ID de la langue sélectionnée ou le code si pas de langue sélectionnée
-    const languageValue = this.selectedLanguage
-      ? this.selectedLanguage._id
-      : nativeLanguage;
+    const { username, email, password, hasAcceptedTerms } = this.registerForm.value;
 
     this._authService
-      .register(username, email, password, languageValue, hasAcceptedTerms)
+      .register(username, email, password, undefined, hasAcceptedTerms)
       .subscribe({
         next: (response: RegisterResponse) => {
           this.isSubmitting = false;
@@ -122,11 +115,6 @@ export class RegisterComponent implements OnInit {
           this._handleRegistrationError(error);
         },
       });
-  }
-
-  onLanguageSelected(language: Language): void {
-    this.selectedLanguage = language;
-    // La valeur est automatiquement mise à jour via le ControlValueAccessor
   }
 
   /**

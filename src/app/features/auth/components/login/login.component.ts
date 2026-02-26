@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
   isSubmitting = false;
   errorMessage = '';
   formSubmitted = false;
+  showPassword = false;
 
   constructor(
     private _fb: FormBuilder,
@@ -25,7 +26,6 @@ export class LoginComponent implements OnInit {
     this.loginForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required],
-      remember: [false],
     });
   }
 
