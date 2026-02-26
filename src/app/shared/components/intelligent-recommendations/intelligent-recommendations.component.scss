@@ -36,17 +36,25 @@
 }
 
 // Styles pour les badges de score
+// Note: @apply avec /50 ne fonctionne pas sur les couleurs CSS-var (gray, yellow overridés)
+// → CSS pur avec rgba() hardcodé à la place
 .score-badge {
   &.high-confidence {
-    @apply bg-green-900/50 text-green-300 border-green-500/50;
+    background-color: rgba(20, 83, 45, 0.5);   // green-900/50
+    color: #86efac;                              // green-300
+    border-color: rgba(34, 197, 94, 0.5);       // green-500/50
   }
 
   &.medium-confidence {
-    @apply bg-yellow-900/50 text-yellow-300 border-yellow-500/50;
+    background-color: rgba(113, 63, 18, 0.5);   // yellow-900/50
+    color: #fde047;                              // yellow-300
+    border-color: rgba(251, 191, 36, 0.5);      // oy-yellow-500/50 (#FBBF24)
   }
 
   &.low-confidence {
-    @apply bg-gray-900/50 text-gray-300 border-gray-500/50;
+    background-color: rgba(31, 20, 16, 0.5);    // oy-gray-900/50 (#1F1410)
+    color: #D4B896;                              // oy-gray-300
+    border-color: rgba(154, 122, 90, 0.5);      // oy-gray-500/50 (#9A7A5A)
   }
 }
 
