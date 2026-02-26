@@ -1,5 +1,7 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://oypunu-production.up.railway.app/api',
+  environmentName: 'production' as const,
+  apiUrl: 'https://oypunu-production.up.railway.app',
   websocketUrl: 'https://oypunu-production.up.railway.app',
+  enableLogging: false,
 };

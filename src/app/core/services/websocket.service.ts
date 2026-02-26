@@ -50,7 +50,8 @@ export class WebSocketService {
   private newMessageSubject = new Subject<Message>();
   private userStatusSubject = new Subject<UserStatus>();
   private typingStatusSubject = new Subject<TypingStatus>();
-  private translationNotificationSubject = new Subject<TranslationNotification>();
+  private translationNotificationSubject =
+    new Subject<TranslationNotification>();
   private errorSubject = new Subject<string>();
 
   // Observables publics
@@ -58,12 +59,13 @@ export class WebSocketService {
   public newMessage$ = this.newMessageSubject.asObservable();
   public userStatus$ = this.userStatusSubject.asObservable();
   public typingStatus$ = this.typingStatusSubject.asObservable();
-  public translationNotification$ = this.translationNotificationSubject.asObservable();
+  public translationNotification$ =
+    this.translationNotificationSubject.asObservable();
   public error$ = this.errorSubject.asObservable();
 
   constructor(
     private authService: AuthService,
-    private logger: LoggerService
+    private logger: LoggerService,
   ) {
     // Se connecter automatiquement si l'utilisateur est authentifié
     this.authService.currentUser$.subscribe((user) => {
@@ -92,10 +94,10 @@ export class WebSocketService {
 
     this.logger.info(
       'Connecting to WebSocket',
-      `${environment.apiUrl.replace('/api', '')}/messaging`
+      `${environment.websocketUrl}/messaging`,
     );
 
-    this.socket = io(`${environment.apiUrl.replace('/api', '')}/messaging`, {
+    this.socket = io(`${environment.websocketUrl}/messaging`, {
       auth: {
         token: token,
       },
@@ -151,7 +153,7 @@ export class WebSocketService {
           username: data.username,
           isOnline: true,
         });
-      }
+      },
     );
 
     this.socket.on(
@@ -162,7 +164,7 @@ export class WebSocketService {
           username: data.username,
           isOnline: false,
         });
-      }
+      },
     );
 
     // Événements de frappe
@@ -175,7 +177,7 @@ export class WebSocketService {
           conversationId: data.conversationId,
           isTyping: true,
         });
-      }
+      },
     );
 
     this.socket.on(
@@ -187,7 +189,7 @@ export class WebSocketService {
           conversationId: data.conversationId,
           isTyping: false,
         });
-      }
+      },
     );
 
     // Événements de traduction
@@ -209,22 +211,25 @@ export class WebSocketService {
     });
 
     // Nouvelles erreurs d'authentification structurées
-    this.socket.on('auth_error', (error: {
-      code: string;
-      message: string;
-      timestamp: string;
-      action: string;
-    }) => {
-      this.logger.error('Erreur d\'authentification WebSocket:', error);
-      
-      // Notifier l'erreur avec plus de contexte
-      this.errorSubject.next(`Authentification: ${error.message}`);
-      
-      // Si l'action est disconnect, ne pas essayer de reconnecter
-      if (error.action === 'disconnect') {
-        this.connectionStatus.next(false);
-      }
-    });
+    this.socket.on(
+      'auth_error',
+      (error: {
+        code: string;
+        message: string;
+        timestamp: string;
+        action: string;
+      }) => {
+        this.logger.error("Erreur d'authentification WebSocket:", error);
+
+        // Notifier l'erreur avec plus de contexte
+        this.errorSubject.next(`Authentification: ${error.message}`);
+
+        // Si l'action est disconnect, ne pas essayer de reconnecter
+        if (error.action === 'disconnect') {
+          this.connectionStatus.next(false);
+        }
+      },
+    );
 
     this.socket.on('connect_error', (error: Error) => {
       this.logger.error('Erreur de connexion WebSocket:', error);

@@ -17,7 +17,10 @@ export class AuthService {
 
   currentUser$ = this._currentUserSubject.asObservable();
 
-  constructor(private _http: HttpClient, private _router: Router) {
+  constructor(
+    private _http: HttpClient,
+    private _router: Router,
+  ) {
     this._loadUserFromStorage();
   }
 
@@ -44,9 +47,9 @@ export class AuthService {
         catchError((error) => {
           console.error('Login error:', error);
           return throwError(
-            () => new Error(error.error?.message || 'Identification échouée')
+            () => new Error(error.error?.message || 'Identification échouée'),
           );
-        })
+        }),
       );
   }
 
@@ -55,7 +58,7 @@ export class AuthService {
     email: string,
     password: string,
     nativeLanguage?: string,
-    hasAcceptedTerms: boolean = true
+    hasAcceptedTerms: boolean = true,
   ): Observable<RegisterResponse> {
     return this._http
       .post<RegisterResponse>(`${this._API_URL}/register`, {
@@ -86,10 +89,10 @@ export class AuthService {
             () =>
               new Error(
                 error.error?.message ||
-                  "Une erreur est survenue lors de l'inscription"
-              )
+                  "Une erreur est survenue lors de l'inscription",
+              ),
           );
-        })
+        }),
       );
   }
 
@@ -102,10 +105,10 @@ export class AuthService {
           return throwError(
             () =>
               new Error(
-                error.error?.message || "Erreur de vérification d'email"
-              )
+                error.error?.message || "Erreur de vérification d'email",
+              ),
           );
-        })
+        }),
       );
   }
 
@@ -121,10 +124,10 @@ export class AuthService {
             () =>
               new Error(
                 error.error?.message ||
-                  "Erreur lors de l'envoi du mail de vérification"
-              )
+                  "Erreur lors de l'envoi du mail de vérification",
+              ),
           );
-        })
+        }),
       );
   }
 
@@ -140,16 +143,16 @@ export class AuthService {
             () =>
               new Error(
                 error.error?.message ||
-                  'Erreur lors de la demande de réinitialisation'
-              )
+                  'Erreur lors de la demande de réinitialisation',
+              ),
           );
-        })
+        }),
       );
   }
 
   resetPassword(
     token: string,
-    password: string
+    password: string,
   ): Observable<{ message: string }> {
     return this._http
       .post<{ message: string }>(`${this._API_URL}/reset-password`, {
@@ -163,10 +166,10 @@ export class AuthService {
             () =>
               new Error(
                 error.error?.message ||
-                  'Erreur lors de la réinitialisation du mot de passe'
-              )
+                  'Erreur lors de la réinitialisation du mot de passe',
+              ),
           );
-        })
+        }),
       );
   }
 
@@ -176,15 +179,15 @@ export class AuthService {
     const authWindow = window.open(
       `${this._API_URL}/google`,
       '_blank',
-      'width=500,height=600'
+      'width=500,height=600',
     );
 
     if (!authWindow) {
       return throwError(
         () =>
           new Error(
-            'Blocage de fenêtre popup détecté. Veuillez autoriser les popups pour ce site.'
-          )
+            'Blocage de fenêtre popup détecté. Veuillez autoriser les popups pour ce site.',
+          ),
       );
     }
 
@@ -196,15 +199,15 @@ export class AuthService {
     const authWindow = window.open(
       `${this._API_URL}/facebook`,
       '_blank',
-      'width=500,height=600'
+      'width=500,height=600',
     );
 
     if (!authWindow) {
       return throwError(
         () =>
           new Error(
-            'Blocage de fenêtre popup détecté. Veuillez autoriser les popups pour ce site.'
-          )
+            'Blocage de fenêtre popup détecté. Veuillez autoriser les popups pour ce site.',
+          ),
       );
     }
 
@@ -216,15 +219,15 @@ export class AuthService {
     const authWindow = window.open(
       `${this._API_URL}/twitter`,
       '_blank',
-      'width=500,height=600'
+      'width=500,height=600',
     );
 
     if (!authWindow) {
       return throwError(
         () =>
           new Error(
-            'Blocage de fenêtre popup détecté. Veuillez autoriser les popups pour ce site.'
-          )
+            'Blocage de fenêtre popup détecté. Veuillez autoriser les popups pour ce site.',
+          ),
       );
     }
 
@@ -232,7 +235,7 @@ export class AuthService {
   }
 
   private _handleSocialAuthWindow(
-    authWindow: Window
+    authWindow: Window,
   ): Observable<AuthResponse> {
     return new Observable<AuthResponse>((observer) => {
       // Fonction pour vérifier si la fenêtre est fermée
@@ -249,14 +252,14 @@ export class AuthService {
             // Obtenir les informations de l'utilisateur
             this._http
               .get<AuthResponse>(
-                `${this._API_URL}/social-auth-callback?token=${token}`
+                `${this._API_URL}/social-auth-callback?token=${token}`,
               )
               .pipe(
                 tap((response) => {
                   localStorage.setItem('token', response.tokens.access_token);
                   localStorage.setItem('user', JSON.stringify(response.user));
                   this._currentUserSubject.next(response.user);
-                })
+                }),
               )
               .subscribe({
                 next: (response) => observer.next(response),
@@ -265,7 +268,7 @@ export class AuthService {
               });
           } else {
             observer.error(
-              new Error("L'authentification sociale a échoué ou a été annulée")
+              new Error("L'authentification sociale a échoué ou a été annulée"),
             );
             observer.complete();
           }
@@ -371,9 +374,9 @@ export class AuthService {
         catchError((error) => {
           console.error('Erreur lors de la récupération des stats:', error);
           return throwError(
-            () => new Error('Erreur lors de la récupération des statistiques')
+            () => new Error('Erreur lors de la récupération des statistiques'),
           );
-        })
+        }),
       );
   }
 
@@ -383,18 +386,18 @@ export class AuthService {
   getUserRecentContributions(limit: number = 5): Observable<any> {
     return this._http
       .get<any>(
-        `${environment.apiUrl}/users/profile/recent-contributions?limit=${limit}`
+        `${environment.apiUrl}/users/profile/recent-contributions?limit=${limit}`,
       )
       .pipe(
         catchError((error) => {
           console.error(
             'Erreur lors de la récupération des contributions:',
-            error
+            error,
           );
           return throwError(
-            () => new Error('Erreur lors de la récupération des contributions')
+            () => new Error('Erreur lors de la récupération des contributions'),
           );
-        })
+        }),
       );
   }
 
@@ -404,18 +407,18 @@ export class AuthService {
   getUserRecentConsultations(limit: number = 5): Observable<any> {
     return this._http
       .get<any>(
-        `${environment.apiUrl}/users/profile/recent-consultations?limit=${limit}`
+        `${environment.apiUrl}/users/profile/recent-consultations?limit=${limit}`,
       )
       .pipe(
         catchError((error) => {
           console.error(
             'Erreur lors de la récupération des consultations:',
-            error
+            error,
           );
           return throwError(
-            () => new Error('Erreur lors de la récupération des consultations')
+            () => new Error('Erreur lors de la récupération des consultations'),
           );
-        })
+        }),
       );
   }
 
@@ -482,7 +485,7 @@ export class AuthService {
           // Si le refresh échoue, déconnecter l'utilisateur
           this.logout();
           return throwError(() => new Error('Session expirée'));
-        })
+        }),
       );
   }
 
@@ -502,10 +505,10 @@ export class AuthService {
           return throwError(
             () =>
               new Error(
-                error.error?.message || 'Erreur lors de la déconnexion globale'
-              )
+                error.error?.message || 'Erreur lors de la déconnexion globale',
+              ),
           );
-        })
+        }),
       );
   }
 
@@ -551,7 +554,7 @@ export class AuthService {
       // Si ce n'est pas un JWT ou erreur de parsing,
       // on laisse le serveur valider
       console.debug(
-        "[AuthService] ⚠️ Impossible de vérifier l'expiration du refresh token côté client"
+        "[AuthService] ⚠️ Impossible de vérifier l'expiration du refresh token côté client",
       );
     }
 

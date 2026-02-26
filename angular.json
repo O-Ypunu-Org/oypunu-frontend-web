@@ -62,7 +62,35 @@
             "scripts": []
           },
           "configurations": {
-            "production": {              "budgets": [
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "25kB",
+                  "maximumError": "50kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "staging": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.staging.ts"
+                }
+              ],
+              "budgets": [
                 {
                   "type": "initial",
                   "maximumWarning": "1MB",
@@ -89,6 +117,9 @@
           "configurations": {
             "production": {
               "buildTarget": "oypunu-frontend:build:production"
+            },
+            "staging": {
+              "buildTarget": "oypunu-frontend:build:staging"
             },
             "development": {
               "buildTarget": "oypunu-frontend:build:development"

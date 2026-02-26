@@ -227,11 +227,11 @@ npm run lint
 ### Endpoints Principaux
 
 ```
-GET    /api/words/search     # Recherche de mots
-POST   /api/words           # Créer un mot
-GET    /api/communities     # Lister les communautés
-POST   /api/auth/login      # Authentification
-GET    /api/messages        # Récupérer les messages
+GET    /words/search     # Recherche de mots
+POST   /words           # Créer un mot
+GET    /communities     # Lister les communautés
+POST   /auth/login      # Authentification
+GET    /messages        # Récupérer les messages
 ```
 
 ### Authentification

@@ -1,6 +1,6 @@
 {
   "name": "oypunu-frontend",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Une application de dictionnaire multilingue avec des fonctionnalités de réseau social, permettant aux utilisateurs de gérer et partager des mots avec leurs amis. Cette application inclut également un module de messagerie pour favoriser les échanges entre utilisateurs.",
   "scripts": {
     "ng": "ng",

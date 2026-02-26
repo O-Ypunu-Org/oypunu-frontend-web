@@ -4,7 +4,7 @@ import {
   HttpRequest,
   HttpErrorResponse,
 } from '@angular/common/http';
-import { inject } from '@angular/core'
+import { inject } from '@angular/core';
 import { LoggerService } from '../services/logger.service';
 import { Router } from '@angular/router';
 import { catchError, throwError, switchMap } from 'rxjs';
@@ -21,8 +21,13 @@ export const authInterceptor: HttpInterceptorFn = (
   const logger = inject(LoggerService);
 
   // Routes qui ne nécessitent pas d'authentification
-  const publicRoutes = ['/auth/login', '/auth/register', '/auth/refresh', '/auth/logout'];
-  const isPublicRoute = publicRoutes.some(route => req.url.includes(route));
+  const publicRoutes = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/refresh',
+    '/auth/logout',
+  ];
+  const isPublicRoute = publicRoutes.some((route) => req.url.includes(route));
 
   const token = authService.getToken();
 
@@ -47,10 +52,12 @@ export const authInterceptor: HttpInterceptorFn = (
       // Gestion des erreurs 401 (Unauthorized)
       if (error.status === 401 && !isPublicRoute) {
         logger.warn('[AuthInterceptor] 🚨 Erreur 401 détectée pour:', req.url);
-        
+
         // Si c'est déjà une requête de refresh qui échoue, déconnecter
         if (req.url.includes('/auth/refresh')) {
-          logger.error('[AuthInterceptor] 💀 Refresh token invalide, déconnexion');
+          logger.error(
+            '[AuthInterceptor] 💀 Refresh token invalide, déconnexion'
+          );
           handleLogout(authService, router, tokenRefreshManager, logger);
           return throwError(() => error);
         }
@@ -58,7 +65,14 @@ export const authInterceptor: HttpInterceptorFn = (
         // Vérifier si on a un refresh token
         if (authService.hasValidRefreshToken()) {
           logger.debug('[AuthInterceptor] 🔄 Tentative de refresh du token');
-          return handleTokenRefresh(authService, router, tokenRefreshManager, req, next, logger);
+          return handleTokenRefresh(
+            authService,
+            router,
+            tokenRefreshManager,
+            req,
+            next,
+            logger
+          );
         } else {
           logger.warn('[AuthInterceptor] 🚪 Pas de refresh token, déconnexion');
           handleLogout(authService, router, tokenRefreshManager, logger);
@@ -83,50 +97,59 @@ function handleTokenRefresh(
   next: HttpHandlerFn,
   logger: LoggerService
 ): import('rxjs').Observable<any> {
-  
   if (!tokenRefreshManager.isCurrentlyRefreshing()) {
     // Démarrer un nouveau refresh
     logger.debug('[AuthInterceptor] 🔄 Démarrage du processus de refresh');
-    
-    return tokenRefreshManager.refreshTokens(() => authService.refreshTokens()).pipe(
-      switchMap((response: any) => {
-        const newToken = response.tokens.access_token;
-        
-        logger.debug('[AuthInterceptor] ✅ Tokens rafraîchis, relance de la requête');
-        
-        // Relancer la requête originale avec le nouveau token
-        const authReq = req.clone({
-          setHeaders: {
-            Authorization: `Bearer ${newToken}`,
-          },
-        });
-        
-        return next(authReq);
-      }),
-      catchError((error) => {
-        logger.error('[AuthInterceptor] ❌ Échec du refresh, déconnexion');
-        handleLogout(authService, router, tokenRefreshManager, logger);
-        return throwError(() => error);
-      })
-    );
+
+    return tokenRefreshManager
+      .refreshTokens(() => authService.refreshTokens())
+      .pipe(
+        switchMap((response: any) => {
+          const newToken = response.tokens.access_token;
+
+          logger.debug(
+            '[AuthInterceptor] ✅ Tokens rafraîchis, relance de la requête'
+          );
+
+          // Relancer la requête originale avec le nouveau token
+          const authReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${newToken}`,
+            },
+          });
+
+          return next(authReq);
+        }),
+        catchError((error) => {
+          logger.error('[AuthInterceptor] ❌ Échec du refresh, déconnexion');
+          handleLogout(authService, router, tokenRefreshManager, logger);
+          return throwError(() => error);
+        })
+      );
   } else {
     // Un refresh est déjà en cours, attendre qu'il se termine
-    logger.debug('[AuthInterceptor] ⏳ Refresh en cours, mise en attente de la requête');
-    
+    logger.debug(
+      '[AuthInterceptor] ⏳ Refresh en cours, mise en attente de la requête'
+    );
+
     return tokenRefreshManager.getNewTokenWhenAvailable().pipe(
       switchMap((newToken: string) => {
-        logger.debug('[AuthInterceptor] 🔄 Refresh terminé, relance de la requête en attente');
-        
+        logger.debug(
+          '[AuthInterceptor] 🔄 Refresh terminé, relance de la requête en attente'
+        );
+
         const authReq = req.clone({
           setHeaders: {
             Authorization: `Bearer ${newToken}`,
           },
         });
-        
+
         return next(authReq);
       }),
       catchError((error) => {
-        logger.error('[AuthInterceptor] ❌ Timeout ou erreur lors de l\'attente du refresh');
+        logger.error(
+          "[AuthInterceptor] ❌ Timeout ou erreur lors de l'attente du refresh"
+        );
         handleLogout(authService, router, tokenRefreshManager, logger);
         return throwError(() => error);
       })
@@ -145,10 +168,10 @@ function handleLogout(
   logger: LoggerService
 ): void {
   logger.debug('[AuthInterceptor] 🚪 Déconnexion avec cleanup');
-  
+
   // Force reset du state du refresh pour éviter les blocages
   tokenRefreshManager.forceReset();
-  
+
   // Déconnexion et redirection
   authService.logout();
   router.navigate(['/auth/login']);
