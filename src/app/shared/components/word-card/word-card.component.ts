@@ -65,13 +65,6 @@ export class WordCardComponent implements OnInit, OnDestroy {
     interjection: 'interj',
   };
 
-  // Avatars utilisateurs fictifs - à remplacer par une logique réelle
-  private userAvatars = new Map<string, string>([
-    ['wordsmith', '/assets/avatars/wordsmith.png'],
-    ['professor_x', '/assets/avatars/professor.png'],
-    ['linguist42', '/assets/avatars/linguist.png'],
-    ['marshall', '/assets/avatars/marshall.png'],
-  ]);
   constructor(
     private _dictionaryService: DictionaryService,
     private _router: Router,
@@ -295,12 +288,18 @@ export class WordCardComponent implements OnInit, OnDestroy {
   }
 
   userHasAvatar(): boolean {
-    const username = this.getUserName();
-    return this.userAvatars.has(username);
+    if (this.word.createdBy && typeof this.word.createdBy === 'object') {
+      const user = this.word.createdBy as unknown as User;
+      return !!user.profilePicture;
+    }
+    return false;
   }
 
   getUserAvatar(): string {
-    const username = this.getUserName();
-    return this.userAvatars.get(username) || '';
+    if (this.word.createdBy && typeof this.word.createdBy === 'object') {
+      const user = this.word.createdBy as unknown as User;
+      return user.profilePicture || '';
+    }
+    return '';
   }
 }
