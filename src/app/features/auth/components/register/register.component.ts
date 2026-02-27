@@ -94,7 +94,7 @@ export class RegisterComponent implements OnInit {
 
             // Redirection immédiate vers l'accueil
             setTimeout(() => {
-              this._router.navigate(['/']);
+              this._router.navigate(['/dictionary']);
             }, 1500);
           } else {
             // Cas de l'inscription classique avec vérification email
@@ -205,7 +205,7 @@ export class RegisterComponent implements OnInit {
         );
 
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {
@@ -237,7 +237,7 @@ export class RegisterComponent implements OnInit {
         );
 
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {
@@ -269,7 +269,7 @@ export class RegisterComponent implements OnInit {
         );
 
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {

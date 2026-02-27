@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
         
         // Redirection avec un petit délai pour laisser voir le message
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {
@@ -91,7 +91,7 @@ export class LoginComponent implements OnInit {
         );
         
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {
@@ -121,7 +121,7 @@ export class LoginComponent implements OnInit {
         );
         
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {
@@ -151,7 +151,7 @@ export class LoginComponent implements OnInit {
         );
         
         setTimeout(() => {
-          this._router.navigate(['/']);
+          this._router.navigate(['/dictionary']);
         }, 1500);
       },
       error: (error) => {

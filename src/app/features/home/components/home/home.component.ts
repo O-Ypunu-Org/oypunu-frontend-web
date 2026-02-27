@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take } from 'rxjs/operators';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -16,24 +17,26 @@ export class HomeComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.checkAuthenticationStatus();
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$), take(1))
+      .subscribe(user => {
+        if (user) {
+          // Utilisateur connecté → rediriger vers le dictionnaire
+          this.router.navigate(['/dictionary'], { replaceUrl: true });
+        } else {
+          this.isAuthenticated = false;
+          this.isLoading = false;
+        }
+      });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private checkAuthenticationStatus(): void {
-    this.authService.currentUser$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.isAuthenticated = !!user;
-        this.isLoading = false;
-      });
   }
 }
