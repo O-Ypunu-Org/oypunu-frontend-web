@@ -58,6 +58,25 @@ export interface EditPermissionsResponse {
   message?: string;
 }
 
+export interface HistoryItem {
+  id: string;
+  wordId: string;
+  word: string;
+  language: string;
+  definition: string;
+  lastViewedAt: string;
+  viewCount: number;
+  viewType: string;
+}
+
+export interface ConsultationsResponse {
+  consultations: HistoryItem[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -65,6 +84,7 @@ export class DictionaryService {
   // URLs de l'API
   private readonly _WORDS_API_URL = `${environment.apiUrl}/words`;
   private readonly _CATEGORIES_API_URL = `${environment.apiUrl}/categories`;
+  private readonly _USERS_API_URL = `${environment.apiUrl}/users`;
 
   private _recentSearches: BehaviorSubject<string[]> = new BehaviorSubject<
     string[]
@@ -967,6 +987,89 @@ export class DictionaryService {
       ...word,
       isFavorite: this.isFavorite(word.id),
     };
+  }
+
+  // Obtenir le mot du jour
+  getWordOfTheDay(): Observable<Word | null> {
+    return this._http.get<any>(`${this._WORDS_API_URL}/word-of-the-day`).pipe(
+      map((response) => (response ? this._normalizeId(response) : null)),
+      catchError((error) => {
+        this.logger.error('Error fetching word of the day:', error);
+        return of(null);
+      })
+    );
+  }
+
+  // Obtenir des mots aléatoires
+  getRandomWords(limit: number = 1): Observable<Word[]> {
+    return this._http.get<any[]>(`${this._WORDS_API_URL}/random?limit=${limit}`).pipe(
+      map((words) => this._normalizeIds(words || [])),
+      catchError((error) => {
+        this.logger.error('Error fetching random words:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Obtenir les mots récents (derniers mots approuvés)
+  getRecentWords(limit: number = 10): Observable<Word[]> {
+    return this._http.get<any>(`${this._WORDS_API_URL}?limit=${limit}&status=approved`).pipe(
+      switchMap((result) => {
+        const words = result?.words ?? (Array.isArray(result) ? result : []);
+        const normalizedWords = this._normalizeIds(words);
+        if (this._authService.isAuthenticated() && this._favoriteWordIds.value.size === 0) {
+          return this.getFavoriteWords().pipe(
+            map(() => normalizedWords.map((w) => this._checkIfFavorite(w)))
+          );
+        }
+        return of(normalizedWords.map((w) => this._checkIfFavorite(w)));
+      }),
+      catchError((error) => {
+        this.logger.error('Error fetching recent words:', error);
+        return of([]);
+      })
+    );
+  }
+
+  // Obtenir l'historique de consultations
+  getRecentConsultations(page: number = 1, limit: number = 20): Observable<ConsultationsResponse> {
+    if (!this._authService.isAuthenticated()) {
+      return of({ consultations: [], total: 0, page: 1, limit: 20, totalPages: 0 });
+    }
+    return this._http
+      .get<ConsultationsResponse>(`${this._USERS_API_URL}/profile/recent-consultations`, {
+        params: { page: page.toString(), limit: limit.toString() },
+      })
+      .pipe(
+        catchError((error) => {
+          this.logger.error('Error fetching consultations:', error);
+          return of({ consultations: [], total: 0, page: 1, limit: 20, totalPages: 0 });
+        })
+      );
+  }
+
+  // Supprimer une entrée de l'historique
+  deleteConsultation(viewId: string): Observable<void> {
+    return this._http
+      .delete<void>(`${this._USERS_API_URL}/profile/history/${viewId}`)
+      .pipe(
+        catchError((error) => {
+          this.logger.error('Error deleting consultation:', error);
+          throw error;
+        })
+      );
+  }
+
+  // Effacer tout l'historique
+  clearAllConsultations(): Observable<{ deletedCount: number }> {
+    return this._http
+      .delete<{ deletedCount: number }>(`${this._USERS_API_URL}/profile/history`)
+      .pipe(
+        catchError((error) => {
+          this.logger.error('Error clearing all consultations:', error);
+          throw error;
+        })
+      );
   }
 
   /**
