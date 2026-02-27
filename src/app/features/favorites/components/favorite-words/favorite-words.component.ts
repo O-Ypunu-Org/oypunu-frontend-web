@@ -291,6 +291,10 @@ export class FavoriteWordsComponent implements OnInit, OnDestroy {
       });
   }
 
+  toggleFavorite(word: Word): void {
+    this.removeFromFavorites(word);
+  }
+
   removeFromFavorites(word: Word): void {
     console.log(`🔥 Component: Tentative de suppression du mot ${word.id} (${word.word})`);
     
