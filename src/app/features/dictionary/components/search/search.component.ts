@@ -230,7 +230,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         this._router.navigate(['/favorites']);
         break;
       case 'wordIndex':
-        this._router.navigate(['/dictionary/search']);
+        this._router.navigate(['/dictionary/index']);
         break;
       case 'randomWord':
         this._loadRandomWord();

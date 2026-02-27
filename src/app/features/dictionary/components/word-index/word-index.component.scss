@@ -1,0 +1,9 @@
+/* Cache la scrollbar de la barre alphabétique tout en gardant le scroll */
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

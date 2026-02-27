@@ -1,0 +1,138 @@
+<div class="min-h-screen bg-gray-950">
+
+  <!-- ─── En-tête ─────────────────────────────────────────────────────────── -->
+  <div class="sticky top-0 z-10 bg-gray-950 border-b border-gray-800">
+
+    <!-- Titre + retour -->
+    <div class="w-full max-w-7xl mx-auto flex items-center gap-3 px-4 sm:px-6 py-3">
+      <button type="button" (click)="goBack()"
+        class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-800
+               hover:bg-gray-700 text-gray-300 hover:text-white transition-colors flex-shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <div class="min-w-0">
+        <h1 class="text-xl font-semibold text-white leading-tight">Index des mots</h1>
+        <p *ngIf="!isLoading && totalWords > 0" class="text-xs text-gray-400 mt-0.5">
+          <span class="text-gray-200 font-medium">{{ totalWords }}</span> mot{{ totalWords > 1 ? 's' : '' }}
+          <span *ngIf="selectedLetter !== 'Tous'"> commençant par « {{ selectedLetter }} »</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- ─── Barre alphabétique (scroll horizontal) ─────────────────────── -->
+    <div class="overflow-x-auto border-t border-gray-800 scrollbar-hidden">
+      <div class="w-full max-w-7xl mx-auto flex gap-1.5 px-4 sm:px-6 py-2.5 min-w-max">
+
+        <!-- Bouton "Tous" -->
+        <button type="button" (click)="selectLetter('Tous')"
+          [class]="selectedLetter === 'Tous'
+            ? 'px-3 h-8 rounded-full bg-purple-600 text-white text-xs font-semibold transition-colors'
+            : 'px-3 h-8 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-xs font-medium hover:bg-gray-700 transition-colors'">
+          Tous
+        </button>
+
+        <!-- Lettres A–Z -->
+        <button type="button"
+          *ngFor="let letter of alphabet"
+          (click)="selectLetter(letter)"
+          [class]="selectedLetter === letter
+            ? 'w-8 h-8 rounded-full bg-purple-600 text-white text-xs font-semibold transition-colors flex-shrink-0'
+            : 'w-8 h-8 rounded-full bg-gray-800 border border-gray-700 text-gray-300 text-xs font-medium hover:bg-gray-700 transition-colors flex-shrink-0'">
+          {{ letter }}
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Zone de contenu ───────────────────────────────────────────────── -->
+  <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 pb-24">
+
+    <!-- Chargement -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-20 gap-3">
+      <div class="w-10 h-10 border-2 border-gray-700 border-t-purple-600 rounded-full animate-spin"></div>
+      <p class="text-sm text-gray-400">Chargement…</p>
+    </div>
+
+    <!-- Erreur -->
+    <div *ngIf="!isLoading && errorMessage"
+      class="flex flex-col items-center justify-center py-20 gap-4 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <p class="text-sm text-red-400">{{ errorMessage }}</p>
+      <button type="button" (click)="selectLetter(selectedLetter)"
+        class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
+        Réessayer
+      </button>
+    </div>
+
+    <!-- État vide (aucun mot pour cette lettre) -->
+    <div *ngIf="!isLoading && !errorMessage && words.length === 0"
+      class="flex flex-col items-center justify-center py-20 gap-3 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <p class="text-base font-medium text-gray-300" *ngIf="selectedLetter === 'Tous'">
+        Aucun mot disponible pour le moment.
+      </p>
+      <p class="text-base font-medium text-gray-300" *ngIf="selectedLetter !== 'Tous'">
+        Aucun mot pour la lettre « {{ selectedLetter }} »
+      </p>
+      <p class="text-sm text-gray-500">
+        Essayez une autre lettre ou explorez le dictionnaire.
+      </p>
+    </div>
+
+    <!-- ─── Grille de mots : 1 col mobile / 2 col tablette / 3 col desktop ─ -->
+    <div *ngIf="!isLoading && !errorMessage && words.length > 0"
+      class="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4">
+      <app-word-card
+        *ngFor="let word of words; trackBy: trackByWord"
+        [word]="word">
+      </app-word-card>
+    </div>
+
+    <!-- ─── Pagination ──────────────────────────────────────────────────── -->
+    <div *ngIf="!isLoading && totalPages > 1"
+      class="flex flex-wrap justify-center items-center gap-1.5 mt-8 pb-4">
+
+      <!-- Précédent -->
+      <button type="button"
+        [disabled]="currentPage <= 1"
+        (click)="changePage(currentPage - 1)"
+        class="px-3 py-2 text-sm rounded-xl bg-gray-800 border border-gray-700 text-gray-300
+               disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors">
+        ← Précédent
+      </button>
+
+      <!-- Numéros de page -->
+      <ng-container *ngFor="let page of getPaginationPages()">
+        <!-- Ellipse -->
+        <span *ngIf="page === -1" class="px-2 text-gray-600 select-none">…</span>
+        <!-- Numéro de page -->
+        <button *ngIf="page !== -1" type="button"
+          (click)="changePage(page)"
+          [class]="page === currentPage
+            ? 'w-9 h-9 text-sm rounded-xl bg-purple-600 text-white font-semibold transition-colors'
+            : 'w-9 h-9 text-sm rounded-xl bg-gray-800 border border-gray-700 text-gray-300 hover:bg-gray-700 transition-colors'">
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <!-- Suivant -->
+      <button type="button"
+        [disabled]="currentPage >= totalPages"
+        (click)="changePage(currentPage + 1)"
+        class="px-3 py-2 text-sm rounded-xl bg-gray-800 border border-gray-700 text-gray-300
+               disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-700 transition-colors">
+        Suivant →
+      </button>
+    </div>
+
+  </div>
+</div>

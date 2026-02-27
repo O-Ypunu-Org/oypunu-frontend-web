@@ -8,7 +8,7 @@
 
     <!-- Chargement -->
     <div *ngIf="isVerifying" class="flex flex-col items-center justify-center space-y-4 py-6">
-      <div class="w-12 h-12 border-t-2 border-b-2 border-blue-500 rounded-full animate-spin"></div>
+      <div class="w-12 h-12 border-t-2 border-b-2 border-purple-600 rounded-full animate-spin"></div>
       <p class="text-gray-400 text-center">Vérification de votre adresse email en cours!...</p>
     </div>
 
@@ -45,7 +45,7 @@
     <!-- Bouton de redirection manuelle -->
     <div *ngIf="!isVerifying" class="flex justify-center pt-4">
       <button (click)="goToLogin()"
-        class="w-full px-4 py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors">
+        class="w-full px-4 py-3 text-white bg-purple-600 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 transition-colors">
         Se connecter
       </button>
     </div>

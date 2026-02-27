@@ -1031,6 +1031,50 @@ export class DictionaryService {
     );
   }
 
+  // Obtenir tous les mots approuvés avec pagination complète (pour l'index)
+  getAllWords(page: number = 1, limit: number = 24, language?: string): Observable<SearchResults> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString())
+      .set('status', 'approved');
+
+    if (language) {
+      params = params.set('language', language);
+    }
+
+    return this._http.get<any>(this._WORDS_API_URL, { params }).pipe(
+      switchMap((result) => {
+        const words = result?.words ?? (Array.isArray(result) ? result : []);
+        const total = result?.total ?? words.length;
+        const totalPages = result?.totalPages ?? Math.ceil(total / limit);
+        const normalizedWords = this._normalizeIds(words);
+
+        if (this._authService.isAuthenticated() && this._favoriteWordIds.value.size === 0) {
+          return this.getFavoriteWords().pipe(
+            map(() => ({
+              words: normalizedWords.map((w) => this._checkIfFavorite(w)),
+              total,
+              page,
+              limit,
+              totalPages,
+            }))
+          );
+        }
+        return of({
+          words: normalizedWords.map((w) => this._checkIfFavorite(w)),
+          total,
+          page,
+          limit,
+          totalPages,
+        });
+      }),
+      catchError((error) => {
+        this.logger.error('Error fetching all words:', error);
+        return of({ words: [], total: 0, page, limit, totalPages: 0 });
+      })
+    );
+  }
+
   // Obtenir l'historique de consultations
   getRecentConsultations(page: number = 1, limit: number = 20): Observable<ConsultationsResponse> {
     if (!this._authService.isAuthenticated()) {

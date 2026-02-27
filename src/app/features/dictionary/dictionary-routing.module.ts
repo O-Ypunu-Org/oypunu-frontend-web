@@ -6,6 +6,7 @@ import { SearchResultsComponent } from './components/search-results/search-resul
 import { AddWordComponent } from './components/add-word/add-word.component';
 import { EditWordComponent } from './components/edit-word/edit-word.component';
 import { AddCategoryComponent } from './components/add-category/add-category.component';
+import { WordIndexComponent } from './components/word-index/word-index.component';
 import { AuthGuard } from '../../core/guards/auth.guard';
 import { RoleGuard } from '../../core/guards/role.guard';
 import { UserRole } from '../../core/models/admin';
@@ -14,6 +15,10 @@ const routes: Routes = [
   {
     path: '',
     component: SearchComponent,
+  },
+  {
+    path: 'index',
+    component: WordIndexComponent,
   },
   {
     path: 'search',

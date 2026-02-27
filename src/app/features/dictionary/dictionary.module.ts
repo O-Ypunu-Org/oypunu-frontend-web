@@ -12,6 +12,7 @@ import { SearchResultsComponent } from './components/search-results/search-resul
 import { AddWordComponent } from './components/add-word/add-word.component';
 import { EditWordComponent } from './components/edit-word/edit-word.component';
 import { AddCategoryComponent } from './components/add-category/add-category.component';
+import { WordIndexComponent } from './components/word-index/word-index.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { AddCategoryComponent } from './components/add-category/add-category.com
     AddWordComponent,
     EditWordComponent,
     AddCategoryComponent,
+    WordIndexComponent,
   ],
   imports: [
     CommonModule,
