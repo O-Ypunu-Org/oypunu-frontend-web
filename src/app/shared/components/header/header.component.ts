@@ -15,6 +15,7 @@ export class HeaderComponent implements OnInit {
   isHomePage = false;
   isAuthPage = false;
   isDashboardPage = false;
+  isFavoritesPage = false;
   isMobileMenuOpen = false;
 
   constructor(
@@ -43,6 +44,7 @@ export class HeaderComponent implements OnInit {
       .subscribe((event: NavigationEnd) => {
         this.isHomePage = event.url === '/' || event.url === '/home';
         this.isAuthPage = event.url.startsWith('/auth');
+        this.isFavoritesPage = event.url.startsWith('/favorites');
         this.updateDashboardStatus();
         // Fermer le menu mobile lors de la navigation
         this.isMobileMenuOpen = false;
@@ -51,6 +53,7 @@ export class HeaderComponent implements OnInit {
     // Vérifier la route initiale
     this.isHomePage = this._router.url === '/' || this._router.url === '/home';
     this.isAuthPage = this._router.url.startsWith('/auth');
+    this.isFavoritesPage = this._router.url.startsWith('/favorites');
     this.updateDashboardStatus();
   }
 
