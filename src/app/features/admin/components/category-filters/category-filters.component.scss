@@ -1,5 +1,6 @@
 /**
  * Styles pour le composant de filtres de catégories
+ * Design System O'Ypunu — Terre & Or Pan-Africaine
  */
 
 .category-filters {
@@ -23,13 +24,13 @@
         .filter-label {
           font-weight: 600;
           font-size: 0.9rem;
-          color: #495057;
+          color: var(--text-secondary);
           display: flex;
           align-items: center;
           gap: 0.5rem;
 
           i {
-            color: #6c757d;
+            color: var(--text-tertiary);
             font-size: 0.85rem;
           }
         }
@@ -42,26 +43,28 @@
 
           .form-control {
             padding: 0.6rem 0.75rem;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--oy-gray-700);
             border-radius: 0.5rem;
             font-size: 0.9rem;
+            background-color: var(--surface-card);
+            color: var(--text-primary);
             transition: all 0.2s ease;
             padding-right: 2.5rem;
 
             &:focus {
-              border-color: #3498db;
-              box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+              border-color: var(--oy-purple-600); // Terracotta
+              box-shadow: 0 0 0 0.2rem rgba(200, 85, 40, 0.25);
               outline: none;
             }
 
             &:disabled {
-              background-color: #f8f9fa;
+              background-color: var(--oy-gray-900);
               opacity: 0.8;
               cursor: not-allowed;
             }
 
             &::placeholder {
-              color: #adb5bd;
+              color: var(--oy-gray-500);
               font-style: italic;
             }
           }
@@ -71,15 +74,15 @@
             right: 0.5rem;
             background: none;
             border: none;
-            color: #6c757d;
+            color: var(--text-tertiary);
             padding: 0.25rem;
             cursor: pointer;
             border-radius: 0.25rem;
             transition: all 0.2s ease;
 
             &:hover {
-              color: #495057;
-              background-color: #f8f9fa;
+              color: var(--text-secondary);
+              background-color: var(--oy-gray-800);
             }
 
             i {
@@ -95,33 +98,35 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.6rem 0.75rem;
-            background-color: #f8f9fa;
-            border: 2px solid #e9ecef;
+            background-color: var(--oy-gray-900);
+            border: 2px solid var(--oy-gray-700);
             border-radius: 0.5rem;
             min-width: 140px;
 
             .loading-text {
-              color: #6c757d;
+              color: var(--text-tertiary);
               font-size: 0.85rem;
             }
           }
 
           .form-select {
             padding: 0.6rem 0.75rem;
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--oy-gray-700);
             border-radius: 0.5rem;
             font-size: 0.9rem;
             min-width: 140px;
+            background-color: var(--surface-card);
+            color: var(--text-primary);
             transition: all 0.2s ease;
 
             &:focus {
-              border-color: #3498db;
-              box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+              border-color: var(--oy-purple-600);
+              box-shadow: 0 0 0 0.2rem rgba(200, 85, 40, 0.25);
               outline: none;
             }
 
             &:disabled {
-              background-color: #f8f9fa;
+              background-color: var(--oy-gray-900);
               opacity: 0.8;
               cursor: not-allowed;
             }
@@ -130,20 +135,22 @@
 
         .form-select {
           padding: 0.6rem 0.75rem;
-          border: 2px solid #e9ecef;
+          border: 2px solid var(--oy-gray-700);
           border-radius: 0.5rem;
           font-size: 0.9rem;
+          background-color: var(--surface-card);
+          color: var(--text-primary);
           transition: all 0.2s ease;
           min-width: 120px;
 
           &:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+            border-color: var(--oy-purple-600);
+            box-shadow: 0 0 0 0.2rem rgba(200, 85, 40, 0.25);
             outline: none;
           }
 
           &:disabled {
-            background-color: #f8f9fa;
+            background-color: var(--oy-gray-900);
             opacity: 0.8;
             cursor: not-allowed;
           }
@@ -169,7 +176,7 @@
 
           &:hover:not(:disabled) {
             transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(31, 20, 16, 0.15);
           }
 
           &:disabled {
@@ -185,23 +192,23 @@
         }
 
         .btn-outline-secondary {
-          border-color: #6c757d;
-          color: #6c757d;
+          border-color: var(--oy-gray-500);
+          color: var(--text-tertiary);
 
           &:hover:not(:disabled) {
-            background-color: #6c757d;
-            border-color: #6c757d;
-            color: white;
+            background-color: var(--oy-gray-700);
+            border-color: var(--oy-gray-700);
+            color: var(--text-primary);
           }
         }
 
         .btn-outline-primary {
-          border-color: #3498db;
-          color: #3498db;
+          border-color: var(--oy-purple-600); // Terracotta
+          color: var(--oy-purple-600);
 
           &:hover:not(:disabled) {
-            background-color: #3498db;
-            border-color: #3498db;
+            background-color: var(--oy-purple-600);
+            border-color: var(--oy-purple-600);
             color: white;
           }
         }
@@ -212,9 +219,9 @@
     .active-filters {
       margin-top: 1.5rem;
       padding: 1rem;
-      background: linear-gradient(135deg, #e8f4f8, #f0f8ff);
+      background: linear-gradient(135deg, rgba(200, 85, 40, 0.08), rgba(200, 85, 40, 0.04));
       border-radius: 0.5rem;
-      border: 1px solid #b8daff;
+      border: 1px solid rgba(200, 85, 40, 0.3);
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -222,7 +229,7 @@
 
       .active-filters-label {
         font-weight: 600;
-        color: #0c63e4;
+        color: var(--oy-purple-600); // Terracotta
         font-size: 0.9rem;
       }
 
@@ -235,13 +242,13 @@
           display: flex;
           align-items: center;
           gap: 0.375rem;
-          background: linear-gradient(135deg, #3498db, #2980b9);
+          background: linear-gradient(135deg, var(--oy-purple-600), var(--oy-purple-700));
           color: white;
           padding: 0.375rem 0.75rem;
           border-radius: 1rem;
           font-size: 0.8rem;
           font-weight: 500;
-          box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+          box-shadow: 0 2px 4px rgba(200, 85, 40, 0.25);
 
           i {
             font-size: 0.7rem;
@@ -420,7 +427,7 @@
   .form-control:focus,
   .form-select:focus,
   .btn:focus {
-    outline: 2px solid #3498db;
+    outline: 2px solid var(--oy-purple-600); // Terracotta
     outline-offset: 2px;
   }
 
@@ -445,20 +452,20 @@
 
   // ===== ÉTATS INTERACTIFS =====
   .form-control:hover:not(:disabled):not(:focus) {
-    border-color: #adb5bd;
+    border-color: var(--oy-gray-600);
   }
 
   .form-select:hover:not(:disabled):not(:focus) {
-    border-color: #adb5bd;
+    border-color: var(--oy-gray-600);
   }
 
-  // ===== VARIABLES CSS =====
+  // ===== VARIABLES CSS (O'Ypunu) =====
   :root {
-    --filter-primary-color: #3498db;
-    --filter-secondary-color: #6c757d;
-    --filter-border-color: #e9ecef;
-    --filter-focus-shadow: rgba(52, 152, 219, 0.25);
-    --filter-bg-light: #f8f9fa;
-    --filter-text-muted: #6c757d;
+    --filter-primary-color: var(--oy-purple-600);     // Terracotta
+    --filter-secondary-color: var(--text-tertiary);
+    --filter-border-color: var(--oy-gray-700);
+    --filter-focus-shadow: rgba(200, 85, 40, 0.25);   // Terracotta 25%
+    --filter-bg-light: var(--oy-gray-900);
+    --filter-text-muted: var(--text-tertiary);
   }
 }

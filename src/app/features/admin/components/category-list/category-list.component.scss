@@ -1,5 +1,6 @@
 /**
  * Styles pour le composant de liste des catégories
+ * Design System O'Ypunu — Terre & Or Pan-Africaine
  */
 
 .category-list-container {
@@ -10,9 +11,9 @@
     align-items: flex-start;
     margin-bottom: 1.5rem;
     padding: 1.25rem;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: linear-gradient(135deg, var(--oy-gray-900), var(--oy-gray-800));
     border-radius: 0.5rem;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--oy-gray-700);
 
     .stats-section {
       display: flex;
@@ -25,26 +26,26 @@
 
         i {
           font-size: 1.25rem;
-          color: #6c757d;
+          color: var(--text-tertiary);
 
           &.text-success {
-            color: #27ae60 !important;
+            color: #2E8B57 !important; // Vert forêt tropicale
           }
 
           &.text-warning {
-            color: #f39c12 !important;
+            color: var(--oy-yellow-500) !important; // Or Kente
           }
         }
 
         .stat-value {
           font-size: 1.5rem;
           font-weight: 700;
-          color: #2c3e50;
+          color: var(--text-primary);
         }
 
         .stat-label {
           font-size: 0.875rem;
-          color: #6c757d;
+          color: var(--text-tertiary);
           font-weight: 500;
         }
       }
@@ -67,7 +68,7 @@
 
         .selection-text {
           font-size: 0.875rem;
-          color: #6c757d;
+          color: var(--text-tertiary);
           font-weight: 500;
         }
       }
@@ -94,9 +95,9 @@
 
   // ===== TABLEAU =====
   .table-container {
-    background: white;
+    background: var(--surface-card);
     border-radius: 0.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(31, 20, 16, 0.10);
     overflow: hidden;
 
     .table {
@@ -104,12 +105,12 @@
 
       // En-têtes de colonnes
       thead {
-        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        background: linear-gradient(135deg, var(--oy-gray-900), var(--oy-gray-800));
 
         th {
           font-weight: 600;
-          color: #495057;
-          border-bottom: 2px solid #dee2e6;
+          color: var(--text-secondary);
+          border-bottom: 2px solid var(--oy-gray-700);
           padding: 1rem 0.75rem;
           font-size: 0.875rem;
           text-transform: uppercase;
@@ -131,7 +132,7 @@
             transition: all 0.2s ease;
 
             &:hover {
-              background-color: rgba(0, 123, 255, 0.1);
+              background-color: rgba(200, 85, 40, 0.10); // terracotta 10%
             }
 
             .column-header {
@@ -147,11 +148,11 @@
 
             &.sorted-asc,
             &.sorted-desc {
-              background-color: rgba(0, 123, 255, 0.1);
+              background-color: rgba(200, 85, 40, 0.10);
 
               .column-header i {
                 opacity: 1;
-                color: #007bff;
+                color: var(--oy-purple-600); // Terracotta
               }
             }
 
@@ -172,12 +173,12 @@
           transition: all 0.2s ease;
 
           &:hover {
-            background-color: #f8f9fa;
+            background-color: var(--oy-gray-800);
           }
 
           &.selected {
-            background-color: rgba(0, 123, 255, 0.1);
-            border-left: 4px solid #007bff;
+            background-color: rgba(200, 85, 40, 0.10);
+            border-left: 4px solid var(--oy-purple-600);
           }
 
           &.inactive {
@@ -198,7 +199,7 @@
           td {
             padding: 1rem 0.75rem;
             vertical-align: middle;
-            border-bottom: 1px solid #f1f3f4;
+            border-bottom: 1px solid var(--oy-gray-800);
 
             &.selection-cell {
               text-align: center;
@@ -210,7 +211,7 @@
                 align-items: center;
 
                 strong {
-                  color: #2c3e50;
+                  color: var(--text-primary);
                   font-weight: 600;
                 }
 
@@ -229,7 +230,7 @@
                 -webkit-box-orient: vertical;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                color: #6c757d;
+                color: var(--text-tertiary);
                 font-size: 0.9rem;
                 line-height: 1.4;
               }
@@ -239,7 +240,7 @@
               .language-info {
                 .language-name {
                   font-weight: 500;
-                  color: #495057;
+                  color: var(--text-secondary);
                 }
               }
             }
@@ -259,8 +260,8 @@
                 height: 1.25rem;
 
                 &:checked {
-                  background-color: #27ae60;
-                  border-color: #27ae60;
+                  background-color: #2E8B57; // Vert forêt tropicale
+                  border-color: #2E8B57;
                 }
               }
 
@@ -274,7 +275,7 @@
             &.date-cell {
               .date-text {
                 font-size: 0.875rem;
-                color: #6c757d;
+                color: var(--text-tertiary);
               }
             }
 
@@ -306,7 +307,7 @@
   .empty-row {
     td {
       text-align: center;
-      color: #6c757d;
+      color: var(--text-tertiary);
 
       .spinner-border {
         width: 2rem;
@@ -324,7 +325,7 @@
         padding: 2rem;
 
         i {
-          color: #ced4da;
+          color: var(--oy-gray-600);
           margin-bottom: 1rem;
         }
 
@@ -348,26 +349,26 @@
     gap: 1rem;
     margin-top: 1.5rem;
     padding: 1rem;
-    background: #f8f9fa;
+    background: var(--oy-gray-900);
     border-radius: 0.5rem;
 
     .pagination {
       .page-item {
         .page-link {
-          color: #495057;
-          border-color: #dee2e6;
+          color: var(--text-secondary);
+          border-color: var(--oy-gray-700);
           padding: 0.5rem 0.75rem;
           font-weight: 500;
           transition: all 0.2s ease;
 
           &:hover:not(:disabled) {
-            background-color: #e9ecef;
-            border-color: #adb5bd;
+            background-color: var(--oy-gray-800);
+            border-color: var(--oy-gray-600);
             transform: translateY(-1px);
           }
 
           &:focus {
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(200, 85, 40, 0.25); // terracotta ring
           }
 
           i {
@@ -376,8 +377,8 @@
         }
 
         &.active .page-link {
-          background: linear-gradient(135deg, #007bff, #0056b3);
-          border-color: #007bff;
+          background: linear-gradient(135deg, var(--oy-purple-600), var(--oy-purple-700));
+          border-color: var(--oy-purple-600);
         }
 
         &.disabled .page-link {
@@ -389,7 +390,7 @@
 
     .pagination-info {
       font-size: 0.875rem;
-      color: #6c757d;
+      color: var(--text-tertiary);
       font-weight: 500;
     }
   }
@@ -438,7 +439,7 @@
 
     // Tableau responsive
     .table-responsive {
-      border: 1px solid #dee2e6;
+      border: 1px solid var(--oy-gray-700);
       border-radius: 0.5rem;
     }
 
@@ -487,11 +488,11 @@
 
   // ===== ACCESSIBILITY =====
   .form-check-input:focus {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(200, 85, 40, 0.25); // terracotta ring
   }
 
   .btn:focus {
-    outline: 2px solid #007bff;
+    outline: 2px solid var(--oy-purple-600);
     outline-offset: 2px;
   }
 
