@@ -10,7 +10,7 @@
     <div class="text-center">
       <div class="text-red-400 text-xl mb-4">{{ error }}</div>
       <button (click)="ngOnInit()"
-              class="bg-[var(--oy-purple-600)] hover:bg-[var(--oy-purple-700)] px-4 py-2 rounded-lg text-white transition-colors">
+        class="bg-[var(--oy-purple-600)] hover:bg-[var(--oy-purple-700)] px-4 py-2 rounded-lg text-white transition-colors">
         Réessayer
       </button>
     </div>
@@ -28,8 +28,8 @@
           <div class="w-20 h-20 rounded-full overflow-hidden
                       bg-gradient-to-br from-[var(--oy-purple-600)] to-[var(--oy-purple-800)]
                       flex items-center justify-center">
-            <img *ngIf="user.profilePicture" [src]="user.profilePicture"
-                 [alt]="user.username" class="w-full h-full object-cover">
+            <img *ngIf="user.profilePicture" [src]="user.profilePicture" [alt]="user.username"
+              class="w-full h-full object-cover">
             <span *ngIf="!user.profilePicture" class="text-2xl font-bold text-white">
               {{ getInitials() }}
             </span>
@@ -44,8 +44,7 @@
               <p *ngIf="user.bio" class="text-gray-300 mt-1 text-sm">{{ user.bio }}</p>
             </div>
             <!-- Bouton modifier (profil propre uniquement) -->
-            <button *ngIf="isOwnProfile" (click)="editProfile()"
-                    class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg
+            <button *ngIf="isOwnProfile" (click)="editProfile()" class="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg
                            bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -55,25 +54,46 @@
             </button>
           </div>
 
-          <!-- Badges -->
-          <div class="flex flex-wrap gap-2 mt-3">
-            <span *ngIf="user.location"
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700 text-gray-300">
+          <!-- Badges rôle + niveau -->
+          <div class="flex flex-wrap gap-2 mt-2">
+            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium"
+              [ngClass]="getRoleBadgeClass()">
+              {{ getRoleEmoji() }} {{ getRoleLabel() }}
+            </span>
+            <ng-container *ngIf="getContributionLevelInfo() as lvl">
+              <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium
+                           bg-[#F5EDE3] text-[#9A7A5A] border border-[#9A7A5A]/30">
+                {{ lvl.icon }} {{ lvl.name }}{{ contributionScore ? ' · ' + contributionScore + ' pts' : '' }}
+              </span>
+            </ng-container>
+          </div>
+
+          <!-- Localisation + statut -->
+          <div class="flex items-center gap-2 mt-2 text-xs text-gray-400">
+            <span *ngIf="getLocationText()" class="flex items-center gap-1">
               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              {{ user.location }}
-            </span>
-            <span *ngIf="userStats"
-                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700 text-gray-300">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              Membre depuis {{ getJoinDate() }}
+              {{ getLocationText() }}
             </span>
+            <span *ngIf="getLocationText() && getActivityStatus()" class="opacity-50">•</span>
+            <span *ngIf="getActivityStatus()" class="flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full" [class.bg-green-400]="isOnline"
+                [class.bg-gray-500]="!isOnline"></span>
+              {{ getActivityStatus() }}
+            </span>
+          </div>
+
+          <!-- Date d'inscription -->
+          <div *ngIf="userStats" class="flex items-center gap-1 mt-1.5 text-xs text-gray-500">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Membre depuis {{ getJoinDate() }}
           </div>
         </div>
       </div>
@@ -82,76 +102,203 @@
     <!-- ─── PROFIL PROPRE (own profile) ─────────────────────────────────── -->
     <ng-container *ngIf="isOwnProfile">
 
-      <!-- 2. Mon dictionnaire (favoris) ─────────────────────────────────── -->
-      <a routerLink="/favorites"
-         class="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-gray-800
-                hover:bg-gray-700 text-gray-200 transition-colors duration-200 mb-4">
-        <svg class="w-5 h-5 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0
-                   1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54
-                   1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1
-                   1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
-        <span class="font-medium">Mon dictionnaire</span>
-        <svg class="w-4 h-4 ml-auto opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
+      <!-- 2. Mon dictionnaire (section titre + item Mes favoris) ────────── -->
+      <div class="mb-4">
+        <h2 class="text-xl font-bold text-white mb-3">Mon dictionnaire</h2>
+        <a routerLink="/favorites" class="flex items-center gap-3 w-full px-4 py-3.5 rounded-lg bg-gray-800
+                  hover:bg-gray-700 text-gray-200 transition-colors duration-200">
+          <svg class="w-5 h-5 text-[var(--oy-purple-600)] flex-shrink-0" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <path d="M19 21l-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" />
+          </svg>
+          <span class="font-medium">Mes favoris</span>
+          <svg class="w-4 h-4 ml-auto opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
 
       <!-- 3. Section rôle ──────────────────────────────────────────────── -->
-      <app-user-section
-        *ngIf="isUser">
+      <app-user-section *ngIf="isUser">
       </app-user-section>
 
-      <app-contributor-section
-        *ngIf="isContributor"
-        [recentWords]="recentContributions">
+      <app-contributor-section *ngIf="isContributor" [recentWords]="recentContributions">
       </app-contributor-section>
 
-      <app-admin-section
-        *ngIf="hasAdminAccess"
-        [isSuperAdmin]="isSuperAdmin">
+      <app-admin-section *ngIf="hasAdminAccess" [isSuperAdmin]="isSuperAdmin">
       </app-admin-section>
 
       <!-- 4. Statistiques ─────────────────────────────────────────────── -->
       <div *ngIf="userStats" class="bg-gray-800 rounded-lg p-6 mb-4">
-        <h2 class="text-lg font-semibold text-white mb-4">Statistiques</h2>
-        <div class="grid grid-cols-3 gap-4 text-center">
-          <div class="bg-gray-700 rounded-lg p-3">
-            <p class="text-2xl font-bold text-white">{{ userStats.totalWordsAdded }}</p>
-            <p class="text-xs text-gray-400 mt-1">Mots ajoutés</p>
+
+        <!-- En-tête -->
+        <div class="flex items-center gap-2 mb-4">
+          <svg class="w-5 h-5 text-[var(--oy-purple-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
+          </svg>
+          <h2 class="text-lg font-semibold text-white">Statistiques</h2>
+        </div>
+
+        <!-- Niveau de contribution -->
+        <ng-container *ngIf="getContributionLevelInfo() as lvl">
+          <div *ngIf="contributionScore && contributionScore > 0" class="flex items-center gap-3 p-3 rounded-xl mb-4
+                      bg-[var(--oy-purple-600)]/10 border border-[var(--oy-purple-600)]/20">
+            <div class="w-10 h-10 rounded-full bg-[var(--oy-purple-600)]/20
+                        flex items-center justify-center flex-shrink-0">
+              <svg class="w-5 h-5 text-[var(--oy-purple-500)]" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-[var(--oy-purple-400)]">{{ lvl.name }}</p>
+              <p class="text-xs text-gray-400">{{ contributionScore }} pts · seuil {{ lvl.minScore }}</p>
+            </div>
           </div>
-          <div class="bg-gray-700 rounded-lg p-3">
-            <p class="text-2xl font-bold text-white">{{ userStats.totalCommunityPosts }}</p>
-            <p class="text-xs text-gray-400 mt-1">Posts</p>
+        </ng-container>
+
+        <!-- Statistiques principales (tous les rôles) — grille 2 colonnes -->
+        <div class="grid grid-cols-2 gap-2 mb-3">
+
+          <!-- Mots favoris -->
+          <div class="flex flex-col items-center p-4 bg-gray-700 rounded-xl">
+            <div class="w-10 h-10 rounded-full bg-[var(--oy-purple-600)]/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-[var(--oy-purple-500)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ userStats.favoriteWordsCount }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Mots favoris</p>
+            <p class="text-xs text-gray-500 text-center">Dans vos favoris</p>
           </div>
-          <div class="bg-gray-700 rounded-lg p-3">
-            <p class="text-2xl font-bold text-white">{{ userStats.favoriteWordsCount }}</p>
-            <p class="text-xs text-gray-400 mt-1">Favoris</p>
+
+          <!-- Conversations -->
+          <div class="flex flex-col items-center p-4 bg-gray-700 rounded-xl">
+            <div class="w-10 h-10 rounded-full bg-gray-500/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ getStatValue('totalConversations') }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Conversations</p>
+            <p class="text-xs text-gray-500 text-center">Actives</p>
+          </div>
+
+          <!-- Publications -->
+          <div class="flex flex-col items-center p-4 bg-gray-700 rounded-xl">
+            <div class="w-10 h-10 rounded-full bg-blue-500/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ userStats.totalCommunityPosts }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Publications</p>
+            <p class="text-xs text-gray-500 text-center">Communauté</p>
+          </div>
+
+          <!-- Série -->
+          <div class="flex flex-col items-center p-4 rounded-xl" [class.bg-yellow-500]="getStatValue('streak') >= 7"
+            [class.bg-opacity-10]="getStatValue('streak') >= 7" [class.bg-gray-700]="getStatValue('streak') < 7">
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ getStatValue('streak') }}j</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Série</p>
+            <p class="text-xs text-gray-500 text-center">Consécutifs</p>
+          </div>
+
+        </div>
+
+        <!-- Statistiques contributeur (contributor / admin / superadmin) -->
+        <div *ngIf="isContributor || hasAdminAccess" class="grid grid-cols-2 gap-2 mb-3">
+
+          <!-- Mots ajoutés -->
+          <div class="flex flex-col items-center p-4 bg-gray-700 rounded-xl">
+            <div class="w-10 h-10 rounded-full bg-green-500/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ userStats.totalWordsAdded }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Contributions</p>
+            <p class="text-xs text-gray-500 text-center">Mots ajoutés</p>
+          </div>
+
+          <!-- En attente -->
+          <div class="flex flex-col items-center p-4 bg-gray-700 rounded-xl">
+            <div class="w-10 h-10 rounded-full bg-yellow-500/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ getStatValue('totalWordsPending') }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">En attente</p>
+            <p class="text-xs text-gray-500 text-center">À valider</p>
+          </div>
+
+          <!-- Rejetés -->
+          <div class="flex flex-col items-center p-4 bg-gray-700 rounded-xl">
+            <div class="w-10 h-10 rounded-full bg-red-500/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-white mb-1">{{ getStatValue('totalWordsRejected') }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Rejetés</p>
+            <p class="text-xs text-gray-500 text-center">Non validés</p>
+          </div>
+
+          <!-- Score (mis en avant) -->
+          <div class="flex flex-col items-center p-4 rounded-xl
+                      bg-[var(--oy-purple-600)]/10 border border-[var(--oy-purple-600)]/20">
+            <div class="w-10 h-10 rounded-full bg-[var(--oy-purple-600)]/20
+                        flex items-center justify-center mb-2">
+              <svg class="w-5 h-5 text-[var(--oy-purple-500)]" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            </div>
+            <p class="text-2xl font-bold text-[var(--oy-purple-400)] mb-1">{{ contributionScore ?? 0 }}</p>
+            <p class="text-xs text-gray-400 text-center font-semibold">Score</p>
+            <p class="text-xs text-gray-500 text-center">{{ getContributionLevelInfo()?.name ?? '' }}</p>
+          </div>
+
+        </div>
+
+        <!-- Informations supplémentaires -->
+        <div class="p-3 bg-gray-900/50 rounded-lg space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-400">Temps total passé</span>
+            <span class="text-xs text-white font-semibold">{{ formatTimeSpent() }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-400">Langues explorées</span>
+            <span class="text-xs text-white font-semibold">{{ getStatValue('languagesExplored') }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-400">Série la plus longue</span>
+            <span class="text-xs text-white font-semibold">{{ getStatValue('longestStreak') }} jours</span>
           </div>
         </div>
+
       </div>
-
-      <!-- 5. Paramètres ──────────────────────────────────────────────── -->
-      <a routerLink="/profile/edit"
-         class="flex items-center gap-3 w-full px-4 py-3 rounded-lg bg-gray-800
-                hover:bg-gray-700 text-gray-200 transition-colors duration-200 mb-4">
-        <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826
-               2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0
-               00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924
-               1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0
-               00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31
-               2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        <span class="font-medium">Paramètres du profil</span>
-        <svg class="w-4 h-4 ml-auto opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
-      </a>
-
     </ng-container>
 
     <!-- ─── PROFIL PUBLIC (autre utilisateur) ───────────────────────────── -->
@@ -159,7 +306,7 @@
 
       <!-- Langues -->
       <div class="bg-gray-800 rounded-lg p-6 mb-4"
-           *ngIf="user.nativeLanguage || (user.learningLanguages && user.learningLanguages.length > 0)">
+        *ngIf="user.nativeLanguage || (user.learningLanguages && user.learningLanguages.length > 0)">
         <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
           <svg class="w-5 h-5 text-[var(--oy-purple-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -178,7 +325,7 @@
             <p class="text-xs text-gray-400 mb-1">Langues apprises</p>
             <div class="flex flex-wrap gap-2">
               <span *ngFor="let lang of user.learningLanguages"
-                    class="px-3 py-1 rounded-full text-sm bg-[var(--oy-purple-600)] text-white">
+                class="px-3 py-1 rounded-full text-sm bg-[var(--oy-purple-600)] text-white">
                 {{ getLanguageDisplayName(lang) }}
               </span>
             </div>
@@ -190,7 +337,7 @@
       <div *ngIf="user.website" class="bg-gray-800 rounded-lg p-6 mb-4">
         <h2 class="text-lg font-semibold text-white mb-3">Site web</h2>
         <a [href]="user.website" target="_blank" rel="noopener noreferrer"
-           class="text-[var(--oy-purple-600)] hover:underline break-all text-sm">
+          class="text-[var(--oy-purple-600)] hover:underline break-all text-sm">
           {{ user.website }}
         </a>
       </div>
