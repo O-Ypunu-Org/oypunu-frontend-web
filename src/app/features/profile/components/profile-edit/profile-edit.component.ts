@@ -144,27 +144,31 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
     this.subscriptions.add(sub);
   }
 
-  /** Résout les codes ISO (ex: "fr") en _id MongoDB après chargement des langues */
+  /** Résout les codes ISO (ex: "fr") en _id MongoDB — efface les valeurs non résolues */
   private normalizeLanguageFormValues(): void {
     const resolve = (val: string): string => {
-      if (!val) return val;
+      if (!val) return '';
       const lang = this.availableLanguages.find(l =>
-        l._id === val || l.iso639_1 === val || l.iso639_2 === val || l.name === val
+        l._id === val || l.iso639_1 === val || l.iso639_2 === val || l.iso639_3 === val || l.name === val
       );
-      return lang?._id || val;
+      return lang?._id || ''; // '' si non trouvé : efface les codes obsolètes (ex: "fr" sans correspondance)
     };
 
     const native = this.profileForm.get('nativeLanguage')?.value;
     if (native) {
       const resolvedId = resolve(native);
       this.profileForm.patchValue({ nativeLanguage: resolvedId });
-      const lang = this.availableLanguages.find(l => l._id === resolvedId);
-      if (lang) this.nativeLanguageSearch = lang.name;
+      if (resolvedId) {
+        const lang = this.availableLanguages.find(l => l._id === resolvedId);
+        if (lang) this.nativeLanguageSearch = lang.name;
+      } else {
+        this.nativeLanguageSearch = '';
+      }
     }
 
     const learning: string[] = this.profileForm.get('learningLanguages')?.value || [];
     if (learning.length > 0) {
-      this.profileForm.patchValue({ learningLanguages: learning.map(resolve) });
+      this.profileForm.patchValue({ learningLanguages: learning.map(resolve).filter(Boolean) });
     }
   }
 
