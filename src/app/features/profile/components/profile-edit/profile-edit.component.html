@@ -1,54 +1,99 @@
 <div class="min-h-screen bg-gray-900 text-white">
-  <div class="container mx-auto px-4 py-8">
+  <div class="max-w-5xl mx-auto px-4 py-8">
+
     <!-- Header -->
-    <div class="mb-8">
-      <div class="flex items-center gap-4 mb-4">
-        <button (click)="onCancel()" class="text-gray-400 hover:text-white transition-colors">
+    <div class="mb-6">
+      <div class="flex items-center gap-3 mb-1">
+        <button (click)="onCancel()" class="text-gray-400 hover:text-white transition-colors shrink-0">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
-            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
           </svg>
         </button>
-        <h1 class="text-3xl font-bold text-white">Modifier mon profil</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white">Modifier mon profil</h1>
       </div>
-      <p class="text-gray-400">Personnalisez votre profil pour vous présenter à la communauté</p>
+      <p class="text-gray-400 text-sm ml-9">Personnalisez votre profil pour vous présenter à la communauté</p>
     </div>
 
-    <!-- Loading State -->
-    <div *ngIf="isLoading" class="flex justify-center items-center py-12">
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="flex justify-center items-center py-16">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
     </div>
 
-    <!-- Error State -->
-    <div *ngIf="error && !isLoading" class="bg-red-900/50 border border-red-500 rounded-lg p-4 mb-6">
+    <!-- Error -->
+    <div *ngIf="error && !isLoading" class="bg-red-900/50 border border-red-500 rounded-xl p-4 mb-6">
       <div class="flex items-center gap-2">
-        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <span class="text-red-400">{{ error }}</span>
+        <span class="text-red-400 text-sm">{{ error }}</span>
       </div>
     </div>
 
-    <!-- Success Message -->
-    <div *ngIf="successMessage" class="bg-green-900/50 border border-green-500 rounded-lg p-4 mb-6">
+    <!-- Success -->
+    <div *ngIf="successMessage" class="bg-green-900/50 border border-green-500 rounded-xl p-4 mb-6">
       <div class="flex items-center gap-2">
-        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
         </svg>
-        <span class="text-green-400">{{ successMessage }}</span>
+        <span class="text-green-400 text-sm">{{ successMessage }}</span>
       </div>
     </div>
 
     <!-- Form -->
-    <form *ngIf="!isLoading" [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="max-w-4xl">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Main Form -->
+    <form *ngIf="!isLoading" [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+
+      <!-- Input fichier partagé (déclenché par les deux labels avatar) -->
+      <input type="file" id="avatarInput" accept="image/*" class="hidden" (change)="onAvatarChange($event)" />
+
+      <!-- ── MOBILE : bannière avatar compacte (masquée sur desktop) ── -->
+      <div class="lg:hidden mb-6 bg-gray-800 rounded-xl p-4 flex items-center gap-4">
+        <div class="relative shrink-0">
+          <div class="w-16 h-16 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <img *ngIf="currentUser?.profilePicture" [src]="currentUser?.profilePicture"
+              [alt]="currentUser?.username" class="w-full h-full object-cover" />
+            <span *ngIf="!currentUser?.profilePicture" class="text-lg font-bold text-white">
+              {{ getInitials() }}
+            </span>
+          </div>
+          <label for="avatarInput"
+            class="absolute inset-0 rounded-full flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 cursor-pointer transition-opacity">
+            <svg *ngIf="!isUploadingAvatar" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            <div *ngIf="isUploadingAvatar" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+          </label>
+        </div>
+
+        <div class="flex-1 min-w-0">
+          <p class="text-white font-semibold truncate">
+            {{ profileForm.get('username')?.value || 'Nom d\'utilisateur' }}
+          </p>
+          <p *ngIf="profileForm.get('city')?.value || profileForm.get('country')?.value"
+            class="text-gray-400 text-xs mt-0.5 truncate">
+            {{ profileForm.get('city')?.value }}{{ profileForm.get('city')?.value && profileForm.get('country')?.value ? ', ' : '' }}{{ profileForm.get('country')?.value }}
+          </p>
+          <p *ngIf="avatarError" class="text-red-400 text-xs mt-1">{{ avatarError }}</p>
+          <label for="avatarInput"
+            class="inline-block mt-1.5 text-xs text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
+            Changer la photo
+          </label>
+        </div>
+      </div>
+
+      <!-- ── GRILLE PRINCIPALE ── -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Colonne principale : formulaire -->
         <div class="lg:col-span-2 space-y-6">
-          <!-- Basic Information -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+          <!-- Informations de base -->
+          <div class="bg-gray-800 rounded-xl p-5 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-white mb-5 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
               </svg>
@@ -56,66 +101,80 @@
             </h2>
 
             <div class="space-y-4">
-              <!-- Username -->
+              <!-- Nom d'utilisateur -->
               <div>
-                <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
+                <label for="username" class="block text-sm font-medium text-gray-300 mb-1.5">
                   Nom d'utilisateur *
                 </label>
                 <input type="text" id="username" formControlName="username"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="Votre nom d'utilisateur" />
-                <div *ngIf="getFieldError('username')" class="text-red-400 text-sm mt-1">
+                <p *ngIf="getFieldError('username')" class="text-red-400 text-xs mt-1">
                   {{ getFieldError('username') }}
+                </p>
+              </div>
+
+              <!-- Prénom + Nom -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="firstName" class="block text-sm font-medium text-gray-300 mb-1.5">Prénom</label>
+                  <input type="text" id="firstName" formControlName="firstName"
+                    class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="Votre prénom" />
+                </div>
+                <div>
+                  <label for="lastName" class="block text-sm font-medium text-gray-300 mb-1.5">Nom</label>
+                  <input type="text" id="lastName" formControlName="lastName"
+                    class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="Votre nom de famille" />
                 </div>
               </div>
 
-              <!-- Bio -->
+              <!-- Biographie -->
               <div>
-                <label for="bio" class="block text-sm font-medium text-gray-300 mb-2">
-                  Biographie
-                </label>
-                <textarea id="bio" formControlName="bio" rows="4"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                <label for="bio" class="block text-sm font-medium text-gray-300 mb-1.5">Biographie</label>
+                <textarea id="bio" formControlName="bio" rows="3"
+                  class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
                   placeholder="Parlez-nous de vous..."></textarea>
                 <div class="flex justify-between items-center mt-1">
-                  <div *ngIf="getFieldError('bio')" class="text-red-400 text-sm">
-                    {{ getFieldError('bio') }}
-                  </div>
-                  <div class="text-gray-400 text-sm">
-                    {{ profileForm.get('bio')?.value?.length || 0 }}/500
-                  </div>
+                  <p *ngIf="getFieldError('bio')" class="text-red-400 text-xs">{{ getFieldError('bio') }}</p>
+                  <p class="text-gray-500 text-xs ml-auto">{{ profileForm.get('bio')?.value?.length || 0 }}/500</p>
                 </div>
               </div>
 
-              <!-- Location -->
-              <div>
-                <label for="location" class="block text-sm font-medium text-gray-300 mb-2">
-                  Localisation
-                </label>
-                <input type="text" id="location" formControlName="location"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Votre ville, pays" />
+              <!-- Ville + Pays -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="city" class="block text-sm font-medium text-gray-300 mb-1.5">Ville</label>
+                  <input type="text" id="city" formControlName="city"
+                    class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="Votre ville" />
+                </div>
+                <div>
+                  <label for="country" class="block text-sm font-medium text-gray-300 mb-1.5">Pays</label>
+                  <input type="text" id="country" formControlName="country"
+                    class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="Votre pays" />
+                </div>
               </div>
 
-              <!-- Website -->
+              <!-- Site web -->
               <div>
-                <label for="website" class="block text-sm font-medium text-gray-300 mb-2">
-                  Site web
-                </label>
+                <label for="website" class="block text-sm font-medium text-gray-300 mb-1.5">Site web</label>
                 <input type="url" id="website" formControlName="website"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="https://votre-site.com" />
-                <div *ngIf="getFieldError('website')" class="text-red-400 text-sm mt-1">
+                <p *ngIf="getFieldError('website')" class="text-red-400 text-xs mt-1">
                   {{ getFieldError('website') }}
-                </div>
+                </p>
               </div>
             </div>
           </div>
 
-          <!-- Languages -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Langues -->
+          <div class="bg-gray-800 rounded-xl p-5 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-white mb-5 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129">
                 </path>
@@ -123,43 +182,172 @@
               Langues
             </h2>
 
-            <div class="space-y-6">
-              <!-- Native Language -->
-              <div>
-                <label for="nativeLanguage" class="block text-sm font-medium text-gray-300 mb-2">
-                  Langue native
-                </label>
-                <select id="nativeLanguage" formControlName="nativeLanguage"
-                  class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <option value="">Sélectionnez votre langue native</option>
-                  <option *ngFor="let lang of availableLanguages" [value]="lang.code">
-                    {{ lang.name }}
-                  </option>
-                </select>
-              </div>
+            <div *ngIf="isLoadingLanguages" class="flex items-center gap-2 text-gray-400 mb-4">
+              <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+              <span class="text-sm">Chargement des langues...</span>
+            </div>
 
-              <!-- Learning Languages -->
+            <div class="space-y-6">
+
+              <!-- Langue native -->
               <div>
-                <label class="block text-sm font-medium text-gray-300 mb-2">
-                  Langues que vous apprenez
-                </label>
-                <div class="grid grid-cols-2 gap-3">
-                  <label *ngFor="let lang of availableLanguages"
-                    class="flex items-center space-x-3 p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors">
-                    <input type="checkbox" [checked]="isLanguageLearning(lang.code)"
-                      (change)="onLanguageChange(lang.code, $event)"
-                      class="w-4 h-4 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2" />
-                    <span class="text-white">{{ lang.name }}</span>
-                  </label>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Langue native</label>
+
+                <ng-container *ngIf="getSelectedNativeLanguage() as selectedLang; else noNativeLang">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm bg-green-600/20 border border-green-500/30 text-green-300">
+                      {{ selectedLang.name }}
+                      <span class="text-green-400/60 text-xs">({{ selectedLang.nativeName }})</span>
+                    </span>
+                    <button type="button" (click)="clearNativeLanguage()"
+                      class="text-gray-500 hover:text-red-400 transition-colors text-xs underline">
+                      Changer
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #noNativeLang>
+                  <p class="text-gray-500 text-sm mb-2 italic">Aucune langue native sélectionnée</p>
+                </ng-template>
+
+                <div class="relative">
+                  <input type="text" [(ngModel)]="nativeLanguageSearch" [ngModelOptions]="{standalone: true}"
+                    (focus)="onNativeSearchFocus()" (blur)="onNativeSearchBlur()"
+                    class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                    placeholder="Rechercher une langue..." />
+
+                  <div *ngIf="showNativeDropdown && filteredNativeLanguages.length > 0"
+                    class="absolute z-20 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                    <button *ngFor="let lang of filteredNativeLanguages" type="button"
+                      (mousedown)="selectNativeLanguage(lang)"
+                      class="w-full text-left px-3 py-2.5 text-sm text-white hover:bg-gray-600 transition-colors flex items-center justify-between"
+                      [class.bg-green-900]="getSelectedNativeLanguage()?._id === lang._id">
+                      <span>{{ lang.name }}</span>
+                      <span class="text-gray-400 text-xs">{{ lang.nativeName }}</span>
+                    </button>
+                  </div>
+
+                  <div *ngIf="showNativeDropdown && filteredNativeLanguages.length === 0 && nativeLanguageSearch"
+                    class="absolute z-20 w-full mt-1 bg-gray-700 border border-gray-600 rounded-lg shadow-xl p-3 text-sm text-gray-400">
+                    Aucune langue trouvée pour "{{ nativeLanguageSearch }}"
+                  </div>
                 </div>
               </div>
+
+              <!-- Langues apprises -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Langues que vous apprenez</label>
+
+                <div *ngIf="selectedLearningLanguages.length > 0" class="flex flex-wrap gap-1.5 mb-3">
+                  <span *ngFor="let lang of selectedLearningLanguages"
+                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-blue-600/20 border border-blue-500/30 text-blue-300">
+                    {{ lang.name }}
+                  </span>
+                </div>
+                <p *ngIf="selectedLearningLanguages.length === 0" class="text-gray-500 text-sm italic mb-3">
+                  Aucune langue sélectionnée
+                </p>
+
+                <input type="text" [(ngModel)]="learningLanguageSearch" [ngModelOptions]="{standalone: true}"
+                  class="w-full px-3 py-2.5 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm mb-3"
+                  placeholder="Filtrer les langues..." />
+
+                <div class="max-h-44 overflow-y-auto space-y-0.5 rounded-lg">
+                  <label *ngFor="let lang of filteredLearningLanguages"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-700/60 transition-colors">
+                    <input type="checkbox" [checked]="isLanguageLearning(lang)"
+                      (change)="onLanguageChange(lang, $event)"
+                      class="w-4 h-4 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2 shrink-0" />
+                    <span class="text-white text-sm">{{ lang.name }}</span>
+                    <span class="text-gray-400 text-xs ml-auto">{{ lang.nativeName }}</span>
+                  </label>
+                  <p *ngIf="filteredLearningLanguages.length === 0 && learningLanguageSearch"
+                    class="text-gray-500 text-sm italic px-3 py-2">
+                    Aucune langue trouvée pour "{{ learningLanguageSearch }}"
+                  </p>
+                </div>
+              </div>
+
+              <!-- Proposer une langue -->
+              <div class="border-t border-gray-700 pt-5">
+                <div *ngIf="!canProposeLanguage"
+                  class="flex items-start gap-3 p-3 bg-gray-700/40 rounded-lg text-sm text-gray-400">
+                  <svg class="w-4 h-4 mt-0.5 shrink-0 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <span>
+                    Pour proposer une nouvelle langue, vous devez avoir le rôle
+                    <strong class="text-yellow-400">Contributeur</strong>.
+                    <a routerLink="/contributor-request" class="text-blue-400 hover:text-blue-300 underline ml-1">
+                      Faire la demande
+                    </a>
+                  </span>
+                </div>
+
+                <div *ngIf="canProposeLanguage">
+                  <div *ngIf="proposeSuccess"
+                    class="flex items-center gap-2 p-3 bg-green-900/30 border border-green-500/30 rounded-lg mb-3">
+                    <svg class="w-4 h-4 text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-green-400 text-sm">{{ proposeSuccess }}</span>
+                  </div>
+
+                  <button type="button" (click)="toggleProposeForm()"
+                    class="text-sm text-blue-400 hover:text-blue-300 flex items-center gap-1.5 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        [attr.d]="showProposeForm ? 'M5 15l7-7 7 7' : 'M19 9l-7 7-7-7'"></path>
+                    </svg>
+                    {{ showProposeForm ? 'Annuler la proposition' : 'Proposer une nouvelle langue' }}
+                  </button>
+
+                  <div *ngIf="showProposeForm" class="mt-4 p-4 bg-gray-700/50 border border-gray-600/50 rounded-xl space-y-3">
+                    <h4 class="text-sm font-semibold text-white">Nouvelle proposition de langue</h4>
+
+                    <div *ngIf="proposeError"
+                      class="text-red-400 text-xs p-2.5 bg-red-900/30 border border-red-500/30 rounded-lg">
+                      {{ proposeError }}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Nom en français *</label>
+                        <input type="text" [(ngModel)]="proposeData.name" [ngModelOptions]="{standalone: true}"
+                          class="w-full px-2.5 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="ex: Wolof" />
+                      </div>
+                      <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1">Nom natif *</label>
+                        <input type="text" [(ngModel)]="proposeData.nativeName" [ngModelOptions]="{standalone: true}"
+                          class="w-full px-2.5 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          placeholder="ex: Wolof" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-xs font-medium text-gray-400 mb-1">Région / Continent *</label>
+                      <input type="text" [(ngModel)]="proposeData.region" [ngModelOptions]="{standalone: true}"
+                        class="w-full px-2.5 py-2 bg-gray-600 border border-gray-500 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="ex: Afrique de l'Ouest" />
+                    </div>
+
+                    <button type="button" (click)="submitLanguageProposal()" [disabled]="isProposing"
+                      class="w-full py-2 px-4 bg-[var(--oy-purple-600)] hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-opacity flex items-center justify-center gap-2">
+                      <div *ngIf="isProposing" class="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white"></div>
+                      {{ isProposing ? 'Envoi en cours...' : 'Soumettre la proposition' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- Privacy Settings -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h2 class="text-xl font-semibold text-white mb-6 flex items-center gap-2">
-              <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <!-- Confidentialité -->
+          <div class="bg-gray-800 rounded-xl p-5 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-semibold text-white mb-5 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                 </path>
@@ -167,73 +355,109 @@
               Confidentialité
             </h2>
 
-            <div class="space-y-4">
-              <label class="flex items-center space-x-3 cursor-pointer">
-                <input type="checkbox" formControlName="isProfilePublic"
-                  class="w-4 h-4 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2" />
-                <div>
-                  <span class="text-white font-medium">Profil public</span>
-                  <p class="text-gray-400 text-sm">Permettre aux autres utilisateurs de voir votre
-                    profil</p>
-                </div>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="space-y-6">
-          <!-- Profile Preview -->
-          <div class="bg-gray-800 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-white mb-4">Aperçu du profil</h3>
-
-            <div class="text-center">
-              <div
-                class="w-20 h-20 mx-auto rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mb-4">
-                <img *ngIf="currentUser?.profilePicture" [src]="currentUser?.profilePicture"
-                  [alt]="currentUser?.username || 'Avatar'" class="w-full h-full object-cover">
-                <span *ngIf="!currentUser?.profilePicture" class="text-xl font-bold text-white">
-                  {{ getInitials() }}
-                </span>
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" formControlName="isProfilePublic"
+                class="w-4 h-4 text-blue-600 bg-gray-600 border-gray-500 rounded focus:ring-blue-500 focus:ring-2 shrink-0" />
+              <div>
+                <span class="text-white font-medium text-sm">Profil public</span>
+                <p class="text-gray-400 text-xs mt-0.5">Permettre aux autres utilisateurs de voir votre profil</p>
               </div>
-
-              <h4 class="text-white font-semibold">{{ profileForm.get('username')?.value || 'Nom
-                d\'utilisateur' }}</h4>
-              <p *ngIf="profileForm.get('bio')?.value" class="text-gray-400 text-sm mt-2 line-clamp-3">
-                {{ profileForm.get('bio')?.value }}
-              </p>
-
-              <div class="flex flex-wrap gap-1 mt-3 justify-center">
-                <span *ngIf="profileForm.get('nativeLanguage')?.value"
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-600 text-white">
-                  {{ getLanguageName(profileForm.get('nativeLanguage')?.value) }}
-                </span>
-                <span *ngFor="let langCode of profileForm.get('learningLanguages')?.value"
-                  class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-600 text-white">
-                  {{ getLanguageName(langCode) }}
-                </span>
-              </div>
-            </div>
+            </label>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="space-y-3">
+          <!-- ── MOBILE : boutons d'action (masqués sur desktop) ── -->
+          <div class="lg:hidden space-y-3 pb-4">
             <button type="submit" [disabled]="isSaving || profileForm.invalid"
-              class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
-              <div *ngIf="isSaving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white">
-              </div>
+              class="w-full bg-[var(--oy-purple-600)] hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-opacity flex items-center justify-center gap-2">
+              <div *ngIf="isSaving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               <svg *ngIf="!isSaving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
               {{ isSaving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
             </button>
-
             <button type="button" (click)="onCancel()" [disabled]="isSaving"
-              class="w-full bg-gray-700 hover:bg-gray-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-lg transition-colors">
+              class="w-full bg-gray-700 hover:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-colors">
               Annuler
             </button>
           </div>
+
         </div>
+
+        <!-- ── DESKTOP : sidebar sticky (masquée sur mobile) ── -->
+        <div class="hidden lg:flex flex-col gap-6 self-start sticky top-8">
+
+          <!-- Aperçu du profil -->
+          <div class="bg-gray-800 rounded-xl p-6">
+            <h3 class="text-base font-semibold text-white mb-5">Aperçu du profil</h3>
+
+            <div class="text-center">
+              <div class="relative w-24 h-24 mx-auto mb-4">
+                <div class="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                  <img *ngIf="currentUser?.profilePicture" [src]="currentUser?.profilePicture"
+                    [alt]="currentUser?.username" class="w-full h-full object-cover" />
+                  <span *ngIf="!currentUser?.profilePicture" class="text-2xl font-bold text-white">
+                    {{ getInitials() }}
+                  </span>
+                </div>
+                <label for="avatarInput"
+                  class="absolute inset-0 rounded-full flex items-center justify-center bg-black/50 opacity-0 hover:opacity-100 cursor-pointer transition-opacity">
+                  <svg *ngIf="!isUploadingAvatar" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <div *ngIf="isUploadingAvatar" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                </label>
+              </div>
+
+              <p *ngIf="avatarError" class="text-red-400 text-xs mb-3">{{ avatarError }}</p>
+
+              <h4 class="text-white font-semibold text-sm">
+                {{ profileForm.get('username')?.value || 'Nom d\'utilisateur' }}
+              </h4>
+
+              <p *ngIf="profileForm.get('city')?.value || profileForm.get('country')?.value"
+                class="text-gray-400 text-xs mt-1">
+                {{ profileForm.get('city')?.value }}{{ profileForm.get('city')?.value && profileForm.get('country')?.value ? ', ' : '' }}{{ profileForm.get('country')?.value }}
+              </p>
+
+              <p *ngIf="profileForm.get('bio')?.value"
+                class="text-gray-400 text-xs mt-2 line-clamp-3 text-left">
+                {{ profileForm.get('bio')?.value }}
+              </p>
+
+              <div class="flex flex-wrap gap-1 mt-3 justify-center">
+                <span *ngIf="profileForm.get('nativeLanguage')?.value"
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-600/20 border border-green-500/30 text-green-300">
+                  {{ getLanguageName(profileForm.get('nativeLanguage')?.value) }}
+                </span>
+                <span *ngFor="let langId of profileForm.get('learningLanguages')?.value"
+                  class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-600/20 border border-blue-500/30 text-blue-300">
+                  {{ getLanguageName(langId) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Boutons d'action (desktop) -->
+          <div class="space-y-3">
+            <button type="submit" [disabled]="isSaving || profileForm.invalid"
+              class="w-full bg-[var(--oy-purple-600)] hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-opacity flex items-center justify-center gap-2">
+              <div *ngIf="isSaving" class="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              <svg *ngIf="!isSaving" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              {{ isSaving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+            </button>
+            <button type="button" (click)="onCancel()" [disabled]="isSaving"
+              class="w-full bg-gray-700 hover:bg-gray-600 disabled:cursor-not-allowed text-white font-medium py-3 px-4 rounded-xl transition-colors">
+              Annuler
+            </button>
+          </div>
+
+        </div>
+
       </div>
     </form>
   </div>

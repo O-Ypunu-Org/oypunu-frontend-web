@@ -16,21 +16,16 @@ export interface UserProfileResponse extends User {
  * Interface pour les données de mise à jour du profil
  */
 export interface UpdateProfileDto {
-  /** Nom d'utilisateur */
   username?: string;
-  /** Langue maternelle (code ISO) */
+  firstName?: string;
+  lastName?: string;
   nativeLanguage?: string;
-  /** Langues en apprentissage (codes ISO) */
   learningLanguages?: string[];
-  /** URL de la photo de profil */
   profilePicture?: string;
-  /** Biographie utilisateur */
   bio?: string;
-  /** Localisation géographique */
-  location?: string;
-  /** Site web personnel */
+  city?: string;
+  country?: string;
   website?: string;
-  /** Visibilité du profil */
   isProfilePublic?: boolean;
 }
 

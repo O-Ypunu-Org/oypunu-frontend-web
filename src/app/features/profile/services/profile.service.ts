@@ -17,11 +17,14 @@ import {
  */
 export interface UpdateProfileData {
   username?: string;
+  firstName?: string;
+  lastName?: string;
   nativeLanguage?: string;
   learningLanguages?: string[];
   profilePicture?: string;
   bio?: string;
-  location?: string;
+  city?: string;
+  country?: string;
   website?: string;
   isProfilePublic?: boolean;
 }
