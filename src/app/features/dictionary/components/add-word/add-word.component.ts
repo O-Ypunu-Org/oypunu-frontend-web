@@ -299,8 +299,18 @@ export class AddWordComponent implements OnInit, OnDestroy {
             delete cleanTranslation.context;
           }
 
+          // Normalisation lowercase du mot traduit
+          if (cleanTranslation.translatedWord) {
+            cleanTranslation.translatedWord = cleanTranslation.translatedWord.trim().toLowerCase();
+          }
+
           return cleanTranslation;
         });
+    }
+
+    // Normalisation lowercase du mot principal
+    if (formData.word) {
+      formData.word = formData.word.trim().toLowerCase();
     }
 
     return formData;
