@@ -36,23 +36,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this._authService.currentUser$.subscribe((user) => {
         this.currentUser = user;
         this.userRole = (user?.role as UserRole) || UserRole.USER;
-
-        // 🔍 DEBUG: Afficher les informations d'accès admin
-        console.log('🔍 ProfileComponent - Utilisateur actuel:', user);
-        console.log('🔍 ProfileComponent - Rôle détecté:', this.userRole);
-        console.log(
-          '🔍 ProfileComponent - Peut accéder admin:',
-          this.canAccessAdmin
-        );
-        console.log(
-          '🔍 ProfileComponent - UserRole.CONTRIBUTOR:',
-          UserRole.CONTRIBUTOR
-        );
-        console.log('🔍 ProfileComponent - UserRole.ADMIN:', UserRole.ADMIN);
-        console.log(
-          '🔍 ProfileComponent - UserRole.SUPERADMIN:',
-          UserRole.SUPERADMIN
-        );
       })
     );
   }
@@ -68,15 +51,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   logout(): void {
     this._authService.logout();
     this.isDropdownOpen = false;
-  }
-
-  // Vérifie si l'utilisateur peut accéder au dashboard admin
-  get canAccessAdmin(): boolean {
-    return (
-      this.userRole === UserRole.CONTRIBUTOR ||
-      this.userRole === UserRole.ADMIN ||
-      this.userRole === UserRole.SUPERADMIN
-    );
   }
 
   // Détecter un clic en dehors de la dropdown pour la fermer

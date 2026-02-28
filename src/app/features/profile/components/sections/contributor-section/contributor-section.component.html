@@ -1,0 +1,71 @@
+<!-- Soumissions récentes — masqué si aucune soumission -->
+<section *ngIf="visibleWords.length > 0" class="bg-gray-800 rounded-lg p-6 mb-4">
+  <h2 class="text-lg font-semibold text-white mb-4">{{ titles.submissions }}</h2>
+  <div class="divide-y divide-gray-700">
+    <div *ngFor="let w of visibleWords"
+         class="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
+      <!-- Mot + langue -->
+      <div class="flex-1 min-w-0">
+        <p class="text-white font-medium truncate">{{ w.word | capitalize }}</p>
+        <p class="text-gray-400 text-xs mt-0.5">{{ w.language }}</p>
+      </div>
+      <!-- Badge statut -->
+      <span [class]="getStatusConfig(w.status).badge + ' ' + getStatusConfig(w.status).text"
+            class="px-2 py-1 rounded-md text-xs font-semibold whitespace-nowrap">
+        {{ getStatusConfig(w.status).label }}
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- Actions rapides -->
+<section class="bg-gray-800 rounded-lg p-6 mb-4">
+  <h2 class="text-lg font-semibold text-white mb-4">{{ titles.actions }}</h2>
+  <div class="space-y-2">
+
+    <!-- Soumettre un mot — action primaire (terracotta) -->
+    <a [routerLink]="routes.addWord"
+       class="flex items-center gap-3 w-full px-4 py-3 rounded-lg
+              bg-[var(--oy-purple-600)] hover:bg-[var(--oy-purple-700)]
+              text-white font-medium transition-colors duration-200">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Soumettre un mot
+    </a>
+
+    <!-- Proposer une langue -->
+    <a [routerLink]="routes.proposeLanguage"
+       class="flex items-center gap-3 w-full px-4 py-3 rounded-lg
+              bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors duration-200">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+      </svg>
+      Proposer une langue
+    </a>
+
+    <!-- Proposer une catégorie -->
+    <a [routerLink]="routes.proposeCategory"
+       class="flex items-center gap-3 w-full px-4 py-3 rounded-lg
+              bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors duration-200">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+      </svg>
+      Proposer une catégorie
+    </a>
+
+    <!-- Modérer le contenu -->
+    <a routerLink="/admin/moderation"
+       class="flex items-center gap-3 w-full px-4 py-3 rounded-lg
+              bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors duration-200">
+      <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+      </svg>
+      Modérer le contenu
+    </a>
+
+  </div>
+</section>
