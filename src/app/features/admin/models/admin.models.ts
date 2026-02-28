@@ -116,20 +116,23 @@ export interface UserRoleChange {
  * Mot en attente de modération
  */
 export interface PendingWord {
-  readonly id: string; // Alias pour _id pour compatibilité frontend
+  readonly id: string;
   readonly _id: string;
   readonly word: string;
   readonly language: string;
-  readonly definition: string; // Définition principale
+  readonly languageId?: { name?: string; nativeName?: string; code?: string };
+  readonly definition: string; // Définition principale extraite (premier meaning/definition)
   readonly meanings: WordMeaning[];
-  readonly examples?: WordExample[];
+  readonly examples?: string[]; // Exemples textuels extraits des meanings
   readonly pronunciation?: string;
   readonly audioFiles?: Record<string, { url: string; cloudinaryId?: string; language?: string; accent?: string }> | Array<{ url: string; language?: string; accent?: string }>;
-  readonly etymology?: string; // Étymologie du mot
+  readonly etymology?: string;
+  readonly categoryId?: { name?: string } | string;
+  readonly translations?: WordTranslation[];
   readonly status: ModerationStatus;
-  readonly submittedBy: User; // Alias de createdBy pour clarté
+  readonly submittedBy: User;
   readonly createdBy: User;
-  readonly submittedAt: Date; // Alias de createdAt pour clarté
+  readonly submittedAt: Date;
   readonly createdAt: Date;
   readonly moderatedBy?: User;
   readonly moderatedAt?: Date;
@@ -137,16 +140,41 @@ export interface PendingWord {
 }
 
 /**
- * Signification d'un mot
+ * Traduction d'un mot (miroir du schéma Translation backend)
+ */
+export interface WordTranslation {
+  readonly languageId?: { name?: string; code?: string };
+  readonly language?: string;
+  readonly translatedWord: string;
+  readonly context?: string[];
+  readonly confidence?: number;
+}
+
+/**
+ * Sous-définition d'un sens (miroir de Definition backend)
+ */
+export interface WordDefinition {
+  readonly definition: string;
+  readonly examples?: string[];
+  readonly sourceUrl?: string;
+}
+
+/**
+ * Sens d'un mot (miroir du schéma Meaning backend)
  */
 export interface WordMeaning {
-  readonly definition: string;
   readonly partOfSpeech?: string;
+  readonly definitions?: WordDefinition[];
+  readonly synonyms?: string[];
+  readonly antonyms?: string[];
+  readonly examples?: string[];
+  // Champ héritage (compat modèle ancien)
+  readonly definition?: string;
   readonly context?: string;
 }
 
 /**
- * Exemple d'utilisation d'un mot
+ * Exemple d'utilisation (format legacy conservé pour compatibilité)
  */
 export interface WordExample {
   readonly sentence: string;

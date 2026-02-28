@@ -1376,9 +1376,15 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   }
 
   /**
-   * Ouvre les détails d'un contenu dans le modal
+   * Ouvre les détails d'un contenu (inline pour les mots, modal pour les autres)
    */
   public openContentDetail(content: ModerableContent): void {
+    // Réinitialise le formulaire d'action inline
+    this.inlineShowReasonInput = false;
+    this.inlineSelectedAction = null;
+    this.inlineActionReason = '';
+    this.inlineActionNotes = '';
+
     const currentState = this.moderationStateSubject.value;
     this.moderationStateSubject.next({
       ...currentState,
@@ -1549,5 +1555,127 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           console.error("Erreur lors de l'export:", error);
         },
       });
+  }
+
+  // ===== HELPERS POUR LE LAYOUT EN SECTIONS (miroir mobile) =====
+
+  /** Filtre et ordonne les stats par types demandés */
+  public sectionStats(stats: ModerationCategoryStats[], types: string[]): ModerationCategoryStats[] {
+    return types
+      .map(type => stats.find(c => c.contentType === type))
+      .filter((c): c is ModerationCategoryStats => !!c);
+  }
+
+  /** Total des éléments en attente toutes catégories */
+  public totalPending(stats: ModerationCategoryStats[]): number {
+    return stats.reduce((sum, c) => sum + c.pendingCount, 0);
+  }
+
+  /** Description courte d'un type de contenu (miroir des descriptions mobiles) */
+  public getCategoryDescription(type: string): string {
+    const descriptions: Record<string, string> = {
+      word:                'Mots soumis à valider ou rejeter',
+      language:            'Nouvelles langues à approuver',
+      category:            'Nouvelles catégories à approuver',
+      community_post:      'Posts de communauté signalés',
+      private_message:     'Messages privés signalés',
+      user_profile:        'Profils utilisateurs signalés',
+      comment:             'Commentaires à modérer',
+      media_content:       'Fichiers multimédias à valider',
+      report:              'Contenus signalés par les utilisateurs',
+      contributor_request: "Demandes d'accès contributeur",
+    };
+    return descriptions[type] || 'Éléments à modérer';
+  }
+
+  // ===== VUE INLINE DU DÉTAIL DE MOT (sans modale) =====
+
+  /** État pour les actions inline */
+  public inlineShowReasonInput = false;
+  public inlineSelectedAction: 'approve' | 'reject' | 'escalate' | null = null;
+  public inlineActionReason = '';
+  public inlineActionNotes = '';
+
+  /** Vérifie si le contenu sélectionné est un mot en attente */
+  public isWordContent(content: any): boolean {
+    return !!(content && 'word' in content && typeof (content as any).word === 'string');
+  }
+
+  /** Retourne les accents audio du mot sélectionné */
+  public getSelectedWordAudioAccents(): Array<{ accent: string; url: string }> {
+    const word = this.moderationStateSubject.value.selectedContent as any;
+    if (!word?.audioFiles) return [];
+
+    const audioFiles = word.audioFiles;
+
+    // Format tableau : [{ url, accent, language, ... }]
+    if (Array.isArray(audioFiles)) {
+      return audioFiles
+        .filter((a: any) => a?.url)
+        .map((a: any) => ({
+          accent: a.accent || a.language || 'Standard',
+          url: a.url as string,
+        }));
+    }
+
+    // Format record : { accentKey: { url, cloudinaryId, ... } }
+    return Object.entries(audioFiles)
+      .filter(([, audioData]: [string, any]) => audioData?.url)
+      .map(([accent, audioData]: [string, any]) => ({
+        accent,
+        url: (audioData as any).url as string,
+      }));
+  }
+
+  /** Synonymes agrégés de toutes les significations */
+  public getWordSynonyms(content: any): string[] {
+    if (!content?.meanings) return [];
+    return content.meanings.flatMap((m: any) => m.synonyms || []);
+  }
+
+  /** Joue un fichier audio par URL (identique à word-details) */
+  public playWordAudio(url: string): void {
+    const audio = new Audio(url);
+    audio.play().catch(console.error);
+  }
+
+  /** Antonymes agrégés de toutes les significations */
+  public getWordAntonyms(content: any): string[] {
+    if (!content?.meanings) return [];
+    return content.meanings.flatMap((m: any) => m.antonyms || []);
+  }
+
+  /** Déclenche une action inline sur le mot sélectionné */
+  public onInlineWordAction(action: 'approve' | 'reject' | 'escalate'): void {
+    if (action === 'approve') {
+      const content = this.moderationStateSubject.value.selectedContent!;
+      this.onContentModerationAction({ type: 'approve', content, reason: undefined, notes: undefined });
+      this.closeContentDetail();
+    } else {
+      this.inlineSelectedAction = action;
+      this.inlineShowReasonInput = true;
+    }
+  }
+
+  /** Annule la saisie de raison */
+  public onCancelInlineReason(): void {
+    this.inlineShowReasonInput = false;
+    this.inlineSelectedAction = null;
+    this.inlineActionReason = '';
+    this.inlineActionNotes = '';
+  }
+
+  /** Confirme l'action avec la raison saisie */
+  public onConfirmInlineAction(): void {
+    if (!this.inlineSelectedAction || !this.inlineActionReason.trim()) return;
+    const content = this.moderationStateSubject.value.selectedContent!;
+    this.onContentModerationAction({
+      type: this.inlineSelectedAction,
+      content,
+      reason: this.inlineActionReason,
+      notes: this.inlineActionNotes || undefined,
+    });
+    this.onCancelInlineReason();
+    this.closeContentDetail();
   }
 }

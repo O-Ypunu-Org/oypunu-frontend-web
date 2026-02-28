@@ -42,66 +42,113 @@
     <div class="p-6 max-h-[60vh] overflow-y-auto" *ngIf="!isLoading && content">
 
       <!-- Mot en attente -->
-      <div *ngIf="isPendingWord(content)" class="space-y-6">
-        <!-- Informations principales -->
-        <div class="bg-gray-700 rounded-lg p-4">
-          <h3 class="text-lg font-semibold text-white mb-3">Informations du mot</h3>
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Mot</label>
-              <p class="text-white font-medium">{{ content.word }}</p>
-            </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Langue</label>
-              <p class="text-white">{{ content.language }}</p>
-            </div>
-          </div>
-        </div>
+      <div *ngIf="isPendingWord(content)" class="space-y-4">
 
-        <!-- Prononciation et audio -->
-        <div class="bg-gray-700 rounded-lg p-4"
-          *ngIf="content.pronunciation || getWordAudioUrls(content).length > 0">
-          <h4 class="text-md font-semibold text-white mb-3">Prononciation</h4>
-          <p class="text-gray-300 italic mb-3" *ngIf="content.pronunciation">
+        <!-- ── En-tête : mot, langue, auteur, prononciation, audio ── -->
+        <div class="bg-gray-700 rounded-lg p-5">
+
+          <!-- Mot (grand titre) -->
+          <h3 class="text-2xl font-bold text-white mb-1">{{ content.word }}</h3>
+
+          <!-- Langue • @auteur -->
+          <div class="flex flex-wrap items-center gap-x-2 text-sm mb-3">
+            <span *ngIf="content.language"
+                  class="font-medium text-[var(--oy-purple-600)]">{{ content.language }}</span>
+            <span *ngIf="content.language" class="text-gray-500">•</span>
+            <span class="text-gray-400">&#64;{{ content.submittedBy.username || content.createdBy.username }}</span>
+          </div>
+
+          <!-- Prononciation IPA -->
+          <p *ngIf="content.pronunciation"
+             class="text-[var(--oy-purple-600)] italic mb-3">
             /{{ content.pronunciation }}/
           </p>
+
+          <!-- Fichiers audio -->
           <div *ngFor="let audio of getWordAudioUrls(content)" class="mb-2">
-            <p class="text-sm text-gray-400 mb-1">🔊 {{ audio.label }}</p>
+            <p class="text-xs text-gray-400 mb-1">🔊 {{ audio.label }}</p>
             <audio controls [src]="audio.url" class="w-full" style="height:36px"></audio>
           </div>
-        </div>
 
-        <!-- Définition -->
-        <div class="bg-gray-700 rounded-lg p-4">
-          <h4 class="text-md font-semibold text-white mb-2">Définition</h4>
-          <p class="text-gray-300">{{ content.definition }}</p>
-        </div>
-
-        <!-- Significations -->
-        <div class="bg-gray-700 rounded-lg p-4" *ngIf="content.meanings && content.meanings.length > 0">
-          <h4 class="text-md font-semibold text-white mb-3">Significations</h4>
-          <div class="space-y-3">
-            <div *ngFor="let meaning of content.meanings" class="border-l-2 border-purple-500 pl-3">
-              <p class="text-gray-300">{{ meaning.definition }}</p>
-              <div class="text-sm text-gray-500 mt-1" *ngIf="meaning.partOfSpeech">
-                <span class="inline-block bg-gray-600 rounded px-2 py-1">{{ meaning.partOfSpeech }}</span>
-              </div>
-            </div>
+          <!-- Étymologie -->
+          <div *ngIf="content.etymology" class="mt-3 bg-gray-600 rounded-lg p-3">
+            <p class="text-xs text-gray-400 uppercase tracking-wider mb-1">Étymologie</p>
+            <p class="text-gray-300 italic text-sm">{{ content.etymology }}</p>
           </div>
         </div>
 
-        <!-- Exemples -->
-        <div class="bg-gray-700 rounded-lg p-4" *ngIf="content.examples && content.examples.length > 0">
-          <h4 class="text-md font-semibold text-white mb-3">Exemples d'utilisation</h4>
-          <div class="space-y-2">
-            <div *ngFor="let example of content.examples" class="bg-gray-600 rounded p-3">
-              <p class="text-gray-300 italic">"{{ example.sentence }}"</p>
-              <p class="text-gray-500 text-sm mt-1" *ngIf="example.translation">
-                Traduction : {{ example.translation }}
+        <!-- ── Significations ── -->
+        <div class="bg-gray-700 rounded-lg p-5"
+             *ngIf="content.meanings && content.meanings.length > 0">
+          <div class="space-y-5">
+            <div *ngFor="let meaning of content.meanings">
+
+              <!-- Badge partie du discours -->
+              <span *ngIf="meaning.partOfSpeech"
+                class="inline-block bg-[var(--oy-purple-600)]/15 text-[var(--oy-purple-600)]
+                       rounded px-2 py-0.5 text-xs font-semibold uppercase tracking-wider mb-3">
+                {{ meaning.partOfSpeech }}
+              </span>
+
+              <!-- Définitions numérotées + exemples inline -->
+              <div *ngIf="meaning.definitions && meaning.definitions.length > 0" class="space-y-3 mb-2">
+                <div *ngFor="let def of meaning.definitions; let i = index">
+                  <p class="text-white text-sm font-medium">
+                    <span class="text-gray-500 mr-1">{{ i + 1 }}.</span>{{ def.definition }}
+                  </p>
+                  <div *ngIf="def.examples && def.examples.length > 0"
+                       class="mt-1 ml-4 border-l border-gray-600 pl-3">
+                    <p *ngFor="let ex of def.examples"
+                       class="text-gray-400 italic text-xs">« {{ ex }} »</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fallback (ancien format sans definitions[]) -->
+              <p *ngIf="(!meaning.definitions || !meaning.definitions.length) && meaning.definition"
+                 class="text-white text-sm font-medium mb-2">{{ meaning.definition }}</p>
+
+              <!-- Exemples directs sur le sens -->
+              <div *ngIf="meaning.examples && meaning.examples.length > 0" class="mb-2 ml-4">
+                <p *ngFor="let ex of meaning.examples"
+                   class="text-gray-400 italic text-xs">« {{ ex }} »</p>
+              </div>
+
+              <!-- Synonymes (ligne) -->
+              <p *ngIf="meaning.synonyms && meaning.synonyms.length > 0"
+                 class="text-sm text-gray-300 mt-2">
+                <span class="text-gray-500 text-xs">Syn. : </span>{{ meaning.synonyms.join(', ') }}
+              </p>
+
+              <!-- Antonymes (ligne) -->
+              <p *ngIf="meaning.antonyms && meaning.antonyms.length > 0"
+                 class="text-sm text-gray-300 mt-1">
+                <span class="text-gray-500 text-xs">Ant. : </span>{{ meaning.antonyms.join(', ') }}
               </p>
             </div>
           </div>
         </div>
+
+        <!-- ── Traductions ── -->
+        <div class="bg-gray-700 rounded-lg p-5"
+             *ngIf="content.translations && content.translations.length > 0">
+          <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">🌐 Traductions</h4>
+          <div class="flex flex-wrap gap-2">
+            <div *ngFor="let t of content.translations"
+                 class="bg-gray-600 rounded-lg px-3 py-2">
+              <p class="text-xs text-gray-400 mb-0.5">
+                {{ t.languageId?.name || t.language || '-' }}
+              </p>
+              <p class="text-white font-medium text-sm">{{ t.translatedWord }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Date de soumission ── -->
+        <p class="text-xs text-gray-500 px-1">
+          Soumis le {{ formatDate(content.submittedAt || content.createdAt) }}
+        </p>
+
       </div>
 
       <!-- Post de communauté -->
@@ -561,8 +608,8 @@
         </div>
       </div>
 
-      <!-- Métadonnées communes -->
-      <div class="bg-gray-700 rounded-lg p-4 mt-6">
+      <!-- Métadonnées communes (masquées pour les mots — déjà dans leur section) -->
+      <div class="bg-gray-700 rounded-lg p-4 mt-6" *ngIf="!isPendingWord(content)">
         <h4 class="text-md font-semibold text-white mb-3">Métadonnées</h4>
         <div class="grid grid-cols-2 gap-4 text-sm">
           <div>
