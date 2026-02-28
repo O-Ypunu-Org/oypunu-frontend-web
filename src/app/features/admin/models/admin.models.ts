@@ -123,6 +123,8 @@ export interface PendingWord {
   readonly definition: string; // Définition principale
   readonly meanings: WordMeaning[];
   readonly examples?: WordExample[];
+  readonly pronunciation?: string;
+  readonly audioFiles?: Record<string, { url: string; cloudinaryId?: string; language?: string; accent?: string }> | Array<{ url: string; language?: string; accent?: string }>;
   readonly etymology?: string; // Étymologie du mot
   readonly status: ModerationStatus;
   readonly submittedBy: User; // Alias de createdBy pour clarté

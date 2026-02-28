@@ -165,6 +165,31 @@ export class ContentDetailModalComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Extrait les URLs audio d'un mot en attente (format Map objet ou tableau)
+   */
+  public getWordAudioUrls(word: PendingWord): { label: string; url: string }[] {
+    const af = word.audioFiles;
+    if (!af || typeof af !== 'object') return [];
+    const result: { label: string; url: string }[] = [];
+    if (Array.isArray(af)) {
+      for (const item of af) {
+        if (item?.url) {
+          const label = [item.language, item.accent].filter(Boolean).join('/') || 'audio';
+          result.push({ label, url: item.url });
+        }
+      }
+    } else {
+      for (const v of Object.values(af as Record<string, any>)) {
+        if (v?.url) {
+          const label = [v.language, v.accent].filter(Boolean).join('/') || 'audio';
+          result.push({ label, url: v.url });
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
    * Vérifie si le contenu est un post de communauté
    */
   public isPendingCommunityPost(
