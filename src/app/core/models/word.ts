@@ -12,6 +12,7 @@ export interface Word {
   id: string;
   word: string;
   language: string;
+  category?: string;
   categoryId?: string;
   pronunciation?: string;
   etymology?: string;

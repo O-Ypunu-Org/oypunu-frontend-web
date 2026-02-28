@@ -20,8 +20,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
   isLoading = true;
   error = '';
   isAuthenticated = false;
-  activeTab: 'definitions' | 'examples' | 'related' | 'translations' =
-    'definitions';
   canEdit = false;
   currentUser: any = null;
   
@@ -42,8 +40,8 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
     interjection: 'Interjection',
   };
 
-  // Options pour les langages
-  languages = {
+  // Options pour les langages (codes ISO → noms affichés)
+  languages: Record<string, string> = {
     fr: 'Français',
     en: 'Anglais',
     es: 'Espagnol',
@@ -54,6 +52,9 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
     ja: 'Japonais',
     zh: 'Chinois',
   };
+
+  // Map catégorie ID → nom (chargée après fetch du mot)
+  categoriesMap: Record<string, string> = {};
 
   private _destroy$ = new Subject<void>();
 
@@ -67,9 +68,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // S'assurer que l'onglet par défaut est toujours 'definitions'
-    this.activeTab = 'definitions';
-
     // Vérifier si l'utilisateur est authentifié
     this._authService.currentUser$
       .pipe(takeUntil(this._destroy$))
@@ -81,8 +79,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
     this._route.paramMap.pipe(takeUntil(this._destroy$)).subscribe((params) => {
       const wordId = params.get('id');
       if (wordId) {
-        // Réinitialiser l'onglet à 'definitions' pour chaque nouveau mot
-        this.activeTab = 'definitions';
         this.loadWord(wordId);
       } else {
         this.error = 'Identifiant de mot manquant';
@@ -132,6 +128,7 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
           if (word) {
             this.word = word;
             this._checkEditPermissions();
+            this._loadCategories(word.language);
             // Enregistrer la consultation pour les visiteurs
             if (!this.isAuthenticated) {
               this._guestLimitsService.recordWordView();
@@ -210,12 +207,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
       });
   }
 
-  switchTab(
-    tab: 'definitions' | 'examples' | 'related' | 'translations'
-  ): void {
-    this.activeTab = tab;
-  }
-
   playAudio(audioUrl: string): void {
     if (!audioUrl) return;
 
@@ -286,6 +277,52 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
     return typeof createdBy === 'object' ? createdBy.username : createdBy;
   }
 
+  /** Charge les catégories de la langue du mot pour résoudre categoryId → nom */
+  private _loadCategories(language: string): void {
+    if (!language) return;
+    this._dictionaryService
+      .getCategories(language)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe((categories) => {
+        this.categoriesMap = categories.reduce((map, cat) => {
+          if (cat._id) map[cat._id] = cat.name;
+          return map;
+        }, {} as Record<string, string>);
+      });
+  }
+
+  /**
+   * Retourne le nom de la langue à afficher.
+   * Gère les cas : code ISO ("fr"), nom complet ("Français"),
+   * objet peuplé ({name: "..."}) ou valeur absente.
+   * Note : le backend renvoie parfois `languageId` au lieu de `language`.
+   */
+  getLanguageDisplay(): string {
+    const word = this.word as any;
+    const lang = word?.language || word?.languageId;
+    if (!lang) return '';
+    if (typeof lang === 'object' && lang.name) return lang.name;
+    if (typeof lang === 'object' && lang.nativeName) return lang.nativeName;
+    const str = String(lang);
+    return this.languages[str] ?? str;
+  }
+
+  /**
+   * Retourne le nom de la catégorie du mot.
+   * Priorité : word.category → categoryId peuplé → categoriesMap.
+   */
+  getCategory(): string | null {
+    if (!this.word) return null;
+    if (this.word.category) return this.word.category;
+    const catId = (this.word as any).categoryId;
+    if (!catId) return null;
+    if (typeof catId === 'object' && catId.name) return catId.name;
+    if (typeof catId === 'string' && this.categoriesMap[catId]) {
+      return this.categoriesMap[catId];
+    }
+    return null;
+  }
+
   private _checkEditPermissions(): void {
     this.canEdit = false;
     if (this.word && this.isAuthenticated) {
@@ -304,6 +341,10 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  onShare(): void {
+    // Partage non encore implémenté
+  }
+
   onEditWord(): void {
     if (this.word && this.canEdit) {
       this._router.navigate(['/dictionary/edit', this.word.id]);
@@ -313,17 +354,17 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
   getStatusBadgeClass(status: string): string {
     switch (status) {
       case 'approved':
-        return 'bg-green-100 text-green-800';
+        return 'bg-[#2E8B57]/20 text-[#2E8B57]';       // semantic.success
       case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-[#E8A000]/20 text-[#FBBF24]';       // secondary (Or Kente)
       case 'rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-[#C0392B]/20 text-[#D64235]';       // semantic.error
       case 'pending_revision':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-[#1E6B8C]/20 text-[#5BA8CC]';       // semantic.info (Bleu Nil)
       case 'revision_approved':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-primary-500/20 text-primary-400';    // primary (Terracotta)
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-gray-800 text-gray-400';
     }
   }
 
