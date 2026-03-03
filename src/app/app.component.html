@@ -1,10 +1,10 @@
 <app-header></app-header>
 
-<main>
+<main [class.messaging-layout]="isMessagingPage">
   <router-outlet></router-outlet>
 </main>
 
-<app-footer></app-footer>
+<app-footer *ngIf="showFooter"></app-footer>
 
 <!-- Conteneur de notifications -->
 <app-toast-container></app-toast-container>

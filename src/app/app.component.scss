@@ -1,1 +1,15 @@
-/* Styles spécifiques au composant si nécessaire */
+/* app-root = colonne flex sur toute la hauteur viewport */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Page messaging : main prend tout l'espace restant, sans scroll page */
+main.messaging-layout {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

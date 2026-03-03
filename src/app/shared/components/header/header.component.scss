@@ -14,13 +14,13 @@
     transition: all 0.2s ease-in-out;
   }
 
-  // État hover — Bleu Nil
+  // État hover — Terracotta
   &:hover {
-    color: var(--oy-blue-400);
+    color: var(--oy-purple-600);
     background-color: rgba(200, 85, 40, 0.08); // terracotta 8% opacity
 
     .nav-icon {
-      color: var(--oy-blue-400);
+      color: var(--oy-purple-600);
       transform: scale(1.1);
     }
   }

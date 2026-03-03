@@ -39,12 +39,10 @@ export class NewConversationModalComponent implements OnInit {
       )
       .subscribe({
         next: (users) => {
-          console.log('Utilisateurs trouvés:', users);
           this.searchResults = users;
           this.loading = false;
         },
-        error: (error) => {
-          console.error('Erreur recherche utilisateurs:', error);
+        error: () => {
           this.error = "Erreur lors de la recherche d'utilisateurs";
           this.loading = false;
         },
@@ -59,7 +57,6 @@ export class NewConversationModalComponent implements OnInit {
   }
 
   selectUser(user: User) {
-    console.log('selectUser appelé avec:', user);
     this.userSelected.emit(user);
   }
 

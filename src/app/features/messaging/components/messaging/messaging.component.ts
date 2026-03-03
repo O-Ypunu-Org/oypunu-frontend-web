@@ -4,6 +4,7 @@ import {
   WebSocketService,
   UserStatus,
 } from '../../../../core/services/websocket.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { Conversation } from '../../../../core/models/message';
 import { Subscription, interval } from 'rxjs';
 
@@ -19,15 +20,18 @@ export class MessagingComponent implements OnInit, OnDestroy {
   isWebSocketConnected = false;
   webSocketError: string | null = null;
   onlineUsers: Set<string> = new Set();
+  currentUserId: string | null = null;
 
   private subscriptions: Subscription = new Subscription();
 
   constructor(
     private messagingService: MessagingService,
-    private webSocketService: WebSocketService
+    private webSocketService: WebSocketService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.currentUserId = this.authService.getCurrentUserId();
     this.loadUnreadCount();
     this.setupWebSocketListeners();
 
@@ -51,7 +55,6 @@ export class MessagingComponent implements OnInit, OnDestroy {
     const connectionSub = this.webSocketService.connectionStatus$.subscribe({
       next: (connected) => {
         this.isWebSocketConnected = connected;
-        console.log('Statut WebSocket:', connected ? 'Connecté' : 'Déconnecté');
       },
     });
 
@@ -77,7 +80,6 @@ export class MessagingComponent implements OnInit, OnDestroy {
     // Écouter les erreurs WebSocket
     const errorSub = this.webSocketService.error$.subscribe({
       next: (error) => {
-        console.error('Erreur WebSocket dans MessagingComponent:', error);
         this.webSocketError = error;
       },
     });
@@ -108,6 +110,17 @@ export class MessagingComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Obtenir l'autre participant d'une conversation
+   */
+  getOtherParticipant(conversation: Conversation): any {
+    if (!conversation || !this.currentUserId) return conversation?.participants[0];
+    return (
+      conversation.participants.find((p) => p.id !== this.currentUserId) ||
+      conversation.participants[0]
+    );
+  }
+
+  /**
    * Charger le nombre de messages non lus
    */
   private loadUnreadCount(): void {
@@ -115,12 +128,7 @@ export class MessagingComponent implements OnInit, OnDestroy {
       next: (count) => {
         this.unreadCount = count;
       },
-      error: (error) => {
-        console.error(
-          'Erreur lors du chargement du nombre de messages non lus:',
-          error
-        );
-      },
+      error: () => {},
     });
 
     this.subscriptions.add(sub);

@@ -43,11 +43,46 @@ export class MessagingService {
    */
   getUserConversations(): Observable<Conversation[]> {
     return this._http
-      .get<{ success: boolean; data: Conversation[] }>(
+      .get<{ success: boolean; data: any[] }>(
         `${this._API_URL}/conversations`
       )
       .pipe(
-        map((response) => response.data),
+        map((response) => {
+          const raw = response.data || [];
+          return raw.map((conv: any) => {
+            const convId = conv._id || conv.id;
+            const normalizedParticipants = (conv.participants || []).map((p: any) => ({
+              ...p,
+              id: p.id || p.userId,
+              profilePicture: p.profilePicture || p.avatar,
+            }));
+            return {
+              ...conv,
+              _id: convId,
+              participants: normalizedParticipants,
+              lastMessage: conv.lastMessage
+                ? {
+                    ...conv.lastMessage,
+                    _id: conv.lastMessage._id || conv.lastMessage.id,
+                    senderId: (() => {
+                      const sid = conv.lastMessage.senderId;
+                      if (!sid) return { username: '', id: '' };
+                      if (typeof sid === 'string') {
+                        // Resolve sender username from participants
+                        const match = normalizedParticipants.find(
+                          (p: any) => p.id === sid || p.userId === sid
+                        );
+                        return match
+                          ? { id: sid, username: match.username, profilePicture: match.profilePicture }
+                          : { id: sid, username: '' };
+                      }
+                      return { id: sid.id || sid._id?.toString() || '', ...sid };
+                    })(),
+                  }
+                : undefined,
+            } as Conversation;
+          });
+        }),
         catchError((error) => {
           const errorMessage =
             error.error?.message ||
@@ -137,5 +172,72 @@ export class MessagingService {
         return conversation || null;
       })
     );
+  }
+
+  // ===== API ENHANCED =====
+
+  deleteMessage(
+    messageId: string,
+    deleteFor: 'me' | 'everyone' = 'everyone'
+  ): Observable<any> {
+    return this._http
+      .delete(`${this._API_URL}/enhanced/messages/${messageId}`, {
+        params: { deleteFor },
+      })
+      .pipe(
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || 'Erreur lors de la suppression')
+          );
+        })
+      );
+  }
+
+  editMessage(messageId: string, content: string): Observable<any> {
+    return this._http
+      .patch(`${this._API_URL}/enhanced/messages/${messageId}`, { content })
+      .pipe(
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || 'Erreur lors de la modification')
+          );
+        })
+      );
+  }
+
+  reactToMessage(messageId: string, reaction: string): Observable<any> {
+    return this._http
+      .post(`${this._API_URL}/enhanced/messages/react`, { messageId, reaction })
+      .pipe(
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || 'Erreur lors de la réaction')
+          );
+        })
+      );
+  }
+
+  removeReaction(messageId: string): Observable<any> {
+    return this._http
+      .delete(`${this._API_URL}/enhanced/messages/${messageId}/reactions`)
+      .pipe(
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || 'Erreur lors du retrait de la réaction')
+          );
+        })
+      );
+  }
+
+  sendMediaMessage(formData: FormData): Observable<any> {
+    return this._http
+      .post(`${this._API_URL}/enhanced/messages/media`, formData)
+      .pipe(
+        catchError((error) => {
+          return throwError(
+            () => new Error(error.error?.message || "Erreur lors de l'envoi du fichier")
+          );
+        })
+      );
   }
 }

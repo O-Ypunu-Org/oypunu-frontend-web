@@ -1,4 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { ThemeService } from './core/services/theme.service';
 
 @Component({
@@ -7,10 +10,34 @@ import { ThemeService } from './core/services/theme.service';
   standalone: false,
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   title = "O'Ypunu";
+  showFooter = true;
+  isMessagingPage = false;
 
-  // Injection du ThemeService pour l'instancier au démarrage
-  // et appliquer immédiatement le thème sauvegardé (ou dark par défaut).
-  constructor(private _themeService: ThemeService) {}
+  private _routerSub: Subscription;
+
+  constructor(
+    private _themeService: ThemeService,
+    private _router: Router,
+    private _renderer: Renderer2
+  ) {
+    this._routerSub = this._router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe((e: any) => {
+        const isMessaging = e.url.startsWith('/messaging');
+        this.showFooter = !isMessaging;
+        this.isMessagingPage = isMessaging;
+
+        if (isMessaging) {
+          this._renderer.addClass(document.body, 'messaging-open');
+        } else {
+          this._renderer.removeClass(document.body, 'messaging-open');
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this._routerSub.unsubscribe();
+  }
 }

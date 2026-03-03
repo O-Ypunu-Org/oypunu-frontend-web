@@ -1,147 +1,421 @@
-<div class="chat-window h-full flex flex-col" *ngIf="conversation">
-  <!-- Header -->
-  <div class="chat-header bg-gray-800/80 backdrop-blur-sm border-b border-gray-700/50 p-4">
-    <div class="flex items-center space-x-3">
-      <div
-        class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-        <span class="text-white font-medium text-sm">
-          {{ getOtherParticipant()?.username?.charAt(0)?.toUpperCase() }}
+<div class="cw-layout">
+
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <div class="cw-header">
+    <ng-container *ngIf="getOtherParticipant() as other">
+
+      <!-- Avatar -->
+      <div class="cw-header__avatar">
+        <img *ngIf="other.profilePicture" [src]="other.profilePicture" [alt]="other.username">
+        <span *ngIf="!other.profilePicture">{{ (other.username || '?').charAt(0).toUpperCase() }}</span>
+        <span class="cw-header__online-dot" *ngIf="isUserOnline(other.id)"></span>
+      </div>
+
+      <!-- Info -->
+      <div class="cw-header__info">
+        <span class="cw-header__name">{{ other.username }}</span>
+        <span class="cw-header__status" [class.cw-header__status--online]="isUserOnline(other.id)">
+          {{ typingUsers.length > 0 ? getTypingText() : (isUserOnline(other.id) ? 'En ligne' : 'Hors ligne') }}
         </span>
       </div>
-      <div>
-        <h3 class="text-white font-medium">{{ getOtherParticipant()?.username }}</h3>
-        <p class="text-gray-400 text-sm">En ligne</p>
+
+      <!-- Actions -->
+      <div class="cw-header__actions">
+        <button class="cw-icon-btn" title="Rechercher">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </button>
+        <button class="cw-icon-btn" title="Plus d'options">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <circle cx="12" cy="5" r="1.5" />
+            <circle cx="12" cy="12" r="1.5" />
+            <circle cx="12" cy="19" r="1.5" />
+          </svg>
+        </button>
       </div>
-    </div>
+
+    </ng-container>
   </div>
 
-  <!-- Messages Container -->
-  <div #messagesContainer class="messages-container flex-1 overflow-y-auto p-4 space-y-4">
-    <!-- Loading Messages -->
-    <div *ngIf="loadingMessages" class="flex justify-center items-center py-8">
-      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-      <span class="ml-2 text-gray-400 text-sm">Chargement des messages...</span>
+  <!-- ═══════════════ MESSAGES ═══════════════ -->
+  <div #messagesContainer class="cw-messages">
+
+    <!-- Loading -->
+    <div *ngIf="loadingMessages" class="cw-feedback">
+      <div class="cw-feedback__spinner"></div>
+      <span>Chargement…</span>
     </div>
 
-    <!-- Error State -->
-    <div *ngIf="error && !loadingMessages" class="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
-      <div class="flex items-center">
-        <svg class="w-4 h-4 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd"
-            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-            clip-rule="evenodd"></path>
+    <!-- Error -->
+    <div *ngIf="error && !loadingMessages" class="cw-feedback cw-feedback--error">
+      <span>{{ error }}</span>
+      <button (click)="loadMessages()">Réessayer</button>
+    </div>
+
+    <!-- Messages list -->
+    <ng-container *ngIf="!loadingMessages">
+
+      <!-- Empty state -->
+      <div *ngIf="messages.length === 0" class="cw-feedback">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        <span class="text-red-400 text-sm">{{ error }}</span>
+        <span>Envoyez votre premier message !</span>
       </div>
-    </div>
 
-    <!-- Messages List -->
-    <div *ngIf="!loadingMessages && !error" class="space-y-3">
-      <div *ngFor="let message of messages" [ngClass]="{
-          'justify-end': isMyMessage(message),
-          'justify-start': !isMyMessage(message)
-        }" class="flex">
-        <div [ngClass]="{
-            'bg-blue-600 text-white': isMyMessage(message),
-            'bg-gray-700/50 text-gray-100': !isMyMessage(message)
-          }" class="max-w-xs lg:max-w-md px-4 py-2 rounded-2xl shadow-sm">
-          <!-- Message Content -->
-          <p class="text-sm whitespace-pre-wrap">{{ message.content }}</p>
+      <!-- Message loop -->
+      <ng-container *ngFor="let message of messages; let i = index">
 
-          <!-- Message Time -->
-          <div class="mt-1 flex items-center justify-end space-x-1">
-            <span [ngClass]="{
-                'text-blue-200': isMyMessage(message),
-                'text-gray-400': !isMyMessage(message)
-              }" class="text-xs">
-              {{ formatMessageDate(message.createdAt) }}
-            </span>
+        <!-- Date separator -->
+        <div *ngIf="shouldShowDateSeparator(i)" class="cw-date-sep">
+          <span>{{ getDateSeparatorLabel(message.createdAt) }}</span>
+        </div>
 
-            <!-- Read Status for sent messages -->
-            <div *ngIf="isMyMessage(message)" class="flex items-center">
-              <svg *ngIf="message.isRead" class="w-3 h-3 text-blue-200" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clip-rule="evenodd"></path>
-              </svg>
-              <svg *ngIf="!message.isRead" class="w-3 h-3 text-blue-300" fill="none" stroke="currentColor"
-                viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-              </svg>
+        <!-- Message row -->
+        <div class="cw-row group" [class.cw-row--sent]="isMyMessage(message)"
+          [class.cw-row--received]="!isMyMessage(message)" [class.cw-row--last]="isLastInGroup(i)">
+
+          <div class="cw-row__wrap">
+
+            <!-- Deleted message -->
+            <div *ngIf="message.isDeleted" class="cw-bubble cw-bubble--deleted">
+              <span>🗑 Message supprimé</span>
             </div>
-          </div>
+
+            <ng-container *ngIf="!message.isDeleted">
+
+              <!-- Edit mode -->
+              <div *ngIf="editingMessageId === message._id" class="cw-edit">
+                <textarea class="cw-edit__area" rows="2" [value]="editContent"
+                  (input)="editContent = $any($event.target).value" (keydown)="onEditEnterKeydown($event)">
+                </textarea>
+                <div class="cw-edit__actions">
+                  <button class="cw-edit__cancel" (click)="cancelEdit()">Annuler</button>
+                  <button class="cw-edit__save" (click)="saveEdit()">Sauvegarder</button>
+                </div>
+              </div>
+
+              <!-- Normal bubble -->
+              <ng-container *ngIf="editingMessageId !== message._id">
+
+                <div class="cw-bubble-row" [class.cw-bubble-row--sent]="isMyMessage(message)"
+                  [class.cw-bubble-row--received]="!isMyMessage(message)">
+
+                  <!-- Bubble wrapper (relative for reaction overlay) -->
+                  <div class="cw-bubble-wrap"
+                    [class.cw-bubble-wrap--has-reactions]="getReactionGroups(message).length > 0">
+
+                    <!-- Bubble -->
+                    <div class="cw-bubble" [class.cw-bubble--sent]="isMyMessage(message)"
+                      [class.cw-bubble--received]="!isMyMessage(message)"
+                      [class.cw-bubble--no-tail]="!isLastInGroup(i)">
+
+                      <!-- Image content -->
+                      <ng-container *ngIf="message.messageType === 'image' && getMediaUrl(message)">
+                        <img [src]="getMediaUrl(message)!" alt="Image" loading="lazy" class="cw-bubble__img"
+                          (click)="openLightbox(getMediaUrl(message)!)">
+                        <p *ngIf="message.content" class="cw-bubble__text">{{ message.content }}</p>
+                      </ng-container>
+
+                      <!-- Audio content -->
+                      <ng-container *ngIf="message.messageType === 'audio' && getAudioUrl(message)">
+                        <ng-container *ngIf="getWaveformBars(message._id) as bars">
+                          <div class="cw-audio" [class.cw-audio--sent]="isMyMessage(message)"
+                            [class.cw-audio--received]="!isMyMessage(message)">
+
+                            <!-- Play / Pause -->
+                            <button class="cw-audio__play" type="button" (click)="toggleAudio(message)"
+                              [attr.aria-label]="playingAudioId === message._id ? 'Pause' : 'Lire le message vocal'">
+                              <svg *ngIf="playingAudioId !== message._id" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                              <svg *ngIf="playingAudioId === message._id" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                              </svg>
+                            </button>
+
+                            <!-- Waveform + timer -->
+                            <div class="cw-audio__body">
+                              <div class="cw-audio__wave">
+                                <span *ngFor="let h of bars; let i = index" class="cw-audio__bar"
+                                  [class.cw-audio__bar--played]="getBarPlayed(i, bars.length, message)"
+                                  [style.height.px]="h">
+                                </span>
+                              </div>
+                              <span class="cw-audio__dur">
+                                {{ formatAudioTime(playingAudioId === message._id ? (audioElapsed[message._id] || 0) :
+                                getAudioDuration(message)) }}
+                              </span>
+                            </div>
+
+                          </div>
+                        </ng-container>
+                      </ng-container>
+
+                      <!-- Text content -->
+                      <p *ngIf="message.content && message.messageType === 'text'" class="cw-bubble__text">
+                        {{ message.content }}
+                      </p>
+
+                      <!-- Meta row (time + ticks) -->
+                      <div class="cw-bubble__meta">
+                        <span *ngIf="message.isEdited" class="cw-bubble__edited">modifié ·</span>
+                        <span class="cw-bubble__time">{{ formatMessageDate(message.createdAt) }}</span>
+                        <ng-container *ngIf="isMyMessage(message)">
+                          <!-- Double tick (read) -->
+                          <svg *ngIf="message.isRead" class="cw-bubble__tick cw-bubble__tick--read" viewBox="0 0 17 11"
+                            fill="none">
+                            <path stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              stroke-linejoin="round" d="M1 6L4.5 9.5L10.5 2" />
+                            <path stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                              stroke-linejoin="round" d="M7 6L10.5 9.5L16.5 2" />
+                          </svg>
+                          <!-- Single tick (sent) -->
+                          <svg *ngIf="!message.isRead" class="cw-bubble__tick" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                              d="M5 13l4 4L19 7" />
+                          </svg>
+                        </ng-container>
+                      </div>
+
+                    </div><!-- /cw-bubble -->
+
+                    <!-- Reaction overlay -->
+                    <div *ngIf="getReactionGroups(message).length > 0" class="cw-reactions"
+                      [class.cw-reactions--sent]="isMyMessage(message)"
+                      [class.cw-reactions--received]="!isMyMessage(message)">
+                      <ng-container *ngFor="let group of getReactionGroups(message); let last = last">
+                        <button (click)="openReactionDetail(message._id, $event)" class="cw-reactions__btn"
+                          [class.cw-reactions__btn--me]="group.includesMe" title="Voir les réactions">
+                          <span>{{ group.emoji }}</span>
+                        </button>
+                        <span *ngIf="!last" class="cw-reactions__sep">·</span>
+                      </ng-container>
+                    </div>
+
+                  </div><!-- /cw-bubble-wrap -->
+
+                  <!-- Hover action buttons -->
+                  <div class="cw-actions msg-action-container">
+                    <button (click)="toggleReactionPicker(message._id, $event)" class="cw-actions__btn" title="Réagir">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                    <button *ngIf="isMyMessage(message)" (click)="toggleMessageMenu(message._id, $event)"
+                      class="cw-actions__btn" title="Plus d'options">
+                      <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                          d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                      </svg>
+                    </button>
+                  </div>
+
+                </div><!-- /cw-bubble-row -->
+
+                <!-- Reaction picker -->
+                <div *ngIf="showReactionPickerForId === message._id" class="cw-picker msg-action-container"
+                  [class.cw-picker--sent]="isMyMessage(message)" [class.cw-picker--received]="!isMyMessage(message)">
+                  <button *ngFor="let emoji of REACTIONS" (click)="reactToMessage(message._id, emoji)"
+                    class="cw-picker__emoji" [class.cw-picker__emoji--active]="getUserReaction(message) === emoji"
+                    [title]="getUserReaction(message) === emoji ? 'Retirer la réaction' : ''">
+                    {{ emoji }}
+                    <span *ngIf="getUserReaction(message) === emoji" class="cw-picker__check">
+                      <svg viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clip-rule="evenodd" />
+                      </svg>
+                    </span>
+                  </button>
+                </div>
+
+                <!-- Context menu (edit / delete) -->
+                <div *ngIf="activeMenuMessageId === message._id && isMyMessage(message)"
+                  class="cw-menu msg-action-container">
+                  <button class="cw-menu__item" (click)="startEditMessage(message)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Modifier
+                  </button>
+                  <div class="cw-menu__divider"></div>
+                  <button class="cw-menu__item cw-menu__item--danger" (click)="deleteMessage(message._id)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Supprimer
+                  </button>
+                </div>
+
+                <!-- Reaction detail popup -->
+                <div *ngIf="reactionDetailMessageId === message._id && message.reactions?.length"
+                  class="cw-react-detail msg-action-container" [class.cw-react-detail--sent]="isMyMessage(message)"
+                  [class.cw-react-detail--received]="!isMyMessage(message)">
+                  <div class="cw-react-detail__head">
+                    <span>{{ message.reactions!.length }} réaction{{ message.reactions!.length > 1 ? 's' : '' }}</span>
+                    <button (click)="closeReactionDetail()" class="cw-react-detail__close">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div *ngFor="let entry of getReactionEntries(message)" class="cw-react-detail__row">
+                    <span class="cw-react-detail__emoji">{{ entry.emoji }}</span>
+                    <span class="cw-react-detail__label" [class.cw-react-detail__label--me]="entry.isMe">
+                      {{ entry.label }}
+                    </span>
+                    <button *ngIf="entry.isMe" (click)="removeReaction(message._id); closeReactionDetail()"
+                      class="cw-react-detail__remove">
+                      Retirer
+                    </button>
+                  </div>
+                </div>
+
+              </ng-container>
+            </ng-container>
+
+          </div><!-- /cw-row__wrap -->
+        </div><!-- /cw-row -->
+
+      </ng-container>
+
+      <!-- Typing indicator -->
+      <div *ngIf="typingUsers.length > 0" class="cw-typing">
+        <div class="cw-typing__bubble">
+          <span class="cw-typing__dot"></span>
+          <span class="cw-typing__dot"></span>
+          <span class="cw-typing__dot"></span>
         </div>
       </div>
 
-      <!-- Empty Messages State -->
-      <div *ngIf="messages.length === 0" class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M8 12h.01M12 12h.01M16 12h.01M21 16c0 2.21 0 4 0 4s1.79 0 4 0 4-1.79 4-4-1.79-4-4-4-4 1.79-4 4z">
-          </path>
-        </svg>
-        <p class="text-gray-500">Aucun message dans cette conversation</p>
-        <p class="text-gray-600 text-sm mt-1">Envoyez votre premier message !</p>
-      </div>
+    </ng-container>
+  </div><!-- /cw-messages -->
 
-      <!-- Typing Indicator -->
-      <div *ngIf="typingUsers.length > 0" class="flex justify-start px-4 py-2">
-        <div class="flex items-center space-x-2 bg-gray-700/30 rounded-lg px-3 py-2">
-          <div class="flex space-x-1">
-            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
-            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.1s;">
-            </div>
-            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style="animation-delay: 0.2s;">
-            </div>
-          </div>
-          <span class="text-sm text-gray-400 italic">{{ getTypingText() }}</span>
-        </div>
+  <!-- ═══════════════ INPUT ═══════════════ -->
+  <div class="cw-input">
+
+    <!-- Hidden file input (image only) -->
+    <input #fileInput type="file" accept="image/*" class="cw-input__file" (change)="onFileSelected($event)">
+
+    <!-- Image preview banner -->
+    <div *ngIf="imagePreview" class="cw-input__preview">
+      <div class="cw-input__preview-img-wrap">
+        <img [src]="imagePreview" alt="Aperçu" class="cw-input__preview-img">
+        <button (click)="clearSelectedFile()" class="cw-input__preview-remove" title="Supprimer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
+      <span class="cw-input__preview-name">{{ selectedFile?.name }}</span>
+      <div *ngIf="isUploadingImage" class="cw-input__preview-spinner"></div>
     </div>
-  </div>
 
-  <!-- Message Input -->
-  <div class="message-input-container border-t border-gray-700/50 p-4 bg-gray-800/50">
-    <form (ngSubmit)="onSubmit()" [formGroup]="messageForm" class="flex items-end space-x-3">
-      <div class="flex-1">
-        <textarea formControlName="content" placeholder="Tapez votre message..."
-          class="w-full bg-gray-700/50 border border-gray-600/50 rounded-lg px-4 py-3 text-white placeholder-gray-400 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-          rows="1" maxlength="1000" (keydown.enter)="onEnterKeydown($any($event))"></textarea>
+    <!-- Recording bar (visible while recording) -->
+    <div *ngIf="isRecording" class="cw-rec-bar">
 
-        <!-- Character Counter -->
-        <div *ngIf="messageForm.get('content')?.value?.length > 800" class="text-right mt-1">
-          <span [ngClass]="{
-              'text-yellow-400': messageForm.get('content')?.value?.length > 900,
-              'text-red-400': messageForm.get('content')?.value?.length > 950,
-              'text-gray-400': messageForm.get('content')?.value?.length <= 900
-            }" class="text-xs">
-            {{ messageForm.get('content')?.value?.length || 0 }}/1000
-          </span>
-        </div>
-      </div>
-
-      <!-- Send Button -->
-      <button type="submit" [disabled]="messageForm.invalid || sendingMessage"
-        class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:opacity-50 text-white rounded-lg p-3 transition-colors duration-200 flex items-center justify-center">
-        <svg *ngIf="!sendingMessage" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8">
-          </path>
+      <!-- Cancel -->
+      <button type="button" (click)="cancelRecording()" class="cw-rec-bar__cancel" title="Annuler l'enregistrement">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6" />
+          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+          <path d="M10 11v6" />
+          <path d="M14 11v6" />
+          <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
         </svg>
-        <div *ngIf="sendingMessage" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
       </button>
-    </form>
-  </div>
-</div>
 
-<!-- No Conversation Selected -->
-<div *ngIf="!conversation" class="h-full flex items-center justify-center">
-  <div class="text-center">
-    <svg class="mx-auto h-16 w-16 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M8 12h.01M12 12h.01M16 12h.01M21 16c0 2.21 0 4 0 4s1.79 0 4 0 4-1.79 4-4-1.79-4-4-4-4 1.79-4 4z">
-      </path>
+      <!-- Red dot indicator -->
+      <span class="cw-rec-bar__dot"></span>
+
+      <!-- Timer -->
+      <span class="cw-rec-bar__timer">{{ formatRecordingDuration(recordingDuration) }}</span>
+
+      <!-- Animated waveform -->
+      <div class="cw-rec-bar__wave" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <!-- Send button -->
+      <button type="button" (click)="sendRecording()" [disabled]="sendingMessage" class="cw-rec-bar__send"
+        title="Envoyer le message vocal">
+        <svg *ngIf="!sendingMessage" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+        <div *ngIf="sendingMessage" class="cw-input__spinner"></div>
+      </button>
+
+    </div>
+
+    <!-- Input row (hidden while recording) -->
+    <form *ngIf="!isRecording" class="cw-input__row" (ngSubmit)="onSubmit()" [formGroup]="messageForm">
+
+      <!-- Attachment button -->
+      <button type="button" (click)="fileInput.click()" class="cw-input__icon-btn" title="Envoyer une image">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path
+            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </button>
+
+      <!-- Textarea -->
+      <textarea class="cw-input__textarea" formControlName="content"
+        [placeholder]="selectedFile ? 'Ajouter une légende…' : 'Message…'" rows="1" maxlength="1000"
+        (keydown.enter)="onEnterKeydown($any($event))">
+      </textarea>
+
+      <!-- Character counter -->
+      <span *ngIf="(messageForm.get('content')?.value?.length || 0) > 800" class="cw-input__counter"
+        [class.cw-input__counter--warn]="(messageForm.get('content')?.value?.length || 0) > 900"
+        [class.cw-input__counter--danger]="(messageForm.get('content')?.value?.length || 0) > 950">
+        {{ messageForm.get('content')?.value?.length || 0 }}/1000
+      </span>
+
+      <!-- Send button (when content) -->
+      <button *ngIf="hasInputContent" type="submit" [disabled]="sendingMessage" class="cw-input__send" title="Envoyer">
+        <svg *ngIf="!sendingMessage" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13" />
+          <polygon points="22 2 15 22 11 13 2 9 22 2" />
+        </svg>
+        <div *ngIf="sendingMessage" class="cw-input__spinner"></div>
+      </button>
+
+      <!-- Mic button (when no content) -->
+      <button *ngIf="!hasInputContent" type="button" (click)="onMicClick()" class="cw-input__mic" title="Message vocal">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 3a3 3 0 00-3 3v6a3 3 0 006 0V6a3 3 0 00-3-3zm-1 15.93V21h2v-2.07A7.002 7.002 0 0019 12h-2a5 5 0 01-10 0H5a7.002 7.002 0 006 6.93z" />
+        </svg>
+      </button>
+
+    </form>
+  </div><!-- /cw-input -->
+
+</div><!-- /cw-layout -->
+
+<!-- ═══════════════ LIGHTBOX ═══════════════ -->
+<div *ngIf="lightboxUrl" class="cw-lightbox" (click)="closeLightbox()">
+  <button class="cw-lightbox__close" type="button" (click)="closeLightbox()" aria-label="Fermer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6L6 18M6 6l12 12" />
     </svg>
-    <h3 class="text-lg font-medium text-gray-400 mb-2">Sélectionnez une conversation</h3>
-    <p class="text-gray-500">Choisissez une conversation dans la liste pour commencer à discuter.</p>
-  </div>
+  </button>
+  <img class="cw-lightbox__img" [src]="lightboxUrl" alt="Image en grand"
+    (click)="$event.stopPropagation()">
 </div>
