@@ -27,6 +27,10 @@
   background: var(--surface-elevated);
   border-bottom: 1px solid var(--surface-border);
 
+  @media (max-width: 768px) {
+    display: none;
+  }
+
   &__avatar {
     position: relative;
     width: 2.5rem;
