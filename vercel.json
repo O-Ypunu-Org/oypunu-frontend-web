@@ -3,6 +3,11 @@
   "installCommand": "npm install --legacy-peer-deps --verbose",
   "framework": "angular",
   "outputDirectory": "dist/oypunu-frontend",
+  "git": {
+    "deploymentEnabled": {
+      "develop": false
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
