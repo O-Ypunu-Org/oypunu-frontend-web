@@ -65,6 +65,11 @@ export class HeaderComponent implements OnInit {
     this.isMobileMenuOpen = false;
   }
 
+  logout(): void {
+    this.isMobileMenuOpen = false;
+    this._authService.logout();
+  }
+
   private updateDashboardStatus(): void {
     // Le dashboard s'affiche quand on est sur /home ET connecté
     this.isDashboardPage = this.isHomePage && this.isAuthenticated;
