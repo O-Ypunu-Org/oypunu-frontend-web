@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   environmentName: 'staging' as const,
-  apiUrl: 'https://oypunu-staging.up.railway.app',
-  websocketUrl: 'https://oypunu-staging.up.railway.app',
+  apiUrl: 'https://staging-api.oypunu.org',
+  websocketUrl: 'https://staging-api.oypunu.org',
   enableLogging: true,
 };

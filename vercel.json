@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build",
+  "buildCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = \"staging\" ]; then npm run build:staging; else npm run build; fi",
   "installCommand": "npm install --legacy-peer-deps --verbose",
   "framework": "angular",
   "outputDirectory": "dist/oypunu-frontend",
