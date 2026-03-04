@@ -22,14 +22,17 @@ body {
 
 /* Page messagerie : verrouille le scroll au niveau body ET de app-root
    pour que la chaîne flex soit correctement bornée et que seule
-   la zone des messages scrolle en interne */
+   la zone des messages scrolle en interne.
+   dvh = dynamic viewport height — s'adapte à la barre d'adresse mobile */
 body.messaging-open {
   overflow: hidden;
   height: 100vh;
+  height: 100dvh;
 }
 
 body.messaging-open > app-root {
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
