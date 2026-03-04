@@ -149,16 +149,6 @@
       </div>
     </div>
 
-    <!-- Debug info -->
-    <div class="bg-yellow-900 border border-yellow-700 rounded-lg p-4 mb-6 text-yellow-100"
-      *ngIf="!state.isLoading && !state.error">
-      <h4>🐛 Debug Info:</h4>
-      <p>State loading: {{ state.isLoading }}</p>
-      <p>State error: {{ state.error }}</p>
-      <p>State users length: {{ state.users.length || 'undefined' }}</p>
-      <p>State totalUsers: {{ state.totalUsers }}</p>
-      <p>State users (first 3): {{ (state.users | slice:0:3 | json) || 'aucun' }}</p>
-    </div>
 
     <!-- User Management Table -->
     <app-user-management-table *ngIf="!state.isLoading && !state.error" [users]="state.users"
