@@ -36,7 +36,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
   isProposing      = false;
   proposeError:   string | null = null;
   proposeSuccess: string | null = null;
-  proposeData: Partial<CreateLanguageDto> = { name: '', nativeName: '', region: '', countries: [] };
+  proposeData: Partial<CreateLanguageDto> & { region?: string } = { name: '', nativeName: '', region: '', countries: [] };
 
   // Avatar
   isUploadingAvatar = false;
@@ -287,7 +287,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
     this.proposeError    = null;
     this.proposeSuccess  = null;
     if (this.showProposeForm) {
-      this.proposeData = { name: '', nativeName: '', region: '', countries: [] };
+      this.proposeData = { name: '', nativeName: '', region: '', regions: [], countries: [] };
     }
   }
 
@@ -303,8 +303,8 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
     const payload: CreateLanguageDto = {
       name:        this.proposeData.name!.trim(),
       nativeName:  this.proposeData.nativeName!.trim(),
-      region:      this.proposeData.region!.trim(),
-      countries:   this.proposeData.countries?.length ? this.proposeData.countries : [this.proposeData.region!.trim()],
+      regions:     this.proposeData.region?.trim() ? [this.proposeData.region.trim()] : [],
+      countries:   this.proposeData.countries?.length ? this.proposeData.countries : (this.proposeData.region?.trim() ? [this.proposeData.region.trim()] : []),
     };
 
     const sub = this.languagesService.proposeLanguage(payload).subscribe({
