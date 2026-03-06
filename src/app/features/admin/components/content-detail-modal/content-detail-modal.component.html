@@ -423,21 +423,49 @@
               <p class="text-white">{{ content.nativeName || 'Non spécifié' }}</p>
             </div>
             <div>
-              <label class="block text-sm text-gray-400 mb-1">Région</label>
-              <p class="text-white">{{ content.region }}</p>
+              <label class="block text-sm text-gray-400 mb-1">Régions</label>
+              <p class="text-white">{{ content.regions?.join(', ') || 'Non spécifié' }}</p>
             </div>
             <div>
               <label class="block text-sm text-gray-400 mb-1">Pays</label>
-              <p class="text-white">{{ content.country }}</p>
+              <p class="text-white">{{ content.countries?.join(', ') || 'Non spécifié' }}</p>
             </div>
-            <div>
-              <label class="block text-sm text-gray-400 mb-1">Code ISO</label>
-              <p class="text-white">{{ content.code || 'Non défini' }}</p>
+            <div *ngIf="content.iso639_1 || content.iso639_2 || content.iso639_3">
+              <label class="block text-sm text-gray-400 mb-1">Codes ISO 639</label>
+              <p class="text-white">
+                <span *ngIf="content.iso639_1">1: {{ content.iso639_1 }}</span>
+                <span *ngIf="content.iso639_1 && (content.iso639_2 || content.iso639_3)"> · </span>
+                <span *ngIf="content.iso639_2">2: {{ content.iso639_2 }}</span>
+                <span *ngIf="content.iso639_2 && content.iso639_3"> · </span>
+                <span *ngIf="content.iso639_3">3: {{ content.iso639_3 }}</span>
+              </p>
             </div>
             <div>
               <label class="block text-sm text-gray-400 mb-1">Famille linguistique</label>
               <p class="text-white">{{ content.family || 'Non spécifiée' }}</p>
             </div>
+            <div *ngIf="content.speakerCount">
+              <label class="block text-sm text-gray-400 mb-1">Locuteurs</label>
+              <p class="text-white">{{ content.speakerCount | number }}</p>
+            </div>
+            <div *ngIf="content.endangermentStatus">
+              <label class="block text-sm text-gray-400 mb-1">Statut de vitalité</label>
+              <p class="text-white">{{ getEndangermentLabel(content.endangermentStatus) }}</p>
+            </div>
+          </div>
+          <div *ngIf="content.description" class="mt-4">
+            <label class="block text-sm text-gray-400 mb-1">Description</label>
+            <p class="text-white leading-relaxed">{{ content.description }}</p>
+          </div>
+          <div *ngIf="content.alternativeNames?.length" class="mt-4">
+            <label class="block text-sm text-gray-400 mb-1">Noms alternatifs</label>
+            <p class="text-white">{{ content.alternativeNames?.join(', ') }}</p>
+          </div>
+          <div class="flex gap-4 mt-4" *ngIf="content.wikipediaUrl || content.ethnologueUrl">
+            <a *ngIf="content.wikipediaUrl" [href]="content.wikipediaUrl" target="_blank"
+              class="text-blue-400 hover:text-blue-300 text-sm underline">Wikipedia</a>
+            <a *ngIf="content.ethnologueUrl" [href]="content.ethnologueUrl" target="_blank"
+              class="text-blue-400 hover:text-blue-300 text-sm underline">Ethnologue</a>
           </div>
         </div>
 
@@ -483,11 +511,11 @@
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-sm text-gray-400 mb-1">Proposée par</label>
-              <p class="text-white">{{ getContentAuthor(content) }}</p>
+              <p class="text-white">{{ getContentAuthorFromProposedBy(content) }}</p>
             </div>
             <div>
               <label class="block text-sm text-gray-400 mb-1">Date de soumission</label>
-              <p class="text-white">{{ formatDate(content.submittedAt) }}</p>
+              <p class="text-white">{{ formatDate(content.createdAt) }}</p>
             </div>
           </div>
         </div>
