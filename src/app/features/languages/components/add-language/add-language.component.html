@@ -72,7 +72,8 @@
               placeholder="ex: Punu, Swahili, Wolof">
             <div *ngIf="languageForm.get('name')?.invalid && languageForm.get('name')?.touched"
               class="text-red-500 text-xs mt-1">
-              Le nom de la langue est requis (minimum 2 caractères)
+              <span *ngIf="languageForm.get('name')?.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
+              <span *ngIf="!languageForm.get('name')?.errors?.['pattern']">Le nom de la langue est requis (minimum 2 caractères)</span>
             </div>
           </div>
 
@@ -87,24 +88,36 @@
               placeholder="ex: Ypunu, Kiswahili, Wolof">
             <div *ngIf="languageForm.get('nativeName')?.invalid && languageForm.get('nativeName')?.touched"
               class="text-red-500 text-xs mt-1">
-              Le nom natif est requis (minimum 2 caractères)
+              <span *ngIf="languageForm.get('nativeName')?.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
+              <span *ngIf="!languageForm.get('nativeName')?.errors?.['pattern']">Le nom natif est requis (minimum 2 caractères)</span>
             </div>
           </div>
 
-          <!-- Région -->
+          <!-- Régions (multi-sélection groupée par continent) -->
           <div>
-            <label for="region" class="block text-sm font-medium text-gray-300 mb-1">
-              Région*
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Région(s)*
             </label>
-            <select id="region" formControlName="region"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('region')?.invalid && languageForm.get('region')?.touched}">
-              <option value="" disabled>Sélectionnez une région</option>
-              <option *ngFor="let region of regions" [value]="region">{{ region }}</option>
-            </select>
-            <div *ngIf="languageForm.get('region')?.invalid && languageForm.get('region')?.touched"
+            <div class="space-y-3 p-3 bg-gray-800 border border-gray-700 rounded-md"
+              [ngClass]="{'border-red-500': languageForm.get('regions')?.value?.length === 0 && languageForm.get('regions')?.touched}">
+              <div *ngFor="let group of regionGroups">
+                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wide mb-1">{{ group.continent }}</p>
+                <div class="grid grid-cols-2 gap-1 pl-2">
+                  <label *ngFor="let region of group.regions"
+                    class="flex items-center gap-2 cursor-pointer text-sm text-gray-300 hover:text-white py-0.5">
+                    <input type="checkbox"
+                      [value]="region"
+                      [checked]="languageForm.get('regions')?.value?.includes(region)"
+                      (change)="onRegionToggle(region, $event)"
+                      class="w-4 h-4 accent-purple-500 cursor-pointer" />
+                    {{ region }}
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="languageForm.get('regions')?.value?.length === 0 && languageForm.get('regions')?.touched"
               class="text-red-500 text-xs mt-1">
-              La région est requise
+              Au moins une région est requise
             </div>
           </div>
         </div>
@@ -137,7 +150,10 @@
               class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
               [ngClass]="{'border-red-500': languageForm.get('iso639_1')?.invalid && languageForm.get('iso639_1')?.touched}"
               placeholder="ex: fr, sw, wo" maxlength="2">
-            <div class="text-xs text-gray-500 mt-1">2 lettres minuscules</div>
+            <div *ngIf="languageForm.get('iso639_1')?.invalid && languageForm.get('iso639_1')?.touched"
+              class="text-red-500 text-xs mt-1">Exactement 2 lettres minuscules (ex: fr)</div>
+            <div *ngIf="!languageForm.get('iso639_1')?.invalid || !languageForm.get('iso639_1')?.touched"
+              class="text-xs text-gray-500 mt-1">2 lettres minuscules</div>
           </div>
 
           <div>
@@ -146,8 +162,12 @@
             </label>
             <input type="text" id="iso639_2" formControlName="iso639_2"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              [ngClass]="{'border-red-500': languageForm.get('iso639_2')?.invalid && languageForm.get('iso639_2')?.touched}"
               placeholder="ex: fra, swa, wol" maxlength="3">
-            <div class="text-xs text-gray-500 mt-1">3 lettres minuscules</div>
+            <div *ngIf="languageForm.get('iso639_2')?.invalid && languageForm.get('iso639_2')?.touched"
+              class="text-red-500 text-xs mt-1">Exactement 3 lettres minuscules (ex: fra)</div>
+            <div *ngIf="!languageForm.get('iso639_2')?.invalid || !languageForm.get('iso639_2')?.touched"
+              class="text-xs text-gray-500 mt-1">3 lettres minuscules</div>
           </div>
 
           <div>
@@ -156,8 +176,12 @@
             </label>
             <input type="text" id="iso639_3" formControlName="iso639_3"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              [ngClass]="{'border-red-500': languageForm.get('iso639_3')?.invalid && languageForm.get('iso639_3')?.touched}"
               placeholder="ex: fra, swa, wol" maxlength="3">
-            <div class="text-xs text-gray-500 mt-1">3 lettres minuscules</div>
+            <div *ngIf="languageForm.get('iso639_3')?.invalid && languageForm.get('iso639_3')?.touched"
+              class="text-red-500 text-xs mt-1">Exactement 3 lettres minuscules (ex: puu)</div>
+            <div *ngIf="!languageForm.get('iso639_3')?.invalid || !languageForm.get('iso639_3')?.touched"
+              class="text-xs text-gray-500 mt-1">3 lettres minuscules</div>
           </div>
         </div>
 
@@ -196,10 +220,27 @@
           </label>
           <input type="number" id="speakerCount" formControlName="speakerCount"
             class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="ex: 280000000" min="1">
-          <div class="text-xs text-gray-500 mt-1">
+            [ngClass]="{'border-red-500': languageForm.get('speakerCount')?.invalid && languageForm.get('speakerCount')?.touched}"
+            placeholder="ex: 280000000" min="1" max="8000000000">
+          <div *ngIf="languageForm.get('speakerCount')?.invalid && languageForm.get('speakerCount')?.touched"
+            class="text-red-500 text-xs mt-1">Nombre entre 1 et 8 000 000 000</div>
+          <div *ngIf="!languageForm.get('speakerCount')?.invalid || !languageForm.get('speakerCount')?.touched"
+            class="text-xs text-gray-500 mt-1">
             Estimation du nombre de personnes parlant cette langue (natifs + non-natifs)
           </div>
+        </div>
+
+        <!-- Famille linguistique -->
+        <div>
+          <label for="family" class="block text-sm font-medium text-gray-300 mb-1">
+            Famille linguistique
+          </label>
+          <input type="text" id="family" formControlName="family"
+            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            [ngClass]="{'border-red-500': languageForm.get('family')?.invalid && languageForm.get('family')?.touched}"
+            placeholder="ex: Bantou, Sémitique, Indo-européen...">
+          <div *ngIf="languageForm.get('family')?.invalid && languageForm.get('family')?.touched"
+            class="text-red-500 text-xs mt-1">Lettres, espaces, apostrophes et tirets uniquement</div>
         </div>
       </div>
 
@@ -256,18 +297,25 @@
           </div>
 
           <div formArrayName="alternativeNames" class="space-y-2">
-            <div *ngFor="let name of alternativeNames.controls; let i = index" class="flex gap-2">
-              <input [formControlName]="i" type="text"
-                class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Nom alternatif de la langue">
-              <button type="button" (click)="removeAlternativeName(i)"
-                class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clip-rule="evenodd" />
-                </svg>
-              </button>
+            <div *ngFor="let name of alternativeNames.controls; let i = index" class="space-y-1">
+              <div class="flex gap-2">
+                <input [formControlName]="i" type="text"
+                  class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  [ngClass]="{'border-red-500': name.invalid && name.touched}"
+                  placeholder="Nom alternatif de la langue">
+                <button type="button" (click)="removeAlternativeName(i)"
+                  class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <div *ngIf="name.invalid && name.touched" class="text-red-500 text-xs">
+                <span *ngIf="name.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
+                <span *ngIf="name.errors?.['minlength']">Minimum 2 caractères requis</span>
+              </div>
             </div>
           </div>
         </div>
@@ -280,7 +328,10 @@
             </label>
             <input type="url" id="wikipediaUrl" formControlName="wikipediaUrl"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              [ngClass]="{'border-red-500': languageForm.get('wikipediaUrl')?.invalid && languageForm.get('wikipediaUrl')?.touched}"
               placeholder="https://fr.wikipedia.org/wiki/...">
+            <div *ngIf="languageForm.get('wikipediaUrl')?.invalid && languageForm.get('wikipediaUrl')?.touched"
+              class="text-red-500 text-xs mt-1">L'URL doit commencer par https://</div>
           </div>
 
           <div>
@@ -289,7 +340,10 @@
             </label>
             <input type="url" id="ethnologueUrl" formControlName="ethnologueUrl"
               class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              [ngClass]="{'border-red-500': languageForm.get('ethnologueUrl')?.invalid && languageForm.get('ethnologueUrl')?.touched}"
               placeholder="https://www.ethnologue.com/language/...">
+            <div *ngIf="languageForm.get('ethnologueUrl')?.invalid && languageForm.get('ethnologueUrl')?.touched"
+              class="text-red-500 text-xs mt-1">L'URL doit commencer par https://</div>
           </div>
         </div>
       </div>

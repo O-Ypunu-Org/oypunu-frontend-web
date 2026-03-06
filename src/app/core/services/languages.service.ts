@@ -43,6 +43,7 @@ export interface CreateLanguageDto {
   alternativeNames?: string[];
   status?: 'major' | 'regional' | 'local' | 'liturgical' | 'extinct';
   speakerCount?: number;
+  family?: string;
   endangermentStatus?: 'endangered' | 'vulnerable' | 'safe' | 'unknown';
   description?: string;
   wikipediaUrl?: string;

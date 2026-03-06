@@ -1024,23 +1024,31 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   public getContentPreview(content: ModerableContent): string {
     if ('definition' in content) return content.definition;
 
-    // Langues: ont name, region, systemStatus
-    if ('name' in content && 'region' in content && 'systemStatus' in content) {
-      return `${(content as any).region}${
-        (content as any).country ? ' - ' + (content as any).country : ''
-      }${
-        (content as any).nativeName
-          ? ' (' + (content as any).nativeName + ')'
-          : ''
-      }`;
+    // Langues proposées : ont name, systemStatus, mais pas languageId ni word
+    if (
+      'name' in content &&
+      'systemStatus' in content &&
+      !('languageId' in content) &&
+      !('word' in content) &&
+      !('username' in content) &&
+      !('title' in content) &&
+      !('sender' in content) &&
+      !('user' in content) &&
+      !('filename' in content)
+    ) {
+      const lang = content as any;
+      const regions = Array.isArray(lang.regions) ? lang.regions.join(', ') : (lang.region || '');
+      const countries = Array.isArray(lang.countries) ? lang.countries.join(', ') : (lang.country || '');
+      const native = lang.nativeName ? ` (${lang.nativeName})` : '';
+      const desc = lang.description ? ` — ${lang.description.substring(0, 100)}${lang.description.length > 100 ? '…' : ''}` : '';
+      return `${regions}${countries ? ' · ' + countries : ''}${native}${desc}` || lang.name;
     }
 
-    // Catégories: ont name, languageId, systemStatus (mais pas region)
+    // Catégories: ont name, languageId, systemStatus
     if (
       'name' in content &&
       'languageId' in content &&
-      'systemStatus' in content &&
-      !('region' in content)
+      'systemStatus' in content
     ) {
       const categoryContent = content as any;
       const languageName =

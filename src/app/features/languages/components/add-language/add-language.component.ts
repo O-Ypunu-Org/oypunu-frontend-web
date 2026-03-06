@@ -29,17 +29,54 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
   successMessage = '';
 
   // Options pré-définies
-  regions = [
-    'Afrique du Nord',
-    "Afrique de l'Ouest",
-    'Afrique centrale',
-    "Afrique de l'Est",
-    'Afrique australe',
-    'Europe',
-    'Asie',
-    'Amérique du Nord',
-    'Amérique du Sud',
-    'Océanie',
+  regionGroups: { continent: string; regions: string[] }[] = [
+    {
+      continent: 'Afrique',
+      regions: [
+        'Afrique du Nord',
+        "Afrique de l'Ouest",
+        'Afrique Centrale',
+        "Afrique de l'Est",
+        'Afrique Australe',
+      ],
+    },
+    {
+      continent: 'Amérique',
+      regions: [
+        'Amérique du Nord',
+        'Amérique Centrale',
+        'Caraïbes',
+        'Amérique du Sud',
+      ],
+    },
+    {
+      continent: 'Asie',
+      regions: [
+        "Asie de l'Est",
+        'Asie du Sud-Est',
+        'Asie du Sud',
+        'Asie Centrale',
+        "Asie de l'Ouest",
+      ],
+    },
+    {
+      continent: 'Europe',
+      regions: [
+        "Europe de l'Ouest",
+        "Europe de l'Est",
+        'Europe du Nord',
+        'Europe du Sud',
+      ],
+    },
+    {
+      continent: 'Océanie',
+      regions: [
+        'Australie et Nouvelle-Zélande',
+        'Mélanésie',
+        'Micronésie',
+        'Polynésie',
+      ],
+    },
   ];
 
   statusOptions = [
@@ -63,6 +100,11 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       label: 'Liturgique',
       description: 'Langue utilisée principalement dans un contexte religieux',
     },
+    {
+      value: 'extinct',
+      label: 'Éteinte',
+      description: "Langue qui n'a plus aucun locuteur natif vivant",
+    },
   ];
 
   endangermentOptions = [
@@ -79,8 +121,12 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     {
       value: 'endangered',
       label: 'En danger',
-      description:
-        'Les enfants ne parlent plus la langue comme langue maternelle',
+      description: 'Les enfants ne parlent plus la langue comme langue maternelle',
+    },
+    {
+      value: 'unknown',
+      label: 'Inconnu',
+      description: 'Statut de vitalité non déterminé',
     },
   ];
 
@@ -218,10 +264,10 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
   private createForm(): FormGroup {
     return this.fb.group({
       // Étape 1: Informations de base
-      name: ['', [Validators.required, Validators.minLength(2)]],
-      nativeName: ['', [Validators.required, Validators.minLength(2)]],
-      region: ['', Validators.required],
-      description: [''],
+      name: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/)]],
+      nativeName: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/)]],
+      regions: [[], Validators.required],
+      description: ['', [Validators.maxLength(2000)]],
 
       // Étape 2: Classification et codes
       iso639_1: ['', [Validators.pattern(/^[a-z]{2}$/)]],
@@ -229,7 +275,8 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       iso639_3: ['', [Validators.pattern(/^[a-z]{3}$/)]],
       status: ['regional', Validators.required],
       endangermentStatus: ['safe'],
-      speakerCount: [null, [Validators.min(1)]],
+      speakerCount: [null, [Validators.min(1), Validators.max(8000000000)]],
+      family: ['', [Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/)]],
 
       // Étape 3: Informations complémentaires
       countries: this.fb.array([]),
@@ -280,7 +327,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
         return !!(
           this.languageForm.get('name')?.valid &&
           this.languageForm.get('nativeName')?.valid &&
-          this.languageForm.get('region')?.valid
+          (this.languageForm.get('regions')?.value?.length > 0)
         );
       case 2:
         return !!this.languageForm.get('status')?.valid;
@@ -306,13 +353,24 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
         return !!(
           this.languageForm.get('name')?.valid &&
           this.languageForm.get('nativeName')?.valid &&
-          this.languageForm.get('region')?.valid
+          (this.languageForm.get('regions')?.value?.length > 0)
         );
       case 2:
         return !!this.languageForm.get('status')?.valid;
       default:
         return true;
     }
+  }
+
+  // Gestion des régions (multi-sélection par checkboxes)
+  onRegionToggle(region: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const current: string[] = this.languageForm.get('regions')?.value || [];
+    const updated = checked
+      ? [...current, region]
+      : current.filter((r) => r !== region);
+    this.languageForm.get('regions')?.setValue(updated);
+    this.languageForm.get('regions')?.markAsTouched();
   }
 
   // Gestion des FormArrays
@@ -326,7 +384,11 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
 
   addAlternativeName(): void {
     this.alternativeNames.push(
-      this.fb.control('', [Validators.required, Validators.minLength(2)])
+      this.fb.control('', [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/),
+      ])
     );
   }
 
@@ -388,7 +450,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     return {
       name: formValue.name.trim(),
       nativeName: formValue.nativeName.trim(),
-      regions: formValue.region ? [formValue.region] : [],
+      regions: formValue.regions || [],
       countries: formValue.countries.filter(
         (country: string) => country.trim() !== ''
       ),
@@ -399,6 +461,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       iso639_3: formValue.iso639_3?.trim() || undefined,
       endangermentStatus: formValue.endangermentStatus || 'safe',
       speakerCount: formValue.speakerCount || undefined,
+      family: formValue.family?.trim() || undefined,
       alternativeNames: formValue.alternativeNames.filter(
         (name: string) => name.trim() !== ''
       ),

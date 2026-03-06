@@ -249,7 +249,15 @@ export class ContentDetailModalComponent implements OnInit, OnDestroy {
     content: ModerableContent
   ): content is PendingLanguage {
     return (
-      'name' in content && 'region' in content && 'systemStatus' in content
+      'name' in content &&
+      'systemStatus' in content &&
+      !('languageId' in content) &&
+      !('word' in content) &&
+      !('username' in content) &&
+      !('title' in content) &&
+      !('sender' in content) &&
+      !('user' in content) &&
+      !('filename' in content)
     );
   }
 
@@ -684,6 +692,29 @@ export class ContentDetailModalComponent implements OnInit, OnDestroy {
 
   public isContributorCommitted(content: ModerableContent): boolean {
     return (content as any).commitment || false;
+  }
+
+  public getEndangermentLabel(status: string | undefined): string {
+    const labels: Record<string, string> = {
+      safe: 'Sûre',
+      vulnerable: 'Vulnérable',
+      endangered: 'En danger',
+      critically_endangered: 'En danger critique',
+      extinct: 'Éteinte',
+      unknown: 'Inconnu',
+    };
+    return status ? (labels[status] ?? status) : 'Non spécifié';
+  }
+
+  public getContentAuthorFromProposedBy(content: ModerableContent): string {
+    const c = content as any;
+    if (c.proposedBy) {
+      if (typeof c.proposedBy === 'object') {
+        return c.proposedBy.username || c.proposedBy.email || 'Utilisateur non trouvé';
+      }
+      return `ID: ${c.proposedBy}`;
+    }
+    return this.getContentAuthor(content);
   }
 
   public getContributorExpiresAt(content: ModerableContent): Date {
