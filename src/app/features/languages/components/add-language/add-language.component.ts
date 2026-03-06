@@ -388,7 +388,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     return {
       name: formValue.name.trim(),
       nativeName: formValue.nativeName.trim(),
-      region: formValue.region,
+      regions: formValue.region ? [formValue.region] : [],
       countries: formValue.countries.filter(
         (country: string) => country.trim() !== ''
       ),
