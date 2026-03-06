@@ -406,10 +406,19 @@ export interface PendingLanguage {
   readonly _id: string;
   readonly name: string;
   readonly nativeName?: string;
-  readonly code?: string; // Code ISO langue
-  readonly region: string;
-  readonly country: string;
-  readonly family?: string; // Famille linguistique
+  readonly code?: string;
+  readonly iso639_1?: string;
+  readonly iso639_2?: string;
+  readonly iso639_3?: string;
+  readonly regions?: string[];
+  readonly countries?: string[];
+  readonly family?: string;
+  readonly description?: string;
+  readonly speakerCount?: number;
+  readonly endangermentStatus?: string;
+  readonly alternativeNames?: string[];
+  readonly wikipediaUrl?: string;
+  readonly ethnologueUrl?: string;
   readonly status: ModerationStatus;
   readonly systemStatus: 'pending_approval' | 'approved' | 'rejected';
   readonly submittedBy: User;
