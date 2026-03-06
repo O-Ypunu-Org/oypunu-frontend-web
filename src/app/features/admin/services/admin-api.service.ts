@@ -179,10 +179,24 @@ export class AdminApiService {
     return this.http.get<any>(`${this.baseUrl}/users`, { params }).pipe(
       map((response) => {
         // Transformer la réponse backend vers l'interface frontend
-        const transformedUsers = (response.users || []).map((user: any) => ({
-          ...user,
-          id: user._id || user.id, // Créer l'alias id à partir de _id
-        }));
+        const transformedUsers = (response.users || []).map((user: any) => {
+          // Dériver le statut depuis les champs booléens du backend
+          let status: 'active' | 'suspended' | 'banned';
+          if (user.isBanned) {
+            status = 'banned';
+          } else if (user.isSuspended) {
+            status = 'suspended';
+          } else if (user.isActive === false) {
+            status = 'suspended'; // compte pas encore activé, pas un ban
+          } else {
+            status = 'active';
+          }
+          return {
+            ...user,
+            id: user._id || user.id,
+            status,
+          };
+        });
 
         const transformedResponse: PaginatedResponse<User> = {
           data: transformedUsers, // Users transformés avec l'alias id
@@ -1195,6 +1209,24 @@ export class AdminApiService {
         suspend: false,
         reason: reason || 'Réactivé par un administrateur',
       })
+      .pipe(retry(this.retryCount), catchError(this.handleError));
+  }
+
+  /**
+   * Bannit définitivement un utilisateur
+   */
+  banUser(userId: string, reason: string): Observable<ApiResponse> {
+    return this.http
+      .patch<ApiResponse>(`${this.baseUrl}/users/${userId}/ban`, { reason })
+      .pipe(retry(this.retryCount), catchError(this.handleError));
+  }
+
+  /**
+   * Lève le bannissement d'un utilisateur (superadmin uniquement)
+   */
+  unbanUser(userId: string): Observable<ApiResponse> {
+    return this.http
+      .patch<ApiResponse>(`${this.baseUrl}/users/${userId}/unban`, {})
       .pipe(retry(this.retryCount), catchError(this.handleError));
   }
 

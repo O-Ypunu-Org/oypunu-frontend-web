@@ -1,10 +1,10 @@
-<div class="bg-gray-800 rounded-lg overflow-hidden">
+<div class="bg-gray-800 rounded-lg">
   <!-- Header avec actions en lot -->
   <div class="p-6 border-b border-gray-700" *ngIf="selectedUsers.length > 0">
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <span class="text-sm text-gray-300">{{ selectedUsers.length }} utilisateur(s) sélectionné(s)</span>
-        <button (click)="onBulkAction('suspend')" [disabled]="isLoading"
+        <button *ngIf="hasSelectedActiveUsers()" (click)="onBulkAction('suspend')" [disabled]="isLoading"
           class="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded text-sm transition-colors flex items-center gap-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -12,7 +12,7 @@
           </svg>
           Suspendre
         </button>
-        <button (click)="onBulkAction('activate')" [disabled]="isLoading"
+        <button *ngIf="hasSelectedSuspendedUsers()" (click)="onBulkAction('activate')" [disabled]="isLoading"
           class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition-colors flex items-center gap-1">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -176,16 +176,14 @@
 
           <!-- Statut -->
           <td class="px-6 py-4 whitespace-nowrap">
-            <span class="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full" [ngClass]="{
-                    'bg-green-900 text-green-300': user.status === 'active',
-                    'bg-yellow-900 text-yellow-300': user.status === 'suspended',
-                    'bg-red-900 text-red-300': user.status === 'banned'
-                  }">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8">
-                <circle cx="4" cy="4" r="3" />
-              </svg>
-              {{ getStatusLabel(user.status) }}
-            </span>
+            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 8 8" [ngClass]="{
+              'text-green-400': user.status === 'active',
+              'text-yellow-400': user.status === 'suspended',
+              'text-red-400': user.status === 'banned',
+              'text-gray-500': !user.status
+            }">
+              <circle cx="4" cy="4" r="3" />
+            </svg>
           </td>
 
           <!-- Dernière connexion -->
@@ -233,6 +231,7 @@
               <!-- Menu déroulant pour plus d'actions -->
               <div class="relative">
                 <button (click)="toggleDropdown($event, user.id || user._id)"
+                  data-dropdown-toggle="true"
                   class="dropdown-button text-gray-400 hover:text-gray-300 transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -240,7 +239,9 @@
                   </svg>
                 </button>
                 <div *ngIf="isDropdownOpen(user.id || user._id)" (click)="$event.stopPropagation()"
-                  class="dropdown-menu absolute right-0 mt-2 w-48 bg-gray-700 rounded-lg shadow-lg z-50 border border-gray-600">
+                  class="fixed w-48 bg-gray-700 rounded-lg shadow-lg z-50 border border-gray-600"
+                  [style.top.px]="dropdownPosition?.top"
+                  [style.left.px]="dropdownPosition?.left">
 
                   <button *ngIf="user.status === 'active'" (click)="onAction('suspend', user)"
                     class="w-full text-left px-4 py-2 text-sm text-yellow-300 hover:bg-gray-600 flex items-center gap-2">
@@ -267,6 +268,24 @@
                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     Changer le rôle
+                  </button>
+
+                  <button *ngIf="user.status !== 'banned'" (click)="onAction('ban', user)"
+                    class="w-full text-left px-4 py-2 text-sm text-orange-300 hover:bg-gray-600 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                    </svg>
+                    Bannir définitivement
+                  </button>
+
+                  <button *ngIf="user.status === 'banned'" (click)="onAction('unban', user)"
+                    class="w-full text-left px-4 py-2 text-sm text-teal-300 hover:bg-gray-600 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Lever le bannissement
                   </button>
 
                   <hr class="border-gray-600 my-1">

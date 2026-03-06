@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 
 export interface ConfirmationConfig {
   title: string;
@@ -9,6 +9,7 @@ export interface ConfirmationConfig {
   showInput?: boolean;
   inputLabel?: string;
   inputPlaceholder?: string;
+  minInputLength?: number;
 }
 
 @Component({
@@ -61,6 +62,10 @@ export interface ConfirmationConfig {
             [placeholder]="config.inputPlaceholder || ''"
             class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
+          <p *ngIf="config.minInputLength" class="mt-1 text-xs"
+            [ngClass]="inputValue.trim().length >= config.minInputLength ? 'text-green-400' : 'text-gray-400'">
+            {{ inputValue.trim().length }} / {{ config.minInputLength }} caractères minimum
+          </p>
         </div>
 
         <!-- Actions -->
@@ -75,7 +80,8 @@ export interface ConfirmationConfig {
           <button
             type="button"
             (click)="onConfirm()"
-            class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors focus:outline-none focus:ring-2"
+            [disabled]="isConfirmDisabled()"
+            class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors focus:outline-none focus:ring-2 disabled:opacity-40 disabled:cursor-not-allowed"
             [ngClass]="getConfirmButtonClass()"
           >
             {{ config.confirmText || 'Confirmer' }}
@@ -85,7 +91,7 @@ export interface ConfirmationConfig {
     </div>
   `,
 })
-export class ConfirmationModalComponent {
+export class ConfirmationModalComponent implements OnChanges {
   @Input() isVisible = false;
   @Input() config: ConfirmationConfig = {
     title: 'Confirmation',
@@ -95,6 +101,17 @@ export class ConfirmationModalComponent {
   @Output() cancelled = new EventEmitter<void>();
 
   inputValue = '';
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isVisible']?.currentValue === true) {
+      this.inputValue = '';
+    }
+  }
+
+  isConfirmDisabled(): boolean {
+    if (!this.config.minInputLength) return false;
+    return this.inputValue.trim().length < this.config.minInputLength;
+  }
 
   getIconClass(): string {
     switch (this.config.type) {

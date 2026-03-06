@@ -11,7 +11,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserManagementTableComponent } from '../../components/user-management/user-management-table.component';
-import { Observable, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, forkJoin } from 'rxjs';
 import {
   takeUntil,
   map,
@@ -23,7 +23,7 @@ import {
 import { Router } from '@angular/router';
 import { AdminApiService } from '../../services/admin-api.service';
 import { PermissionService } from '../../services/permission.service';
-import { ToastService } from '../../../../core/services/toast.service';
+import { ToastService } from '../../../../shared/services/toast.service';
 import {
   User,
   UserRole,
@@ -90,6 +90,10 @@ export class UserAdminContainer implements OnInit, OnDestroy {
     message: '',
   };
   private confirmationAction?: (inputValue?: string) => void;
+
+  // Modal de détails utilisateur
+  public showUserDetailsModal = false;
+  public userForDetails: User | null = null;
 
   // Modal de changement de rôle
   public showRoleChangeModal = false;
@@ -238,31 +242,49 @@ export class UserAdminContainer implements OnInit, OnDestroy {
   /**
    * Actions sur les utilisateurs
    */
-  public viewUserDetails(userId: string): void {
-    console.log('🔍 Voir détails utilisateur:', userId);
-    this.toastService.warning(
-      'Fonctionnalité en cours de développement',
-      'La page de détail utilisateur sera bientôt disponible.'
-    );
+  public viewUserDetails(user: User): void {
+    this.userForDetails = user;
+    this.showUserDetailsModal = true;
   }
 
-  public editUser(userId: string): void {
-    console.log('✏️ Éditer utilisateur:', userId);
-    this.toastService.warning(
-      'Fonctionnalité en cours de développement',
-      "La page d'édition utilisateur sera bientôt disponible."
-    );
+  public closeUserDetails(): void {
+    this.showUserDetailsModal = false;
+    this.userForDetails = null;
+  }
+
+  public editUserFromDetails(): void {
+    const user = this.userForDetails;
+    this.showUserDetailsModal = false;
+    this.userForDetails = null;
+    if (user) this.openRoleChangeModal(user.id, user);
+  }
+
+  public editUser(user: User): void {
+    this.openRoleChangeModal(user.id, user);
   }
 
   /**
-   * Export des utilisateurs
+   * Export de tous les utilisateurs
    */
   public exportUsers(): void {
-    console.log('📤 Export utilisateurs');
-    this.toastService.warning(
-      'Fonctionnalité en cours de développement',
-      "L'export des utilisateurs sera bientôt disponible côté backend."
-    );
+    this.adminApiService
+      .exportUsers()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          const blob = new Blob([data], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `users-export-${new Date().toISOString().split('T')[0]}.csv`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          this.toastService.success('Export réussi', 'Le fichier CSV a été téléchargé.');
+        },
+        error: () => {
+          this.toastService.error("Erreur d'export", "Une erreur est survenue lors de l'export.");
+        },
+      });
   }
 
   /**
@@ -320,10 +342,10 @@ export class UserAdminContainer implements OnInit, OnDestroy {
 
     switch (action.type) {
       case 'view':
-        this.viewUserDetails(userId);
+        this.viewUserDetails(action.user);
         break;
       case 'edit':
-        this.editUser(userId);
+        this.editUser(action.user);
         break;
       case 'suspend':
         this.suspendUser(userId);
@@ -336,6 +358,12 @@ export class UserAdminContainer implements OnInit, OnDestroy {
         break;
       case 'permissions':
         this.manageUserPermissions(userId);
+        break;
+      case 'ban':
+        this.banUser(userId);
+        break;
+      case 'unban':
+        this.unbanUser(userId);
         break;
       case 'delete':
         this.deleteUser(userId);
@@ -408,8 +436,9 @@ export class UserAdminContainer implements OnInit, OnDestroy {
       cancelText: 'Annuler',
       type: 'warning',
       showInput: true,
-      inputLabel: 'Raison de la suspension (optionnel)',
+      inputLabel: 'Raison de la suspension (obligatoire)',
       inputPlaceholder: 'Expliquez pourquoi vous suspendez cet utilisateur...',
+      minInputLength: 10,
     };
 
     this.confirmationAction = (inputValue?: string) => {
@@ -533,8 +562,83 @@ export class UserAdminContainer implements OnInit, OnDestroy {
   }
 
   private manageUserPermissions(userId: string): void {
-    // Navigation vers la page de gestion des permissions ou ouverture du modal
-    this.router.navigate(['/admin/users', userId, 'permissions']);
+    this.toastService.warning(
+      'Fonctionnalité à venir',
+      'La gestion des permissions individuelles sera disponible dans une prochaine version.'
+    );
+  }
+
+  private banUser(userId: string): void {
+    this.confirmationConfig = {
+      title: 'Bannir définitivement',
+      message:
+        'Êtes-vous sûr de vouloir bannir définitivement cet utilisateur ? Il ne pourra plus se connecter avec ce compte.',
+      confirmText: 'Bannir définitivement',
+      cancelText: 'Annuler',
+      type: 'danger',
+      showInput: true,
+      inputLabel: 'Raison du bannissement (obligatoire)',
+      inputPlaceholder: 'Violation grave des conditions d\'utilisation...',
+      minInputLength: 10,
+    };
+
+    this.confirmationAction = (inputValue?: string) => {
+      const reason = inputValue?.trim() || 'Bannissement par un administrateur';
+      this.adminApiService
+        .banUser(userId, reason)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success(
+              'Utilisateur banni',
+              "L'utilisateur a été banni définitivement."
+            );
+            this.loadUsers();
+          },
+          error: () => {
+            this.toastService.error(
+              'Erreur de bannissement',
+              "Vérifiez que vous avez les permissions nécessaires et que l'utilisateur n'est pas un superadmin."
+            );
+          },
+        });
+    };
+
+    this.showConfirmationModal = true;
+  }
+
+  private unbanUser(userId: string): void {
+    this.confirmationConfig = {
+      title: 'Lever le bannissement',
+      message:
+        "Êtes-vous sûr de vouloir lever le bannissement de cet utilisateur ? Il pourra à nouveau se connecter.",
+      confirmText: 'Lever le bannissement',
+      cancelText: 'Annuler',
+      type: 'warning',
+    };
+
+    this.confirmationAction = () => {
+      this.adminApiService
+        .unbanUser(userId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success(
+              'Bannissement levé',
+              "L'utilisateur peut à nouveau se connecter."
+            );
+            this.loadUsers();
+          },
+          error: () => {
+            this.toastService.error(
+              'Erreur',
+              "Seul un super-administrateur peut lever un bannissement."
+            );
+          },
+        });
+    };
+
+    this.showConfirmationModal = true;
   }
 
   private deleteUser(userId: string): void {
@@ -545,17 +649,25 @@ export class UserAdminContainer implements OnInit, OnDestroy {
       confirmText: 'Supprimer définitivement',
       cancelText: 'Annuler',
       type: 'danger',
+      showInput: true,
+      inputLabel: 'Raison de la suppression (obligatoire)',
+      inputPlaceholder: 'Expliquez pourquoi vous supprimez cet utilisateur...',
+      minInputLength: 10,
     };
 
-    this.confirmationAction = (inputValue?: string) => {
-      // Pour l'instant, afficher un toast d'information
-      this.toastService.warning(
-        'Fonctionnalité en cours de développement',
-        "La suppression d'utilisateurs sera bientôt disponible côté backend."
-      );
-      console.warn(
-        "⚠️ Tentative de suppression d'utilisateur - endpoint non disponible"
-      );
+    this.confirmationAction = () => {
+      this.adminApiService
+        .deleteUser(userId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => {
+            this.toastService.success('Utilisateur supprimé', "L'utilisateur a été supprimé.");
+            this.loadUsers();
+          },
+          error: () => {
+            this.toastService.error('Non disponible', "La suppression d'utilisateurs n'est pas encore disponible côté backend.");
+          },
+        });
     };
 
     this.showConfirmationModal = true;
@@ -564,29 +676,70 @@ export class UserAdminContainer implements OnInit, OnDestroy {
   // ===== ACTIONS EN LOT =====
 
   private bulkSuspendUsers(userIds: string[]): void {
-    this.toastService.warning(
-      'Fonctionnalité en cours de développement',
-      'Les actions en lot seront bientôt disponibles côté backend.'
-    );
-    console.warn('⚠️ Tentative de suspension en lot - endpoint non disponible');
+    const currentState = this.userAdminStateSubject.value;
+    const activeIds = userIds.filter(id => {
+      const user = currentState.users.find(u => u.id === id || u._id === id);
+      return user?.status === 'active';
+    });
+
+    if (activeIds.length === 0) {
+      this.toastService.warning('Aucune action', "Aucun des utilisateurs sélectionnés n'est actif.");
+      return;
+    }
+
+    forkJoin(activeIds.map(id => this.adminApiService.suspendUser(id, 'Suspension en lot')))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toastService.success('Suspension réussie', `${activeIds.length} utilisateur(s) suspendu(s).`);
+          this.loadUsers();
+        },
+        error: () => {
+          this.toastService.error('Erreur', 'Erreur lors de la suspension en lot.');
+          this.loadUsers();
+        },
+      });
   }
 
   private bulkActivateUsers(userIds: string[]): void {
-    this.toastService.warning(
-      'Fonctionnalité en cours de développement',
-      'Les actions en lot seront bientôt disponibles côté backend.'
-    );
-    console.warn("⚠️ Tentative d'activation en lot - endpoint non disponible");
+    const currentState = this.userAdminStateSubject.value;
+    const suspendedIds = userIds.filter(id => {
+      const user = currentState.users.find(u => u.id === id || u._id === id);
+      return user?.status === 'suspended' || user?.status === 'banned';
+    });
+
+    if (suspendedIds.length === 0) {
+      this.toastService.warning('Aucune action', "Aucun des utilisateurs sélectionnés n'est suspendu.");
+      return;
+    }
+
+    forkJoin(suspendedIds.map(id => this.adminApiService.reactivateUser(id, 'Réactivation en lot')))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toastService.success('Réactivation réussie', `${suspendedIds.length} utilisateur(s) réactivé(s).`);
+          this.loadUsers();
+        },
+        error: () => {
+          this.toastService.error('Erreur', 'Erreur lors de la réactivation en lot.');
+          this.loadUsers();
+        },
+      });
   }
 
   private bulkDeleteUsers(userIds: string[]): void {
-    this.toastService.warning(
-      'Fonctionnalité en cours de développement',
-      'Les actions en lot seront bientôt disponibles côté backend.'
-    );
-    console.warn(
-      '⚠️ Tentative de suppression en lot - endpoint non disponible'
-    );
+    this.adminApiService
+      .bulkDeleteUsers(userIds)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toastService.success('Suppression réussie', `${userIds.length} utilisateur(s) supprimé(s).`);
+          this.loadUsers();
+        },
+        error: () => {
+          this.toastService.error('Non disponible', "La suppression en lot n'est pas encore disponible côté backend.");
+        },
+      });
   }
 
   private exportSelectedUsers(userIds: string[]): void {
