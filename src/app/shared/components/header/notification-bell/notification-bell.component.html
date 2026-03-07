@@ -1,0 +1,71 @@
+<div class="relative notification-bell-wrapper">
+  <!-- Bouton cloche -->
+  <button (click)="toggleDropdown()"
+    class="bell-btn relative p-2 rounded-md text-gray-400 hover:bg-gray-700 transition-colors duration-200"
+    aria-label="Notifications" title="Notifications">
+    <!-- Icône cloche -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <!-- Badge non-lus -->
+    <span *ngIf="unreadCount > 0"
+      class="notification-badge absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 text-xs font-bold text-white rounded-full">
+      {{ unreadCount > 99 ? '99+' : unreadCount }}
+    </span>
+  </button>
+
+  <!-- Dropdown -->
+  <div *ngIf="isOpen"
+    class="absolute right-0 mt-2 w-80 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-50 overflow-hidden">
+    <!-- En-tête -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+      <span class="text-sm font-semibold text-white">Notifications</span>
+      <button *ngIf="unreadCount > 0" (click)="markAllAsRead()"
+        class="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+        Tout marquer lu
+      </button>
+    </div>
+
+    <!-- Chargement -->
+    <div *ngIf="isLoading" class="flex justify-center py-6">
+      <div class="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <!-- Liste vide -->
+    <div *ngIf="!isLoading && notifications.length === 0"
+      class="flex flex-col items-center justify-center py-8 text-gray-500">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2 opacity-40" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+          d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+      <span class="text-sm">Aucune notification</span>
+    </div>
+
+    <!-- Notifications -->
+    <div *ngIf="!isLoading && notifications.length > 0" class="max-h-80 overflow-y-auto divide-y divide-gray-700">
+      <button *ngFor="let notif of notifications" (click)="onNotificationClick(notif)"
+        class="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-gray-700 transition-colors"
+        [class.bg-gray-750]="!notif.isRead">
+        <!-- Icône type -->
+        <span class="flex-shrink-0 text-lg leading-none mt-0.5">{{ getTypeIcon(notif.type) }}</span>
+        <!-- Contenu -->
+        <div class="flex-1 min-w-0">
+          <p class="text-sm text-gray-200 leading-snug" [class.font-medium]="!notif.isRead">
+            {{ notif.message }}
+          </p>
+          <p class="text-xs text-gray-500 mt-0.5">{{ getTimeAgo(notif.createdAt) }}</p>
+        </div>
+      </button>
+    </div>
+
+    <!-- Pied : lien vers page complète -->
+    <div class="border-t border-gray-700 px-4 py-2">
+      <button (click)="goToAll()"
+        class="w-full text-center text-xs text-purple-400 hover:text-purple-300 transition-colors py-1">
+        Voir toutes les notifications →
+      </button>
+    </div>
+  </div>
+</div>

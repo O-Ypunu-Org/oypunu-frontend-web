@@ -21,6 +21,7 @@ import { SignupPromptModalComponent } from './components/signup-prompt-modal/sig
 import { ToastContainerComponent } from './components/toast-container/toast-container.component';
 import { LanguageAutocompleteComponent } from './components/language-autocomplete/language-autocomplete.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
+import { NotificationBellComponent } from './components/header/notification-bell/notification-bell.component';
 // import { IntelligentRecommendationsComponent } from './components/intelligent-recommendations/intelligent-recommendations.component';
 
 @NgModule({
@@ -44,6 +45,7 @@ import { ConfirmationModalComponent } from './components/confirmation-modal/conf
     ToastContainerComponent,
     LanguageAutocompleteComponent,
     ConfirmationModalComponent,
+    NotificationBellComponent,
     // IntelligentRecommendationsComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
@@ -67,6 +69,7 @@ import { ConfirmationModalComponent } from './components/confirmation-modal/conf
     ToastContainerComponent,
     LanguageAutocompleteComponent,
     ConfirmationModalComponent,
+    NotificationBellComponent,
     // IntelligentRecommendationsComponent,
   ],
 })

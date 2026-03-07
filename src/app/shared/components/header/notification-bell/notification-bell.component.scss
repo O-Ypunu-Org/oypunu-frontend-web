@@ -1,0 +1,16 @@
+.bell-btn {
+  &:hover {
+    color: var(--oy-purple-400, #E07048) !important; // primary.400 — Hover state (terracotta lumineux)
+    background-color: rgba(200, 85, 40, 0.08) !important;
+  }
+
+  &:focus {
+    outline: 2px solid var(--oy-purple-600);
+    outline-offset: 2px;
+  }
+}
+
+// Badge non-lus — couleur terracotta du design system
+.notification-badge {
+  background-color: var(--oy-purple-600, #C85528);
+}
