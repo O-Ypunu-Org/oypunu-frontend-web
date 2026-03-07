@@ -68,6 +68,11 @@
           </svg>
         </button>
 
+        <!-- Cloche de notifications (desktop, si authentifié) -->
+        <div *ngIf="isAuthenticated" class="hidden md:block">
+          <app-notification-bell></app-notification-bell>
+        </div>
+
         <!-- Profil Desktop (visible uniquement si authentifié) -->
         <div *ngIf="isAuthenticated" class="hidden md:block">
           <app-profile></app-profile>

@@ -463,9 +463,9 @@
           </div>
           <div class="flex gap-4 mt-4" *ngIf="content.wikipediaUrl || content.ethnologueUrl">
             <a *ngIf="content.wikipediaUrl" [href]="content.wikipediaUrl" target="_blank"
-              class="text-blue-400 hover:text-blue-300 text-sm underline">Wikipedia</a>
+              class="text-purple-600 hover:text-purple-700 text-sm underline">Wikipedia</a>
             <a *ngIf="content.ethnologueUrl" [href]="content.ethnologueUrl" target="_blank"
-              class="text-blue-400 hover:text-blue-300 text-sm underline">Ethnologue</a>
+              class="text-purple-600 hover:text-purple-700 text-sm underline">Ethnologue</a>
           </div>
         </div>
 
@@ -539,7 +539,7 @@
               <label class="block text-sm text-gray-400 mb-1">LinkedIn</label>
               <p class="text-white">
                 <a *ngIf="getContributorLinkedIn(content)" [href]="getContributorLinkedIn(content)" target="_blank" 
-                   class="text-blue-400 hover:text-blue-300 underline">{{ getContributorLinkedIn(content) }}</a>
+                   class="text-purple-600 hover:text-purple-700 underline">{{ getContributorLinkedIn(content) }}</a>
                 <span *ngIf="!getContributorLinkedIn(content)" class="text-gray-400">Non fourni</span>
               </p>
             </div>
@@ -547,7 +547,7 @@
               <label class="block text-sm text-gray-400 mb-1">Portfolio</label>
               <p class="text-white">
                 <a *ngIf="getContributorPortfolio(content)" [href]="getContributorPortfolio(content)" target="_blank" 
-                   class="text-blue-400 hover:text-blue-300 underline">{{ getContributorPortfolio(content) }}</a>
+                   class="text-purple-600 hover:text-purple-700 underline">{{ getContributorPortfolio(content) }}</a>
                 <span *ngIf="!getContributorPortfolio(content)" class="text-gray-400">Non fourni</span>
               </p>
             </div>

@@ -85,6 +85,14 @@ const routes: Routes = [
     component: ContributorRequestComponent,
     canActivate: [AuthGuard],
   },
+  {
+    path: 'notifications',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('./features/notifications/notifications.module').then(
+        (m) => m.NotificationsModule
+      ),
+  },
   { path: '**', redirectTo: '' },
 ];
 
