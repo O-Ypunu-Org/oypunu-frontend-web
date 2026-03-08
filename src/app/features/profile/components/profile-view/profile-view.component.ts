@@ -19,6 +19,7 @@ export class ProfileViewComponent implements OnInit, OnDestroy {
   isOwnProfile = false;
   isLoading    = true;
   error:       string | null  = null;
+  avatarError  = false;
 
   userRole:            UserRole         = UserRole.USER;
   recentContributions: ProfileRecentWord[] = [];
@@ -68,6 +69,7 @@ export class ProfileViewComponent implements OnInit, OnDestroy {
     const profileSub = this.profileService.getProfile().subscribe({
       next: (profile) => {
         this.user = profile;
+        this.avatarError = false;
         this.userStats = {
           totalWordsAdded:     (profile as any).totalWordsAdded     || 0,
           totalCommunityPosts: (profile as any).totalCommunityPosts || 0,
@@ -119,8 +121,9 @@ export class ProfileViewComponent implements OnInit, OnDestroy {
 
     const profileSub = this.profileService.getUserByUsername(username).subscribe({
       next: (user) => {
-        this.user      = user;
-        this.isLoading = false;
+        this.user        = user;
+        this.avatarError = false;
+        this.isLoading   = false;
       },
       error: () => {
         this.error    = 'Utilisateur non trouvé';

@@ -256,7 +256,10 @@ export class AuthService {
               )
               .pipe(
                 tap((response) => {
-                  localStorage.setItem('token', response.tokens.access_token);
+                  localStorage.setItem('access_token', response.tokens.access_token);
+                  if (response.tokens.refresh_token) {
+                    localStorage.setItem('refresh_token', response.tokens.refresh_token);
+                  }
                   localStorage.setItem('user', JSON.stringify(response.user));
                   this._currentUserSubject.next(response.user);
                 }),
