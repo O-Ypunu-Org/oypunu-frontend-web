@@ -1,3 +1,4 @@
+import type { Community } from './community';
 export type { Community } from './community';
 
 export interface Author {
