@@ -17,9 +17,10 @@ import { Subscription } from 'rxjs';
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit, OnDestroy {
-  isDropdownOpen = false;
-  currentUser: User | null = null;
-  userRole: UserRole = UserRole.USER;
+  isDropdownOpen   = false;
+  currentUser:     User | null = null;
+  userRole:        UserRole    = UserRole.USER;
+  navbarAvatarError = false;
 
   private subscription = new Subscription();
 
@@ -34,8 +35,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this._authService.currentUser$.subscribe((user) => {
-        this.currentUser = user;
-        this.userRole = (user?.role as UserRole) || UserRole.USER;
+        this.currentUser      = user;
+        this.userRole         = (user?.role as UserRole) || UserRole.USER;
+        this.navbarAvatarError = false;
       })
     );
   }

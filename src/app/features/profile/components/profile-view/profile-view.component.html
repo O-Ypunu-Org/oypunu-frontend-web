@@ -28,9 +28,9 @@
           <div class="w-20 h-20 rounded-full overflow-hidden
                       bg-gradient-to-br from-[var(--oy-purple-600)] to-[var(--oy-purple-800)]
                       flex items-center justify-center">
-            <img *ngIf="user.profilePicture" [src]="user.profilePicture" [alt]="user.username"
-              class="w-full h-full object-cover">
-            <span *ngIf="!user.profilePicture" class="text-2xl font-bold text-white">
+            <img *ngIf="user.profilePicture && !avatarError" [src]="user.profilePicture" [alt]="user.username"
+              class="w-full h-full object-cover" (error)="avatarError = true">
+            <span *ngIf="!user.profilePicture || avatarError" class="text-2xl font-bold text-white">
               {{ getInitials() }}
             </span>
           </div>
