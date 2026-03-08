@@ -57,8 +57,7 @@
               <h1 class="text-3xl font-bold text-white">{{ community.name }}</h1>
               <div class="flex items-center mt-2 space-x-3">
                 <span class="px-2 py-1 rounded bg-gray-700 text-sm">
-                  {{ community.language === 'fr' ? 'Français' : (community.language === 'en' ? 'Anglais' :
-                  community.language) }}
+                  {{ community.language?.nativeName || community.language?.name || '—' }}
                 </span>
                 <span class="text-gray-400">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24"
@@ -118,6 +117,33 @@
         <!-- Contenu des onglets -->
         <!-- Section des discussions -->
         <div *ngIf="activeTab === 'discussions'" class="p-6">
+          <!-- Tendances -->
+          <div *ngIf="trendingPosts.length > 0" class="mb-6">
+            <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+              🔥 Tendances
+            </h3>
+            <div class="space-y-2">
+              <a *ngFor="let post of trendingPosts"
+                [routerLink]="['/communities', community!._id, 'posts', post._id]"
+                class="flex items-center justify-between p-3 bg-gray-750 rounded-lg border border-gray-700 hover:border-purple-600 transition-colors group">
+                <span class="text-sm text-gray-200 group-hover:text-white truncate flex-1 mr-3">{{ post.title }}</span>
+                <div class="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0">
+                  <span class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                    </svg>
+                    {{ post.score }}
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    {{ post.commentsCount }}
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div>
           <app-community-posts></app-community-posts>
         </div>
         <!-- ?Ou avec un système de routage plus propre -->
@@ -157,13 +183,25 @@
 
               <!-- Actions pour les admins -->
               <div *ngIf="isAdmin() && member.userId._id !== currentUser?._id" class="relative">
-                <button class="text-gray-400 hover:text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
+                <button (click)="toggleRoleMenu(member.userId._id)" class="text-gray-400 hover:text-white p-1 rounded">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                   </svg>
                 </button>
+                <div *ngIf="showRoleMenu[member.userId._id]"
+                  class="absolute right-0 mt-1 w-40 bg-gray-800 border border-gray-700 rounded-lg shadow-xl z-10 py-1">
+                  <button (click)="setRole(member.userId._id, 'moderator')"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                    [class.text-purple-400]="member.role === 'moderator'">
+                    Modérateur
+                  </button>
+                  <button (click)="setRole(member.userId._id, 'member')"
+                    class="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                    [class.text-purple-400]="member.role === 'member'">
+                    Membre
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -180,7 +218,7 @@
             <div>
               <h3 class="text-lg font-medium mb-2">Langue</h3>
               <p class="text-gray-300">
-                {{ getLanguageName(community.language) }}
+                {{ community.language?.nativeName || community.language?.name || '—' }}
               </p>
             </div>
             <div *ngIf="community?.tags && community.tags!.length > 0">
@@ -202,6 +240,24 @@
               <p class="text-gray-300" *ngIf="community?.createdAt">
                 {{ community.createdAt ? formatDate(community.createdAt) : 'Date inconnue' }}
               </p>
+            </div>
+            <!-- Statistiques -->
+            <div *ngIf="communityStats">
+              <h3 class="text-lg font-medium mb-3">Statistiques</h3>
+              <div class="grid grid-cols-3 gap-3">
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                  <p class="text-2xl font-bold text-white">{{ communityStats.totalPosts ?? 0 }}</p>
+                  <p class="text-xs text-gray-400 mt-1">Publications</p>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                  <p class="text-2xl font-bold text-white">{{ communityStats.totalComments ?? 0 }}</p>
+                  <p class="text-xs text-gray-400 mt-1">Commentaires</p>
+                </div>
+                <div class="bg-gray-700 rounded-lg p-3 text-center">
+                  <p class="text-2xl font-bold text-purple-400">{{ communityStats.totalScore ?? 0 }}</p>
+                  <p class="text-xs text-gray-400 mt-1">Score total</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>

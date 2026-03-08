@@ -17,6 +17,8 @@ import {
   ChangeDetectionStrategy,
   OnInit,
   OnDestroy,
+  OnChanges,
+  SimpleChanges,
 } from '@angular/core';
 
 import {
@@ -58,7 +60,7 @@ export interface ContentModerationAction {
   styleUrls: ['./content-detail-modal.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ContentDetailModalComponent implements OnInit, OnDestroy {
+export class ContentDetailModalComponent implements OnInit, OnDestroy, OnChanges {
   // ===== INPUTS =====
 
   @Input() isVisible: boolean = false;
@@ -85,13 +87,26 @@ export class ContentDetailModalComponent implements OnInit, OnDestroy {
 
   // ===== LIFECYCLE HOOKS =====
 
+  private readonly countryNames = new Intl.DisplayNames(['fr'], { type: 'region' });
+
+  getCountryNames(codes: string[] | undefined): string {
+    if (!codes?.length) return 'Non spécifié';
+    return codes.map(c => { try { return this.countryNames.of(c) ?? c; } catch { return c; } }).join(', ');
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isVisible']) {
+      document.body.style.overflow = changes['isVisible'].currentValue ? 'hidden' : '';
+    }
+  }
+
   ngOnInit(): void {
-    // Écouter la touche Échap pour fermer la modal
     document.addEventListener('keydown', this.onKeyDown.bind(this));
   }
 
   ngOnDestroy(): void {
     document.removeEventListener('keydown', this.onKeyDown.bind(this));
+    document.body.style.overflow = '';
   }
 
   // ===== MÉTHODES PUBLIQUES =====

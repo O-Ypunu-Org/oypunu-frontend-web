@@ -1,13 +1,9 @@
-// models/community-post.model.ts
+export type { Community } from './community';
+
 export interface Author {
   _id: string;
   username: string;
   profilePicture?: string;
-}
-
-export interface Community {
-  _id: string;
-  name: string;
 }
 
 export interface Post {

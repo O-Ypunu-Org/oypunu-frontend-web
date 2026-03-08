@@ -123,8 +123,8 @@ export class NotificationBellComponent implements OnInit, OnDestroy {
       this.router.navigate(['/dictionary/word', notif.entityId]);
     } else if (notif.entityType === 'language') {
       this.router.navigate(['/languages']);
-    } else if (notif.entityType === 'conversation' && notif.entityId) {
-      this.router.navigate(['/messages', notif.entityId]);
+    } else if (notif.entityType === 'conversation') {
+      this.router.navigate(['/messaging']);
     } else if (notif.entityType === 'contributor_request') {
       this.router.navigate(['/profile']);
     } else {

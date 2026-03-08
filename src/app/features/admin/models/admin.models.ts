@@ -416,6 +416,8 @@ export interface PendingLanguage {
   readonly description?: string;
   readonly speakerCount?: number;
   readonly endangermentStatus?: string;
+  readonly languageStatus?: string;
+  readonly scripts?: Array<{ name: string; code?: string; direction?: string; isDefault?: boolean }>;
   readonly alternativeNames?: string[];
   readonly wikipediaUrl?: string;
   readonly ethnologueUrl?: string;

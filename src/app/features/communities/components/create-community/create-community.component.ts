@@ -17,6 +17,7 @@ export class CreateCommunityComponent implements OnInit {
   tags: string[] = [];
   newTag: string = '';
   coverImagePreview: string | null = null;
+  availableLanguages: Array<{ _id: string; name: string; nativeName: string }> = [];
 
   constructor(
     private formBuilder: FormBuilder,
@@ -26,6 +27,10 @@ export class CreateCommunityComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
+    this.communitiesService.getAllSystemLanguages().subscribe({
+      next: (langs) => (this.availableLanguages = langs),
+      error: () => (this.availableLanguages = []),
+    });
   }
 
   initForm(): void {

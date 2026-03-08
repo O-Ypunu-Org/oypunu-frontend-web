@@ -84,6 +84,10 @@ export class NotificationsPageComponent implements OnInit {
       this.router.navigate(['/dictionary/word', notif.entityId]);
     } else if (notif.entityType === 'language') {
       this.router.navigate(['/languages']);
+    } else if (notif.entityType === 'conversation') {
+      this.router.navigate(['/messaging']);
+    } else if (notif.entityType === 'contributor_request') {
+      this.router.navigate(['/profile']);
     }
   }
 

@@ -204,6 +204,20 @@ export class CommunityPostsService {
     );
   }
 
+  reportPost(postId: string, reason: string): Observable<{ success: boolean; message: string }> {
+    return this._http.post<{ success: boolean; message: string }>(
+      `${this._API_URL}/posts/${postId}/report`,
+      { reason }
+    );
+  }
+
+  reportComment(commentId: string, reason: string): Observable<{ success: boolean; message: string }> {
+    return this._http.post<{ success: boolean; message: string }>(
+      `${this._API_URL}/comments/${commentId}/report`,
+      { reason }
+    );
+  }
+
   // Méthodes de compatibilité (pour une transition en douceur)
   toggleLikePost(postId: string): Observable<VoteResponse> {
     // Par défaut, upvote si c'était un like

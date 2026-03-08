@@ -8,6 +8,7 @@ import { CreateCommunityComponent } from './components/create-community/create-c
 import { CommunityDetailsComponent } from './components/community-details/community-details.component';
 import { CommunityPostsComponent } from './components/community-posts/community-posts.component';
 import { PostDetailComponent } from './components/post-detail/post-detail.component';
+import { ReportModalComponent } from './components/report-modal/report-modal.component';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -17,6 +18,7 @@ import { SharedModule } from '../../shared/shared.module';
     CommunityDetailsComponent,
     CommunityPostsComponent,
     PostDetailComponent,
+    ReportModalComponent,
   ],
   imports: [
     CommonModule,

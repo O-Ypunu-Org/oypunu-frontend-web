@@ -4,10 +4,10 @@ import {
   CommunitiesService,
   CommunityMember,
 } from '../../../../core/services/communities.service';
+import { CommunityPostsService } from '../../../../core/services/community-posts.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { Community } from '../../../../core/models/community';
-import { Subscription, forkJoin } from 'rxjs';
-import { switchMap, tap, catchError } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-community-details',
@@ -26,19 +26,26 @@ export class CommunityDetailsComponent implements OnInit, OnDestroy {
   currentUser: any = null;
   activeTab: 'discussions' | 'members' | 'about' = 'discussions';
 
+  // Trending & Stats
+  trendingPosts: any[] = [];
+  communityStats: any = null;
+
+  // Dropdown admin membres
+  showRoleMenu: { [userId: string]: boolean } = {};
+
   private subscriptions = new Subscription();
 
   constructor(
     private _route: ActivatedRoute,
     private _router: Router,
     private _communitiesService: CommunitiesService,
+    private _postsService: CommunityPostsService,
     public authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadCommunityData();
 
-    // Souscrire à l'Observable pour obtenir l'utilisateur courant
     this.subscriptions.add(
       this.authService.currentUser$.subscribe((user) => {
         this.currentUser = user;
@@ -54,20 +61,28 @@ export class CommunityDetailsComponent implements OnInit, OnDestroy {
     this.activeTab = tab;
   }
 
-  getLanguageName(code: string): string {
-    const languageMap: { [key: string]: string } = {
-      fr: 'Français',
-      en: 'Anglais',
-      es: 'Espagnol',
-      de: 'Allemand',
-      it: 'Italien',
-      pt: 'Portugais',
-      ja: 'Japonais',
-      zh: 'Chinois',
-      ru: 'Russe',
-    };
+  loadTrendingAndStats(communityId: string): void {
+    this._postsService.getTrendingPosts(communityId, 3).subscribe({
+      next: (posts) => (this.trendingPosts = posts),
+      error: () => (this.trendingPosts = []),
+    });
+    this._postsService.getCommunityStats(communityId).subscribe({
+      next: (stats) => (this.communityStats = stats),
+      error: () => (this.communityStats = null),
+    });
+  }
 
-    return languageMap[code] || code;
+  toggleRoleMenu(userId: string): void {
+    this.showRoleMenu = { ...this.showRoleMenu, [userId]: !this.showRoleMenu[userId] };
+  }
+
+  closeRoleMenu(userId: string): void {
+    this.showRoleMenu = { ...this.showRoleMenu, [userId]: false };
+  }
+
+  setRole(memberId: string, role: 'admin' | 'moderator' | 'member'): void {
+    this.closeRoleMenu(memberId);
+    this.updateMemberRole(memberId, role);
   }
 
   loadCommunityData(): void {
@@ -85,6 +100,7 @@ export class CommunityDetailsComponent implements OnInit, OnDestroy {
     this._communitiesService.getOne(communityId).subscribe({
       next: (community) => {
         this.community = community;
+        this.loadTrendingAndStats(communityId);
 
         // Ensuite charger les membres séparément pour éviter les dépendances
         this._communitiesService.getMembers(communityId).subscribe({
