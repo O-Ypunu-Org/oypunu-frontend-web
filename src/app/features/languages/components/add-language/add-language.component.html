@@ -346,6 +346,43 @@
               class="text-red-500 text-xs mt-1">L'URL doit commencer par https://</div>
           </div>
         </div>
+
+        <!-- Sources de référence -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <div>
+              <label class="block text-sm font-medium text-gray-300">Sources de référence</label>
+              <p class="text-xs text-gray-500 mt-0.5">URL ou référence bibliographique · max. 10 · 500 car. chacune</p>
+            </div>
+            <button type="button" (click)="addSource()" [disabled]="sources.length >= 10"
+              class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
+              + Ajouter une source
+            </button>
+          </div>
+
+          <div formArrayName="sources" class="space-y-2">
+            <div *ngFor="let src of sources.controls; let i = index" class="space-y-1">
+              <div class="flex gap-2">
+                <input [formControlName]="i" type="text"
+                  class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                  [ngClass]="{'border-red-500': src.invalid && src.touched}"
+                  placeholder="https://example.com  ou  Auteur, Titre, Année…">
+                <button type="button" (click)="removeSource(i)"
+                  class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <div *ngIf="src.invalid && src.touched" class="text-red-500 text-xs">
+                <span *ngIf="src.errors?.['maxlength']">500 caractères maximum</span>
+                <span *ngIf="src.errors?.['pattern']">Balises HTML et protocole javascript: interdits</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Navigation et soumission -->

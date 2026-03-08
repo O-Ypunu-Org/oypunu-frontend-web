@@ -35,9 +35,9 @@ export class CreateCommunityComponent implements OnInit {
 
   initForm(): void {
     this.communityForm = this.formBuilder.group({
-      name: ['', [Validators.required]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
       language: ['', [Validators.required]],
-      description: [''],
+      description: ['', [Validators.maxLength(1000)]],
       isPrivate: [false],
       coverImage: [''],
     });
