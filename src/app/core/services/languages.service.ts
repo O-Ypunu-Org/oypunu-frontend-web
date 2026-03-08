@@ -48,6 +48,7 @@ export interface CreateLanguageDto {
   description?: string;
   wikipediaUrl?: string;
   ethnologueUrl?: string;
+  sources?: string[];
 }
 
 export interface LanguageStats {

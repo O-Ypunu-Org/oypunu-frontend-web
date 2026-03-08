@@ -283,6 +283,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       alternativeNames: this.fb.array([]),
       wikipediaUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
       ethnologueUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
+      sources: this.fb.array([]),
     });
   }
 
@@ -293,6 +294,10 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
 
   get alternativeNames(): FormArray {
     return this.languageForm.get('alternativeNames') as FormArray;
+  }
+
+  get sources(): FormArray {
+    return this.languageForm.get('sources') as FormArray;
   }
 
   // Gestion des étapes
@@ -396,6 +401,21 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     this.alternativeNames.removeAt(index);
   }
 
+  addSource(): void {
+    if (this.sources.length >= 10) return;
+    this.sources.push(
+      this.fb.control('', [
+        Validators.required,
+        Validators.maxLength(500),
+        Validators.pattern(/^(?!.*<[^>]+>)(?!.*javascript:).+$/i),
+      ])
+    );
+  }
+
+  removeSource(index: number): void {
+    this.sources.removeAt(index);
+  }
+
   // Soumission du formulaire
   onSubmit(): void {
     if (this.languageForm.invalid) {
@@ -467,6 +487,9 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       ),
       wikipediaUrl: formValue.wikipediaUrl?.trim() || undefined,
       ethnologueUrl: formValue.ethnologueUrl?.trim() || undefined,
+      sources: (formValue.sources as string[])
+        .map((s: string) => s.trim())
+        .filter((s: string) => s.length > 0),
     };
   }
 

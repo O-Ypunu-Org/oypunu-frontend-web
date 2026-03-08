@@ -83,7 +83,7 @@ export class ProfileEditComponent implements OnInit, OnDestroy {
       bio:               ['', [Validators.maxLength(500)]],
       city:              [''],
       country:           [''],
-      website:           ['', [Validators.pattern(/^https?:\/\/.+/)]],
+      website:           ['', [Validators.pattern(/^https?:\/\/.+/), Validators.maxLength(2048)]],
       nativeLanguage:    [''],
       learningLanguages: [[]],
       isProfilePublic:   [true],
