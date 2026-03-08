@@ -23,6 +23,11 @@ export class PostDetailComponent implements OnInit {
   currentUser: any;
   sortBy: 'score' | 'newest' | 'oldest' = 'score';
 
+  // Report modal
+  showReportModal = false;
+  reportTargetId: string | null = null;
+  reportTargetType: 'post' | 'comment' | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -272,6 +277,34 @@ export class PostDetailComponent implements OnInit {
       advanced: 'bg-red-700 text-red-200',
     };
     return classes[difficulty] || 'bg-gray-700 text-gray-200';
+  }
+
+  openReportModal(type: 'post' | 'comment', id: string): void {
+    this.reportTargetType = type;
+    this.reportTargetId = id;
+    this.showReportModal = true;
+  }
+
+  closeReportModal(): void {
+    this.showReportModal = false;
+    this.reportTargetId = null;
+    this.reportTargetType = null;
+  }
+
+  submitReport(reason: string): void {
+    if (!this.reportTargetId || !this.reportTargetType) return;
+
+    const obs = this.reportTargetType === 'post'
+      ? this.postsService.reportPost(this.reportTargetId, reason)
+      : this.postsService.reportComment(this.reportTargetId, reason);
+
+    obs.subscribe({
+      next: () => this.closeReportModal(),
+      error: (err) => {
+        console.error('Erreur lors du signalement:', err);
+        this.closeReportModal();
+      },
+    });
   }
 
   // Épingler/dépingler une publication

@@ -428,7 +428,7 @@
             </div>
             <div>
               <label class="block text-sm text-gray-400 mb-1">Pays</label>
-              <p class="text-white">{{ content.countries?.join(', ') || 'Non spécifié' }}</p>
+              <p class="text-white">{{ getCountryNames(content.countries) }}</p>
             </div>
             <div *ngIf="content.iso639_1 || content.iso639_2 || content.iso639_3">
               <label class="block text-sm text-gray-400 mb-1">Codes ISO 639</label>
@@ -448,9 +448,21 @@
               <label class="block text-sm text-gray-400 mb-1">Locuteurs</label>
               <p class="text-white">{{ content.speakerCount | number }}</p>
             </div>
+            <div *ngIf="content.languageStatus">
+              <label class="block text-sm text-gray-400 mb-1">Statut</label>
+              <p class="text-white">{{ content.languageStatus }}</p>
+            </div>
             <div *ngIf="content.endangermentStatus">
               <label class="block text-sm text-gray-400 mb-1">Statut de vitalité</label>
               <p class="text-white">{{ getEndangermentLabel(content.endangermentStatus) }}</p>
+            </div>
+            <div *ngIf="content.scripts?.length">
+              <label class="block text-sm text-gray-400 mb-1">Écriture(s)</label>
+              <p class="text-white">
+                <ng-container *ngFor="let s of content.scripts; let last = last">
+                  {{ s.name }}{{ s.code ? ' (' + s.code + ')' : '' }}{{ last ? '' : ', ' }}
+                </ng-container>
+              </p>
             </div>
           </div>
           <div *ngIf="content.description" class="mt-4">

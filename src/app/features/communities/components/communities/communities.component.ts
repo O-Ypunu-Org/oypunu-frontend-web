@@ -7,6 +7,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { GuestLimitsService } from '../../../../core/services/guest-limits.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import { Router } from '@angular/router';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'app-communities',
@@ -16,13 +17,47 @@ import { Router } from '@angular/router';
 })
 export class CommunitiesComponent implements OnInit {
   filters: CommunityFilters = {
-    language: '', // Initialisation avec une chaîne vide pour "Toutes les langues"
+    language: '',
+    sortBy: 'memberCount',
+    sortOrder: 'desc',
   };
   communities: any[] = [];
   isLoading = false;
   errorMessage: string | null = null;
   userCommunities: string[] = [];
   isAuthenticated = false;
+
+  // Langues disponibles chargées depuis l'API
+  availableLanguages: Array<{ _id: string; name: string; nativeName: string; iso639_1?: string }> = [];
+
+  sortOptions: DropdownOption[] = [
+    { value: 'memberCount|desc', label: 'Les plus populaires' },
+    { value: 'createdAt|desc', label: 'Les plus récentes' },
+    { value: 'name|asc', label: 'Alphabétique' },
+  ];
+
+  selectedSort = 'memberCount|desc';
+
+  get languageOptions(): DropdownOption[] {
+    return [
+      { value: '', label: 'Toutes les langues' },
+      ...this.availableLanguages.map((lang) => ({
+        value: lang._id,
+        label: lang.nativeName || lang.name,
+      })),
+    ];
+  }
+
+  // Pagination
+  page = 1;
+  limit = 9;
+  total = 0;
+  get totalPages(): number {
+    return Math.ceil(this.total / this.limit);
+  }
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
 
   // Gestion des limitations pour visiteurs
   showSignupModal = false;
@@ -47,11 +82,35 @@ export class CommunitiesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadLanguages();
+    this.loadCommunities();
+  }
+
+  loadLanguages(): void {
+    this._communitiesService.getLanguages().subscribe({
+      next: (languages) => (this.availableLanguages = languages),
+      error: () => (this.availableLanguages = []),
+    });
+  }
+
+  onSortChange(): void {
+    const [sortBy, sortOrder] = this.selectedSort.split('|');
+    this.filters.sortBy = sortBy as any;
+    this.filters.sortOrder = sortOrder as any;
+    this.page = 1;
     this.loadCommunities();
   }
 
   onFilterChange(): void {
+    this.page = 1;
     this.loadCommunities();
+  }
+
+  goToPage(p: number): void {
+    if (p < 1 || p > this.totalPages) return;
+    this.page = p;
+    this.loadCommunities();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   loadCommunities(): void {
@@ -70,9 +129,10 @@ export class CommunitiesComponent implements OnInit {
       }
     }
 
-    this._communitiesService.getAll(this.filters).subscribe({
+    this._communitiesService.getAll({ ...this.filters, page: this.page, limit: this.limit }).subscribe({
       next: (response) => {
         this.communities = response.communities;
+        this.total = response.total ?? 0;
         this.isLoading = false;
         
         // Donner du feedback discret sur les consultations restantes pour les visiteurs

@@ -28,6 +28,10 @@ export class CommunityPostsComponent implements OnInit {
   isMember = false;
   isCheckingMembership = false;
   isJoiningCommunity = false;
+
+  // Report modal
+  showReportModal = false;
+  reportPostId: string | null = null;
   membershipError: string | null = null;
 
   newPostForm: PostFormData = {
@@ -264,6 +268,27 @@ export class CommunityPostsComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur lors du vote:', error);
+      },
+    });
+  }
+
+  openReportModal(postId: string): void {
+    this.reportPostId = postId;
+    this.showReportModal = true;
+  }
+
+  closeReportModal(): void {
+    this.showReportModal = false;
+    this.reportPostId = null;
+  }
+
+  submitReport(reason: string): void {
+    if (!this.reportPostId) return;
+    this.postsService.reportPost(this.reportPostId, reason).subscribe({
+      next: () => this.closeReportModal(),
+      error: (err) => {
+        console.error('Erreur lors du signalement:', err);
+        this.closeReportModal();
       },
     });
   }

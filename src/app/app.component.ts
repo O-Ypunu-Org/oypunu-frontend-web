@@ -26,7 +26,7 @@ export class AppComponent implements OnDestroy {
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: any) => {
         const isMessaging = e.url.startsWith('/messaging');
-        this.showFooter = !isMessaging;
+        this.showFooter = e.url === '/dictionary' || e.url.startsWith('/dictionary?');
         this.isMessagingPage = isMessaging;
 
         if (isMessaging) {

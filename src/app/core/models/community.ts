@@ -1,10 +1,17 @@
-import { User } from './user';
+export interface CommunityLanguage {
+  _id: string;
+  name: string;
+  nativeName: string;
+  iso639_1?: string;
+  iso639_2?: string;
+  iso639_3?: string;
+}
 
 // community.ts
 export interface Community {
   _id: string;
   name: string;
-  language: string;
+  language?: CommunityLanguage;
   description?: string;
   memberCount: number;
   createdBy: {
@@ -27,5 +34,3 @@ export interface CommunityMember {
   joinedAt: Date;
   role: 'member' | 'moderator' | 'admin';
 }
-
-// community-post.ts et autres modèles...

@@ -1344,6 +1344,7 @@ export class AdminApiService {
           const transformedLanguages = (response || []).map((lang: any) => ({
             ...lang,
             id: lang._id || lang.id, // Créer l'alias id à partir de _id
+            languageStatus: lang.status, // Statut géographique (regional, minority, major…)
             status: this.mapLanguageSystemStatusToModerationStatus(
               lang.systemStatus
             ),

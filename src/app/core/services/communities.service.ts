@@ -114,6 +114,20 @@ export class CommunitiesService {
     );
   }
 
+  // Langues ayant au moins une communauté (pour le filtre de la liste)
+  getLanguages(): Observable<Array<{ _id: string; name: string; nativeName: string; iso639_1?: string }>> {
+    return this._http.get<Array<{ _id: string; name: string; nativeName: string; iso639_1?: string }>>(
+      `${this._API_URL}/languages`
+    );
+  }
+
+  // Toutes les langues du système (pour la création de communauté)
+  getAllSystemLanguages(): Observable<Array<{ _id: string; name: string; nativeName: string; iso639_1?: string }>> {
+    return this._http.get<Array<{ _id: string; name: string; nativeName: string; iso639_1?: string }>>(
+      `${environment.apiUrl}/languages`
+    );
+  }
+
   // Récupérer une communauté par son ID
   getOne(communityId: string): Observable<Community> {
     // Pour les visiteurs non authentifiés, vérifier les limitations avant de charger

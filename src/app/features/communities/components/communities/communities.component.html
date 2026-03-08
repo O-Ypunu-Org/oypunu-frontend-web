@@ -19,34 +19,43 @@
 
     <!-- Filtres -->
     <div class="bg-gray-900 rounded-lg p-4 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <!-- Filtre langue (dynamique depuis la BDD) -->
+        <app-custom-dropdown
+          label="Langue"
+          [options]="languageOptions"
+          [(ngModel)]="filters.language"
+          (selectionChange)="onFilterChange()">
+        </app-custom-dropdown>
+
+        <!-- Recherche texte -->
         <div>
-          <label for="language" class="block text-sm font-medium text-gray-400 mb-1">Langue</label>
-          <select id="language" [(ngModel)]="filters.language" (change)="onFilterChange()"
-            class="w-full bg-gray-800 text-white border-gray-700 rounded-md py-2 px-3">
-            <option value="" selected>Toutes les langues</option>
-            <option value="fr">Français</option>
-            <option value="en">Anglais</option>
-            <option value="es">Espagnol</option>
-            <option value="de">Allemand</option>
-            <option value="it">Italien</option>
-            <option value="pt">Portugais</option>
-            <option value="ru">Russe</option>
-            <option value="ja">Japonais</option>
-            <option value="zh">Chinois</option>
-          </select>
+          <label class="block text-sm font-medium text-gray-400 mb-1">Rechercher</label>
+          <div class="relative">
+            <input type="text" [(ngModel)]="filters.searchTerm" (keyup.enter)="onFilterChange()"
+              placeholder="Rechercher une communauté..."
+              class="w-full bg-gray-800 text-white border border-gray-700 rounded-md py-2 pl-3 pr-9 focus:outline-none hover:border-gray-600 placeholder-gray-500">
+            <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0" />
+            </svg>
+          </div>
         </div>
-        <div>
-          <label for="searchTerm" class="block text-sm font-medium text-gray-400 mb-1">Rechercher</label>
-          <input type="text" id="searchTerm" [(ngModel)]="filters.searchTerm" (keyup.enter)="onFilterChange()"
-            placeholder="Rechercher une communauté..."
-            class="w-full bg-gray-800 text-white border-gray-700 rounded-md py-2 px-3">
-        </div>
-        <div class="flex items-end">
-          <button (click)="onFilterChange()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
-            Filtrer
-          </button>
-        </div>
+
+        <!-- Tri -->
+        <app-custom-dropdown
+          label="Trier par"
+          [options]="sortOptions"
+          [(ngModel)]="selectedSort"
+          (selectionChange)="onSortChange()">
+        </app-custom-dropdown>
+
+        <!-- Bouton Filtrer -->
+        <button (click)="onFilterChange()"
+          class="w-full bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white px-4 py-2 rounded-md transition-colors">
+          Filtrer
+        </button>
       </div>
     </div>
 
@@ -108,8 +117,7 @@
           <!-- Tag de langue -->
           <div class="mb-3">
             <span class="px-2 py-1 rounded bg-gray-700 text-xs text-gray-300">
-              {{ community.language === 'fr' ? 'Français' : (community.language === 'en' ? 'Anglais' :
-              community.language) }}
+              {{ community.language?.nativeName || community.language?.name || '—' }}
             </span>
           </div>
 
@@ -128,8 +136,28 @@
       </div>
 
       <!-- Pagination -->
-      <div *ngIf="communities.length > 0" class="mt-6 flex justify-center">
-        <!-- Composant de pagination ici -->
+      <div *ngIf="totalPages > 1" class="mt-8 flex justify-center items-center gap-1">
+        <button
+          (click)="goToPage(page - 1)"
+          [disabled]="page === 1"
+          class="px-3 py-1.5 rounded-md bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          &lsaquo;
+        </button>
+        <ng-container *ngFor="let p of pages">
+          <button
+            (click)="goToPage(p)"
+            [class]="p === page
+              ? 'px-3 py-1.5 rounded-md bg-purple-600 text-white font-semibold'
+              : 'px-3 py-1.5 rounded-md bg-gray-800 text-gray-300 hover:bg-gray-700 transition-colors'">
+            {{ p }}
+          </button>
+        </ng-container>
+        <button
+          (click)="goToPage(page + 1)"
+          [disabled]="page === totalPages"
+          class="px-3 py-1.5 rounded-md bg-gray-800 text-gray-300 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+          &rsaquo;
+        </button>
       </div>
 
       <!-- Pas de communautés -->
