@@ -108,7 +108,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   constructor(
     private readonly adminApiService: AdminApiService,
     private readonly permissionService: PermissionService,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
   ) {
     this.moderationState$ = this.moderationStateSubject.asObservable();
 
@@ -137,24 +137,29 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
 
     // Gérer les paramètres URL pour l'ouverture directe de demandes de contributeur
     // Format URL attendu: /admin/moderation?type=contributor_request&id=68a7427892bdc1be97f15542
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      if (params['type'] === 'contributor_request') {
-        console.log('🔗 Ouverture directe de demande de contributeur depuis URL:', params);
-        
-        // Sélectionner automatiquement la catégorie des demandes de contributeur
-        this.onCategorySelected({
-          contentType: ModerableContentType.CONTRIBUTOR_REQUEST,
-          filters: undefined
-        });
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        if (params['type'] === 'contributor_request') {
+          console.log(
+            '🔗 Ouverture directe de demande de contributeur depuis URL:',
+            params,
+          );
 
-        // Si un ID spécifique est fourni, l'ouvrir dans le modal après un délai
-        if (params['id']) {
-          setTimeout(() => {
-            this.openContributorRequestById(params['id']);
-          }, 1000); // Attendre que la liste soit chargée
+          // Sélectionner automatiquement la catégorie des demandes de contributeur
+          this.onCategorySelected({
+            contentType: ModerableContentType.CONTRIBUTOR_REQUEST,
+            filters: undefined,
+          });
+
+          // Si un ID spécifique est fourni, l'ouvrir dans le modal après un délai
+          if (params['id']) {
+            setTimeout(() => {
+              this.openContributorRequestById(params['id']);
+            }, 1000); // Attendre que la liste soit chargée
+          }
         }
-      }
-    });
+      });
   }
 
   ngOnDestroy(): void {
@@ -179,7 +184,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       .getPendingWords(
         currentState.currentPage,
         currentState.pageSize,
-        currentState.filters
+        currentState.filters,
       )
       .pipe(
         takeUntil(this.destroy$),
@@ -190,7 +195,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
             error: 'Erreur lors du chargement des mots en attente',
           });
           throw error;
-        })
+        }),
       )
       .subscribe((response) => {
         this.moderationStateSubject.next({
@@ -217,7 +222,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     });
 
     console.log(
-      '📊 Chargement des statistiques de modération par catégorie...'
+      '📊 Chargement des statistiques de modération par catégorie...',
     );
 
     // Récupérer les statistiques spécifiques pour chaque type de contenu
@@ -240,14 +245,14 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
         .getAllPendingModerationContent(
           1,
           1,
-          ModerableContentType.COMMUNITY_POST
+          ModerableContentType.COMMUNITY_POST,
         )
         .pipe(catchError(() => of({ data: [], total: 0 }))),
       this.adminApiService
         .getAllPendingModerationContent(
           1,
           1,
-          ModerableContentType.PRIVATE_MESSAGE
+          ModerableContentType.PRIVATE_MESSAGE,
         )
         .pipe(catchError(() => of({ data: [], total: 0 }))),
       this.adminApiService
@@ -260,7 +265,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
         .getAllPendingModerationContent(
           1,
           1,
-          ModerableContentType.MEDIA_CONTENT
+          ModerableContentType.MEDIA_CONTENT,
         )
         .pipe(catchError(() => of({ data: [], total: 0 }))),
       this.adminApiService
@@ -268,16 +273,24 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
         .pipe(catchError(() => of({ data: [], total: 0 }))),
       // Demandes de contributeur - utiliser les paramètres par défaut
       this.adminApiService
-        .getPendingContributorRequests(undefined, undefined, { status: 'pending' })
+        .getPendingContributorRequests(undefined, undefined, {
+          status: 'pending',
+        })
         .pipe(
-          map(response => {
-            console.log('🤝 Debug - Réponse API des demandes de contributeur:', response);
+          map((response) => {
+            console.log(
+              '🤝 Debug - Réponse API des demandes de contributeur:',
+              response,
+            );
             return response;
           }),
           catchError((error) => {
-            console.error('❌ Debug - Erreur API des demandes de contributeur:', error);
+            console.error(
+              '❌ Debug - Erreur API des demandes de contributeur:',
+              error,
+            );
             return of({ data: [], total: 0 });
-          })
+          }),
         ),
     ];
 
@@ -429,7 +442,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
             type: cat.contentType,
             label: cat.label,
             pending: cat.pendingCount,
-          }))
+          })),
         );
 
         // Mettre à jour l'état
@@ -443,7 +456,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       .catch((error) => {
         console.error(
           '❌ Erreur lors du chargement des statistiques de modération:',
-          error
+          error,
         );
         this.moderationStateSubject.next({
           ...currentState,
@@ -457,7 +470,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
    * Transforme les statistiques backend en format des catégories frontend
    */
   private transformBackendStatsToCategories(
-    stats: any
+    stats: any,
   ): ModerationCategoryStats[] {
     const defaultCategories = [
       {
@@ -490,7 +503,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       // Chercher les stats correspondantes dans la réponse backend
       const typeStats = stats.reportsByType?.find(
         (r: any) =>
-          this.mapBackendTypeToFrontend(r.type) === category.contentType
+          this.mapBackendTypeToFrontend(r.type) === category.contentType,
       );
 
       // Pour les langues, nous allons récupérer les statistiques séparément
@@ -529,10 +542,10 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
         catchError((error) => {
           console.warn(
             '❌ Container - Impossible de charger les statistiques des langues:',
-            error
+            error,
           );
           return [];
-        })
+        }),
       )
       .subscribe((response) => {
         const languageStats = response.data || [];
@@ -540,14 +553,14 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
 
         console.log(
           `🌍 Container - Trouvé ${pendingCount} langues en attente:`,
-          languageStats
+          languageStats,
         );
 
         // Debug : afficher les détails de la première langue
         if (languageStats.length > 0) {
           console.log(
             '🔍 Debug - Première langue détails:',
-            JSON.stringify(languageStats[0], null, 2)
+            JSON.stringify(languageStats[0], null, 2),
           );
         }
 
@@ -646,7 +659,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           catchError((error) => {
             console.error(
               '❌ Container - Erreur lors du chargement des mots en attente:',
-              error
+              error,
             );
             this.moderationStateSubject.next({
               ...newState,
@@ -654,12 +667,12 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
               error: 'Impossible de charger les mots en attente',
             });
             return [];
-          })
+          }),
         )
         .subscribe((response) => {
           console.log(
             '📝 Container - Mots chargés:',
-            response.data?.length || 0
+            response.data?.length || 0,
           );
 
           this.moderationStateSubject.next({
@@ -672,7 +685,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     } else if (contentType === ModerableContentType.LANGUAGE) {
       // Pour les langues en attente, utiliser l'endpoint spécifique
       console.log(
-        '🌍 Container - Chargement du contenu des langues pour la liste...'
+        '🌍 Container - Chargement du contenu des langues pour la liste...',
       );
 
       this.adminApiService
@@ -682,7 +695,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           catchError((error) => {
             console.error(
               '❌ Container - Erreur lors du chargement des langues en attente:',
-              error
+              error,
             );
             this.moderationStateSubject.next({
               ...currentState,
@@ -690,16 +703,16 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
               error: 'Impossible de charger les langues en attente',
             });
             return [];
-          })
+          }),
         )
         .subscribe((response) => {
           console.log(
             '🌍 Container - Langues chargées pour la liste:',
-            response.data
+            response.data,
           );
           console.log(
             '🔍 Debug - Contenu complet de la réponse:',
-            JSON.stringify(response, null, 2)
+            JSON.stringify(response, null, 2),
           );
 
           const finalState = {
@@ -721,7 +734,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     } else if (contentType === ModerableContentType.CATEGORY) {
       // Pour les catégories en attente, utiliser l'endpoint spécifique
       console.log(
-        '📂 Container - Chargement du contenu des catégories pour la liste...'
+        '📂 Container - Chargement du contenu des catégories pour la liste...',
       );
 
       this.adminApiService
@@ -731,7 +744,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           catchError((error) => {
             console.error(
               '❌ Container - Erreur lors du chargement des catégories en attente:',
-              error
+              error,
             );
             this.moderationStateSubject.next({
               ...newState,
@@ -739,16 +752,16 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
               error: 'Impossible de charger les catégories en attente',
             });
             return [];
-          })
+          }),
         )
         .subscribe((response) => {
           console.log(
             '📂 Container - Catégories chargées pour la liste:',
-            response.data
+            response.data,
           );
           console.log(
             '🔍 Debug - Contenu complet de la réponse:',
-            JSON.stringify(response, null, 2)
+            JSON.stringify(response, null, 2),
           );
 
           const finalState = {
@@ -765,7 +778,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
               selectedCategory: finalState.selectedCategory,
               contentCount: finalState.allModerationContent.length,
               content: finalState.allModerationContent,
-            }
+            },
           );
 
           this.moderationStateSubject.next(finalState);
@@ -773,7 +786,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     } else if (contentType === ModerableContentType.CONTRIBUTOR_REQUEST) {
       // Pour les demandes de contributeur, utiliser l'endpoint spécifique
       console.log(
-        '🤝 Container - Chargement du contenu des demandes de contributeur pour la liste...'
+        '🤝 Container - Chargement du contenu des demandes de contributeur pour la liste...',
       );
 
       this.adminApiService
@@ -783,24 +796,25 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           catchError((error) => {
             console.error(
               '❌ Container - Erreur lors du chargement des demandes de contributeur en attente:',
-              error
+              error,
             );
             this.moderationStateSubject.next({
               ...newState,
               isLoading: false,
-              error: 'Impossible de charger les demandes de contributeur en attente',
+              error:
+                'Impossible de charger les demandes de contributeur en attente',
             });
             return [];
-          })
+          }),
         )
         .subscribe((response) => {
           console.log(
             '🤝 Container - Demandes de contributeur chargées pour la liste:',
-            response.data
+            response.data,
           );
           console.log(
             '🔍 Debug - Contenu complet de la réponse:',
-            JSON.stringify(response, null, 2)
+            JSON.stringify(response, null, 2),
           );
 
           const finalState = {
@@ -817,7 +831,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
               selectedCategory: finalState.selectedCategory,
               contentCount: finalState.allModerationContent.length,
               content: finalState.allModerationContent,
-            }
+            },
           );
 
           this.moderationStateSubject.next(finalState);
@@ -833,7 +847,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           catchError((error) => {
             console.error(
               `❌ Container - Erreur lors du chargement du contenu ${contentType}:`,
-              error
+              error,
             );
             this.moderationStateSubject.next({
               ...newState,
@@ -841,13 +855,13 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
               error: `Impossible de charger le contenu ${contentType}`,
             });
             return [];
-          })
+          }),
         )
         .subscribe((response) => {
           console.log(
             `📊 Container - Contenu ${contentType} chargé:`,
             response.data?.length || 0,
-            'éléments'
+            'éléments',
           );
 
           this.moderationStateSubject.next({
@@ -956,37 +970,48 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
    * Ouvre une demande de contributeur spécifique par ID (pour les liens email)
    */
   private openContributorRequestById(requestId: string): void {
-    console.log('🔗 Recherche de la demande de contributeur avec ID:', requestId);
+    console.log(
+      '🔗 Recherche de la demande de contributeur avec ID:',
+      requestId,
+    );
 
     const currentState = this.moderationStateSubject.value;
-    
+
     // Chercher dans la liste chargée
     const request = currentState.allModerationContent.find(
-      (content: any) => (content.id === requestId || content._id === requestId)
+      (content: any) => content.id === requestId || content._id === requestId,
     );
 
     if (request) {
-      console.log('✅ Demande de contributeur trouvée, ouverture du modal:', request);
+      console.log(
+        '✅ Demande de contributeur trouvée, ouverture du modal:',
+        request,
+      );
       this.openContentDetail(request);
     } else {
-      console.log('⚠️ Demande de contributeur non trouvée dans la liste actuelle, rechargement...');
+      console.log(
+        '⚠️ Demande de contributeur non trouvée dans la liste actuelle, rechargement...',
+      );
       // Recharger la catégorie et essayer à nouveau
       this.onCategorySelected({
         contentType: ModerableContentType.CONTRIBUTOR_REQUEST,
-        filters: undefined
+        filters: undefined,
       });
-      
+
       setTimeout(() => {
         const newState = this.moderationStateSubject.value;
         const foundRequest = newState.allModerationContent.find(
-          (content: any) => (content.id === requestId || content._id === requestId)
+          (content: any) =>
+            content.id === requestId || content._id === requestId,
         );
-        
+
         if (foundRequest) {
           console.log('✅ Demande trouvée après rechargement:', foundRequest);
           this.openContentDetail(foundRequest);
         } else {
-          console.error('❌ Demande de contributeur introuvable même après rechargement');
+          console.error(
+            '❌ Demande de contributeur introuvable même après rechargement',
+          );
         }
       }, 2000);
     }
@@ -999,7 +1024,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
    */
   public getContentTitle(content: ModerableContent): string {
     if ('word' in content) return `Mot : ${content.word}`;
-    if ('name' in content && 'region' in content && 'systemStatus' in content)
+    if ('name' in content && 'regions' in content && 'systemStatus' in content)
       return `Langue : ${content.name}`;
     if ('title' in content) return content.title;
     if ('sender' in content) return `Message de ${content.sender.username}`;
@@ -1007,14 +1032,22 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     if ('targetType' in content) return `Commentaire sur ${content.targetType}`;
     if ('filename' in content) return `Média : ${content.filename}`;
     if ('aiModel' in content) return 'Contenu détecté par IA';
-    
+
     // Demandes de contributeur - selon le format MongoDB
-    if ('username' in content && 'motivation' in content && 'status' in content) {
+    if (
+      'username' in content &&
+      'motivation' in content &&
+      'status' in content
+    ) {
       return `Demande de contributeur : ${(content as any).username}`;
     }
-    if ('firstName' in content && 'lastName' in content && 'motivation' in content)
+    if (
+      'firstName' in content &&
+      'lastName' in content &&
+      'motivation' in content
+    )
       return `Demande de contributeur : ${(content as any).firstName} ${(content as any).lastName}`;
-      
+
     return 'Contenu à modérer';
   }
 
@@ -1037,11 +1070,20 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       !('filename' in content)
     ) {
       const lang = content as any;
-      const regions = Array.isArray(lang.regions) ? lang.regions.join(', ') : (lang.region || '');
-      const countries = Array.isArray(lang.countries) ? lang.countries.join(', ') : (lang.country || '');
+      const regions = Array.isArray(lang.regions)
+        ? lang.regions.join(', ')
+        : lang.region || '';
+      const countries = Array.isArray(lang.countries)
+        ? lang.countries.join(', ')
+        : lang.country || '';
       const native = lang.nativeName ? ` (${lang.nativeName})` : '';
-      const desc = lang.description ? ` — ${lang.description.substring(0, 100)}${lang.description.length > 100 ? '…' : ''}` : '';
-      return `${regions}${countries ? ' · ' + countries : ''}${native}${desc}` || lang.name;
+      const desc = lang.description
+        ? ` — ${lang.description.substring(0, 100)}${lang.description.length > 100 ? '…' : ''}`
+        : '';
+      return (
+        `${regions}${countries ? ' · ' + countries : ''}${native}${desc}` ||
+        lang.name
+      );
     }
 
     // Catégories: ont name, languageId, systemStatus
@@ -1071,25 +1113,39 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
         (content as any).filename
       }`;
     // Demandes de contributeur - selon le format MongoDB
-    if ('username' in content && 'motivation' in content && 'email' in content) {
+    if (
+      'username' in content &&
+      'motivation' in content &&
+      'email' in content
+    ) {
       const contributorRequest = content as any;
-      const languages = contributorRequest.languages 
-        ? (typeof contributorRequest.languages === 'string' 
-           ? contributorRequest.languages 
-           : contributorRequest.languages.map((lang: any) => lang.name || lang).join(', '))
+      const languages = contributorRequest.languages
+        ? typeof contributorRequest.languages === 'string'
+          ? contributorRequest.languages
+          : contributorRequest.languages
+              .map((lang: any) => lang.name || lang)
+              .join(', ')
         : 'Non spécifiées';
       const motivation = contributorRequest.motivation
-        ? contributorRequest.motivation.substring(0, 100) + (contributorRequest.motivation.length > 100 ? '...' : '')
+        ? contributorRequest.motivation.substring(0, 100) +
+          (contributorRequest.motivation.length > 100 ? '...' : '')
         : 'Aucune motivation fournie';
       return `Email: ${contributorRequest.email} | Langues: ${languages} | Motivation: ${motivation}`;
     }
-    
+
     // Demandes de contributeur - format alternatif
-    if ('firstName' in content && 'lastName' in content && 'motivation' in content) {
+    if (
+      'firstName' in content &&
+      'lastName' in content &&
+      'motivation' in content
+    ) {
       const contributorRequest = content as any;
-      const languages = contributorRequest.languages && contributorRequest.languages.length > 0
-        ? contributorRequest.languages.map((lang: any) => lang.name || lang).join(', ')
-        : 'Non spécifiées';
+      const languages =
+        contributorRequest.languages && contributorRequest.languages.length > 0
+          ? contributorRequest.languages
+              .map((lang: any) => lang.name || lang)
+              .join(', ')
+          : 'Non spécifiées';
       const motivation = contributorRequest.motivation
         ? contributorRequest.motivation.substring(0, 100) + '...'
         : 'Aucune motivation fournie';
@@ -1107,7 +1163,11 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     if ('reportedAt' in content) return content.reportedAt;
     if ('detectedAt' in content) return content.detectedAt;
     // Demandes de contributeur - selon le format MongoDB
-    if ('createdAt' in content && 'username' in content && 'motivation' in content) 
+    if (
+      'createdAt' in content &&
+      'username' in content &&
+      'motivation' in content
+    )
       return new Date((content as any).createdAt);
     if ('requestedAt' in content) return new Date((content as any).requestedAt);
     return new Date();
@@ -1123,13 +1183,17 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     if ('sender' in content) return content.sender.username;
     if ('uploadedBy' in content) return content.uploadedBy.username;
     // Demandes de contributeur - selon le format MongoDB
-    if ('username' in content && 'motivation' in content) 
+    if ('username' in content && 'motivation' in content)
       return (content as any).username;
     // Demandes de contributeur - utiliser le nom complet
     if ('firstName' in content && 'lastName' in content)
       return `${(content as any).firstName} ${(content as any).lastName}`;
     // Ou utiliser l'utilisateur si disponible
-    if ('user' in content && (content as any).user && typeof (content as any).user === 'object')
+    if (
+      'user' in content &&
+      (content as any).user &&
+      typeof (content as any).user === 'object'
+    )
       return (content as any).user.username || (content as any).user.email;
     return '';
   }
@@ -1248,7 +1312,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       // Pour les mots, seules les actions 'approve' et 'reject' sont supportées
       if (type === 'escalate') {
         console.warn(
-          'Action escalate non supportée pour les mots, conversion en reject'
+          'Action escalate non supportée pour les mots, conversion en reject',
         );
         apiCall = this.adminApiService.moderateWord(content.id, {
           action: 'reject',
@@ -1273,25 +1337,25 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       // Pour les catégories, seules les actions 'approve' et 'reject' sont supportées
       if (type === 'escalate') {
         console.warn(
-          'Action escalate non supportée pour les catégories, conversion en reject'
+          'Action escalate non supportée pour les catégories, conversion en reject',
         );
         apiCall = this.adminApiService.moderateCategory(
           content.id,
           'reject',
           reason || 'Escaladé pour révision',
-          notes
+          notes,
         );
       } else {
         apiCall = this.adminApiService.moderateCategory(
           content.id,
           type,
           reason,
-          notes
+          notes,
         );
       }
     } else if (
       'name' in content &&
-      'region' in content &&
+      'regions' in content &&
       'systemStatus' in content
     ) {
       // Pour les langues, utiliser l'endpoint spécifique de modération de langues
@@ -1299,24 +1363,26 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       // Pour les langues, seules les actions 'approve' et 'reject' sont supportées
       if (type === 'escalate') {
         console.warn(
-          'Action escalate non supportée pour les langues, conversion en reject'
+          'Action escalate non supportée pour les langues, conversion en reject',
         );
         apiCall = this.adminApiService.moderateLanguage(
           content.id,
           'reject',
           reason || 'Escaladé pour révision',
-          notes
+          notes,
         );
       } else {
         apiCall = this.adminApiService.moderateLanguage(
           content.id,
           type,
           reason,
-          notes
+          notes,
         );
       }
     } else if (
-      ('firstName' in content && 'lastName' in content && 'motivation' in content) ||
+      ('firstName' in content &&
+        'lastName' in content &&
+        'motivation' in content) ||
       ('username' in content && 'motivation' in content && 'email' in content)
     ) {
       // Pour les demandes de contributeur, utiliser l'endpoint spécifique
@@ -1324,20 +1390,20 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       // Pour les demandes de contributeur, seules les actions 'approve' et 'reject' sont supportées
       if (type === 'escalate') {
         console.warn(
-          'Action escalate non supportée pour les demandes de contributeur, conversion en reject'
+          'Action escalate non supportée pour les demandes de contributeur, conversion en reject',
         );
         const requestId = (content as any).id || (content as any)._id;
         apiCall = this.adminApiService.moderateContributorRequest(requestId, {
           status: 'rejected',
           reviewNotes: notes,
-          rejectionReason: reason || 'Escaladé pour révision'
+          rejectionReason: reason || 'Escaladé pour révision',
         });
       } else {
         const requestId = (content as any).id || (content as any)._id;
         apiCall = this.adminApiService.moderateContributorRequest(requestId, {
           status: type === 'approve' ? 'approved' : 'rejected',
           reviewNotes: notes,
-          rejectionReason: reason
+          rejectionReason: reason,
         });
       }
     } else {
@@ -1361,7 +1427,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
         contentType,
         type,
         reason,
-        notes
+        notes,
       );
     }
 
@@ -1520,7 +1586,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   private bulkModerateWords(
     wordIds: string[],
     status: string,
-    reason?: string
+    reason?: string,
   ): void {
     this.adminApiService
       .bulkModerateWords(wordIds, status, reason)
@@ -1530,7 +1596,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           console.log(
             `${wordIds.length} mots ${
               status === 'approved' ? 'approuvés' : 'rejetés'
-            }`
+            }`,
           );
           this.loadPendingWords();
         },
@@ -1568,9 +1634,12 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   // ===== HELPERS POUR LE LAYOUT EN SECTIONS (miroir mobile) =====
 
   /** Filtre et ordonne les stats par types demandés */
-  public sectionStats(stats: ModerationCategoryStats[], types: string[]): ModerationCategoryStats[] {
+  public sectionStats(
+    stats: ModerationCategoryStats[],
+    types: string[],
+  ): ModerationCategoryStats[] {
     return types
-      .map(type => stats.find(c => c.contentType === type))
+      .map((type) => stats.find((c) => c.contentType === type))
       .filter((c): c is ModerationCategoryStats => !!c);
   }
 
@@ -1582,15 +1651,15 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   /** Description courte d'un type de contenu (miroir des descriptions mobiles) */
   public getCategoryDescription(type: string): string {
     const descriptions: Record<string, string> = {
-      word:                'Mots soumis à valider ou rejeter',
-      language:            'Nouvelles langues à approuver',
-      category:            'Nouvelles catégories à approuver',
-      community_post:      'Posts de communauté signalés',
-      private_message:     'Messages privés signalés',
-      user_profile:        'Profils utilisateurs signalés',
-      comment:             'Commentaires à modérer',
-      media_content:       'Fichiers multimédias à valider',
-      report:              'Contenus signalés par les utilisateurs',
+      word: 'Mots soumis à valider ou rejeter',
+      language: 'Nouvelles langues à approuver',
+      category: 'Nouvelles catégories à approuver',
+      community_post: 'Posts de communauté signalés',
+      private_message: 'Messages privés signalés',
+      user_profile: 'Profils utilisateurs signalés',
+      comment: 'Commentaires à modérer',
+      media_content: 'Fichiers multimédias à valider',
+      report: 'Contenus signalés par les utilisateurs',
       contributor_request: "Demandes d'accès contributeur",
     };
     return descriptions[type] || 'Éléments à modérer';
@@ -1606,7 +1675,11 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
 
   /** Vérifie si le contenu sélectionné est un mot en attente */
   public isWordContent(content: any): boolean {
-    return !!(content && 'word' in content && typeof (content as any).word === 'string');
+    return !!(
+      content &&
+      'word' in content &&
+      typeof (content as any).word === 'string'
+    );
   }
 
   /** Retourne les accents audio du mot sélectionné */
@@ -1657,7 +1730,12 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   public onInlineWordAction(action: 'approve' | 'reject' | 'escalate'): void {
     if (action === 'approve') {
       const content = this.moderationStateSubject.value.selectedContent!;
-      this.onContentModerationAction({ type: 'approve', content, reason: undefined, notes: undefined });
+      this.onContentModerationAction({
+        type: 'approve',
+        content,
+        reason: undefined,
+        notes: undefined,
+      });
       this.closeContentDetail();
     } else {
       this.inlineSelectedAction = action;
