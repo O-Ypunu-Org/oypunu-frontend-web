@@ -101,6 +101,8 @@
     overflow: hidden;
 
     .table {
+      width: 100%;
+      border-collapse: collapse;
       margin-bottom: 0;
 
       // En-têtes de colonnes
@@ -255,20 +257,25 @@
             }
 
             &.status-cell {
-              .form-check-input {
-                width: 2.5rem;
-                height: 1.25rem;
+              .status-badge {
+                display: inline-block;
+                padding: 0.25rem 0.625rem;
+                border-radius: 999px;
+                font-size: 0.8rem;
+                font-weight: 600;
+                letter-spacing: 0.02em;
 
-                &:checked {
-                  background-color: #2E8B57; // Vert forêt tropicale
-                  border-color: #2E8B57;
+                &.status-active {
+                  background-color: rgba(46, 139, 87, 0.15);
+                  color: #2E8B57;
+                  border: 1px solid rgba(46, 139, 87, 0.3);
                 }
-              }
 
-              .form-check-label {
-                font-size: 0.875rem;
-                font-weight: 500;
-                margin-left: 0.5rem;
+                &.status-inactive {
+                  background-color: rgba(192, 57, 43, 0.12);
+                  color: #C0392B;
+                  border: 1px solid rgba(192, 57, 43, 0.3);
+                }
               }
             }
 
@@ -281,19 +288,41 @@
 
             &.actions-cell {
               text-align: center;
+              white-space: nowrap;
 
-              .btn-group .btn {
-                padding: 0.25rem 0.5rem;
-                font-size: 0.75rem;
-                border-radius: 0.25rem;
+              .actions-group {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.375rem;
+              }
 
-                &:hover {
-                  transform: translateY(-1px);
+              .action-btn {
+                width: 32px;
+                height: 32px;
+                border: 1px solid var(--surface-border, #3a2a20);
+                border-radius: 0.375rem;
+                background: transparent;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s ease;
+                padding: 0;
+
+                svg { display: block; pointer-events: none; }
+
+                &.action-edit {
+                  color: #E8A000;
+                  &:hover { background: rgba(232,160,0,0.15); border-color: #E8A000; }
                 }
 
-                i {
-                  font-size: 0.7rem;
+                &.action-delete {
+                  color: #C0392B;
+                  &:hover { background: rgba(192,57,43,0.15); border-color: #C0392B; }
                 }
+
+                &:disabled { opacity: 0.4; cursor: not-allowed; }
               }
             }
           }

@@ -1,13 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import {
   LanguagesService,
   CreateLanguageDto,
 } from '../../../../core/services/languages.service';
+import { AdminApiService } from '../../../admin/services/admin-api.service';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-add-language',
@@ -16,12 +18,13 @@ import {
   styleUrls: ['./add-language.component.scss'],
 })
 export class AddLanguageComponent implements OnInit, OnDestroy {
+  /** Mode admin : soumet vers l'endpoint admin/create et affiche le champ isActive */
+  @Input() isAdmin = false;
+  /** Langue à modifier (mode édition admin) */
+  @Input() editLanguage: any = null;
+
   // Formulaire principal
   languageForm: FormGroup;
-
-  // Gestion des étapes
-  currentStep = 1;
-  totalSteps = 3;
 
   // États de l'interface
   isSubmitting = false;
@@ -247,13 +250,77 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private languagesService: LanguagesService,
-    private router: Router
+    private adminApiService: AdminApiService,
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.languageForm = this.createForm();
   }
 
   ngOnInit(): void {
-    console.log('🎯 AddLanguageComponent initialisé');
+    // Détecter le mode admin depuis le rôle utilisateur (une seule source de vérité)
+    const user = this.authService.getCurrentUser();
+    if (user && (user.role === 'admin' || user.role === 'superadmin')) {
+      this.isAdmin = true;
+    }
+
+    // Pré-remplit le formulaire si editLanguage passé en @Input
+    if (this.editLanguage) {
+      this.patchFormWithLanguage(this.editLanguage);
+      return;
+    }
+
+    // Mode édition depuis la route /languages/edit/:id
+    const languageId = this.route.snapshot.paramMap.get('id');
+    if (languageId) {
+      // Admin → endpoint admin (retourne tous les champs y compris systemStatus)
+      // Contributeur → endpoint public (GET /languages/:id)
+      const fetch$: Observable<any> = this.isAdmin
+        ? this.adminApiService.getLanguageById(languageId)
+        : this.languagesService.getLanguageById(languageId);
+
+      fetch$.pipe(takeUntil(this.destroy$)).subscribe({
+        next: (lang) => {
+          this.editLanguage = lang;
+          this.patchFormWithLanguage(lang);
+        },
+        error: () => {
+          this.errorMessage = 'Impossible de charger la langue à modifier.';
+        },
+      });
+    }
+  }
+
+  private patchFormWithLanguage(lang: any): void {
+    this.languageForm.patchValue({
+      name: lang.name ?? '',
+      nativeName: lang.nativeName ?? '',
+      regions: lang.regions ?? [],
+      description: lang.description ?? '',
+      iso639_1: lang.iso639_1 ?? '',
+      iso639_2: lang.iso639_2 ?? '',
+      iso639_3: lang.iso639_3 ?? '',
+      status: lang.status ?? 'regional',
+      endangermentStatus: lang.endangermentStatus ?? 'safe',
+      speakerCount: lang.speakerCount ?? null,
+      family: lang.family ?? '',
+      wikipediaUrl: lang.wikipediaUrl ?? '',
+      ethnologueUrl: lang.ethnologueUrl ?? '',
+      isActive: lang.isActive ?? true,
+    });
+    // Pays
+    (lang.countries ?? []).forEach((c: string) =>
+      this.countries.push(this.fb.control(c, Validators.required))
+    );
+    // Noms alternatifs
+    (lang.alternativeNames ?? []).forEach((n: string) =>
+      this.alternativeNames.push(this.fb.control(n, [Validators.required, Validators.minLength(2)]))
+    );
+    // Sources
+    (lang.sources ?? []).forEach((s: string) =>
+      this.sources.push(this.fb.control(s, [Validators.required, Validators.maxLength(500)]))
+    );
   }
 
   ngOnDestroy(): void {
@@ -284,6 +351,9 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       wikipediaUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
       ethnologueUrl: ['', [Validators.pattern(/^https?:\/\/.+/)]],
       sources: this.fb.array([]),
+
+      // Admin only
+      isActive: [true],
     });
   }
 
@@ -298,73 +368,6 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
 
   get sources(): FormArray {
     return this.languageForm.get('sources') as FormArray;
-  }
-
-  // Gestion des étapes
-  nextStep(): void {
-    if (this.currentStep < this.totalSteps && this.isCurrentStepValid()) {
-      this.currentStep++;
-      this.errorMessage = '';
-    }
-  }
-
-  previousStep(): void {
-    if (this.currentStep > 1) {
-      this.currentStep--;
-      this.errorMessage = '';
-    }
-  }
-
-  goToStep(step: number): void {
-    if (
-      step >= 1 &&
-      step <= this.totalSteps &&
-      step <= this.getMaxAccessibleStep()
-    ) {
-      this.currentStep = step;
-      this.errorMessage = '';
-    }
-  }
-
-  isCurrentStepValid(): boolean {
-    switch (this.currentStep) {
-      case 1:
-        return !!(
-          this.languageForm.get('name')?.valid &&
-          this.languageForm.get('nativeName')?.valid &&
-          (this.languageForm.get('regions')?.value?.length > 0)
-        );
-      case 2:
-        return !!this.languageForm.get('status')?.valid;
-      case 3:
-        return true; // Étape 3 est toujours valide (informations optionnelles)
-      default:
-        return false;
-    }
-  }
-
-  private getMaxAccessibleStep(): number {
-    // Étape 1 toujours accessible
-    if (!this.isStepValid(1)) return 1;
-    // Étape 2 accessible si étape 1 valide
-    if (!this.isStepValid(2)) return 2;
-    // Étape 3 accessible si étape 2 valide
-    return 3;
-  }
-
-  private isStepValid(step: number): boolean {
-    switch (step) {
-      case 1:
-        return !!(
-          this.languageForm.get('name')?.valid &&
-          this.languageForm.get('nativeName')?.valid &&
-          (this.languageForm.get('regions')?.value?.length > 0)
-        );
-      case 2:
-        return !!this.languageForm.get('status')?.valid;
-      default:
-        return true;
-    }
   }
 
   // Gestion des régions (multi-sélection par checkboxes)
@@ -429,36 +432,36 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
 
     const formData = this.prepareSubmitData();
 
-    console.log('📤 Données à soumettre:', formData);
+    const langId = this.editLanguage?._id || this.editLanguage?.id;
+    const request$: Observable<any> = this.editLanguage
+      ? this.isAdmin
+        ? this.adminApiService.updateLanguageAdmin(langId, formData)
+        : this.languagesService.updateMyProposal(langId, formData)
+      : this.isAdmin
+        ? this.adminApiService.createLanguageAdmin(formData)
+        : this.languagesService.proposeLanguage(formData);
 
-    this.languagesService
-      .proposeLanguage(formData)
+    request$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('✅ Langue proposée avec succès:', response);
           this.isSubmitting = false;
-          this.successMessage =
-            'Votre proposition de langue a été soumise avec succès ! Elle sera examinée par nos modérateurs.';
+          this.successMessage = this.isAdmin
+            ? (this.editLanguage ? 'Langue mise à jour avec succès.' : 'Langue créée avec succès.')
+            : 'Votre proposition de langue a été soumise avec succès ! Elle sera examinée par nos modérateurs.';
 
-          // Redirection après 3 secondes
           setTimeout(() => {
-            this.router.navigate(['/admin']);
-          }, 3000);
+            this.router.navigate([this.isAdmin ? '/admin/languages' : '/profile']);
+          }, 2000);
         },
         error: (error) => {
-          console.error('❌ Erreur lors de la proposition:', error);
           this.isSubmitting = false;
-
           if (error.error?.message) {
-            if (Array.isArray(error.error.message)) {
-              this.errorMessage = error.error.message.join(', ');
-            } else {
-              this.errorMessage = error.error.message;
-            }
+            this.errorMessage = Array.isArray(error.error.message)
+              ? error.error.message.join(', ')
+              : error.error.message;
           } else {
-            this.errorMessage =
-              'Une erreur est survenue lors de la soumission. Veuillez réessayer.';
+            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
           }
         },
       });
@@ -490,6 +493,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       sources: (formValue.sources as string[])
         .map((s: string) => s.trim())
         .filter((s: string) => s.length > 0),
+      ...(this.isAdmin ? { isActive: formValue.isActive ?? true } : {}),
     };
   }
 
@@ -502,25 +506,6 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
         control.controls.forEach((c) => c.markAsTouched());
       }
     });
-  }
-
-  // Utilitaires UI
-  getStepIcon(step: number): string {
-    if (step < this.currentStep) return '✅';
-    if (step === this.currentStep) return '📝';
-    return '⏳';
-  }
-
-  getStepClass(step: number): string {
-    if (step < this.currentStep) return 'bg-green-600 text-white';
-    if (step === this.currentStep) return 'bg-purple-600 text-white';
-    if (step <= this.getMaxAccessibleStep())
-      return 'bg-gray-600 text-gray-300 hover:bg-gray-500 cursor-pointer';
-    return 'bg-gray-800 text-gray-500 cursor-not-allowed';
-  }
-
-  getProgressPercentage(): number {
-    return Math.round((this.currentStep / this.totalSteps) * 100);
   }
 
   // Méthode utilitaire pour obtenir le nom d'un pays à partir de son code

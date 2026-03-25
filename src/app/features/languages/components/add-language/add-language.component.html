@@ -1,446 +1,392 @@
 <div class="min-h-screen bg-gray-950 text-white">
-  <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto py-10 px-4 sm:px-6">
 
     <!-- En-tête -->
     <div class="mb-8">
-      <a routerLink="/dictionary/add" class="inline-flex items-center text-gray-400 hover:text-gray-300 mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+      <a *ngIf="!isAdmin" routerLink="/dictionary/add"
+        class="inline-flex items-center text-gray-400 hover:text-gray-300 mb-4 text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd"
             d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
             clip-rule="evenodd" />
         </svg>
         Retour à l'ajout de mot
       </a>
-      <h1 class="text-3xl font-bold">🌍 Proposer une nouvelle langue</h1>
-      <p class="text-gray-400 mt-2">
-        Enrichissez O'Ypunu en proposant une langue qui n'est pas encore disponible.
-        Votre proposition sera examinée par notre équipe de modérateurs.
+
+      <h1 class="text-2xl font-bold">
+        {{ editLanguage ? 'Modifier la langue' : 'Proposer une nouvelle langue' }}
+      </h1>
+      <p class="text-gray-400 mt-1 text-sm">
+        {{ editLanguage
+        ? 'Modifiez les informations de cette langue.'
+        : 'Enrichissez O\'Ypunu en proposant une langue qui n\'est pas encore disponible. Votre proposition sera examinée par notre équipe de modérateurs.' }}
       </p>
     </div>
 
-    <!-- Messages d'erreur et de succès -->
-    <div *ngIf="errorMessage" class="bg-red-900/50 rounded-lg p-4 mb-6 text-red-200 border border-red-800">
+    <!-- Messages -->
+    <div *ngIf="errorMessage" class="bg-red-900/50 rounded-lg p-4 mb-6 text-red-200 border border-red-800 text-sm">
       {{ errorMessage }}
     </div>
-
-    <div *ngIf="successMessage" class="bg-green-900/50 rounded-lg p-4 mb-6 text-green-200 border border-green-800">
+    <div *ngIf="successMessage"
+      class="bg-green-900/50 rounded-lg p-4 mb-6 text-green-200 border border-green-800 text-sm">
       {{ successMessage }}
     </div>
 
-    <!-- Indicateur de progression -->
-    <div class="mb-8">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-semibold">Progression</h2>
-        <span class="text-sm text-gray-400">{{ getProgressPercentage() }}% terminé</span>
-      </div>
+    <form [formGroup]="languageForm" (ngSubmit)="onSubmit()" class="space-y-6">
 
-      <!-- Barre de progression -->
-      <div class="bg-gray-800 rounded-full h-2 mb-6">
-        <div class="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full transition-all duration-300"
-          [style.width.%]="getProgressPercentage()"></div>
-      </div>
-
-      <!-- Navigation par étapes -->
-      <div class="flex justify-center space-x-4">
-        <button *ngFor="let step of [1, 2, 3]" (click)="goToStep(step)" [ngClass]="getStepClass(step)"
-          class="px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 flex items-center space-x-2">
-          <span>{{ getStepIcon(step) }}</span>
-          <span>Étape {{ step }}</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Formulaire multi-étapes -->
-    <form [formGroup]="languageForm" (ngSubmit)="onSubmit()" class="bg-gray-900 p-6 rounded-lg border border-gray-800">
-
-      <!-- ÉTAPE 1: Informations de base -->
-      <div *ngIf="currentStep === 1" class="space-y-6">
-        <div class="text-center mb-6">
-          <h3 class="text-2xl font-bold text-purple-400">📝 Informations de base</h3>
-          <p class="text-gray-400 mt-2">Commençons par les informations essentielles de votre langue</p>
+      <!-- ===== SECTION 1: Informations de base ===== -->
+      <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-800">
+          <h2 class="text-base font-semibold text-white">Informations de base</h2>
+          <p class="text-gray-400 text-xs mt-0.5">Commençons par les informations essentielles de votre langue</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Nom de la langue -->
-          <div>
-            <label for="name" class="block text-sm font-medium text-gray-300 mb-1">
-              Nom de la langue*
-            </label>
-            <input type="text" id="name" formControlName="name"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('name')?.invalid && languageForm.get('name')?.touched}"
-              placeholder="ex: Punu, Swahili, Wolof">
-            <div *ngIf="languageForm.get('name')?.invalid && languageForm.get('name')?.touched"
-              class="text-red-500 text-xs mt-1">
-              <span *ngIf="languageForm.get('name')?.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
-              <span *ngIf="!languageForm.get('name')?.errors?.['pattern']">Le nom de la langue est requis (minimum 2 caractères)</span>
+        <div class="px-6 py-5 space-y-5">
+
+          <!-- Nom de la langue + Nom natif -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Nom de la langue *</label>
+              <input type="text" formControlName="name"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                [ngClass]="{'border-red-500': languageForm.get('name')?.invalid && languageForm.get('name')?.touched}"
+                placeholder="Ex: Punu">
+              <p *ngIf="languageForm.get('name')?.invalid && languageForm.get('name')?.touched"
+                class="text-red-400 text-xs mt-1">
+                <span *ngIf="languageForm.get('name')?.errors?.['pattern']">Lettres, espaces, apostrophes et tirets
+                  uniquement</span>
+                <span *ngIf="!languageForm.get('name')?.errors?.['pattern']">Requis (minimum 2 caractères)</span>
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Nom natif *</label>
+              <input type="text" formControlName="nativeName"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                [ngClass]="{'border-red-500': languageForm.get('nativeName')?.invalid && languageForm.get('nativeName')?.touched}"
+                placeholder="Ex: Yipunu">
+              <p *ngIf="languageForm.get('nativeName')?.invalid && languageForm.get('nativeName')?.touched"
+                class="text-red-400 text-xs mt-1">
+                <span *ngIf="languageForm.get('nativeName')?.errors?.['pattern']">Lettres, espaces, apostrophes et
+                  tirets uniquement</span>
+                <span *ngIf="!languageForm.get('nativeName')?.errors?.['pattern']">Requis (minimum 2 caractères)</span>
+              </p>
             </div>
           </div>
 
-          <!-- Nom natif -->
+          <!-- Régions -->
           <div>
-            <label for="nativeName" class="block text-sm font-medium text-gray-300 mb-1">
-              Nom natif*
-            </label>
-            <input type="text" id="nativeName" formControlName="nativeName"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('nativeName')?.invalid && languageForm.get('nativeName')?.touched}"
-              placeholder="ex: Ypunu, Kiswahili, Wolof">
-            <div *ngIf="languageForm.get('nativeName')?.invalid && languageForm.get('nativeName')?.touched"
-              class="text-red-500 text-xs mt-1">
-              <span *ngIf="languageForm.get('nativeName')?.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
-              <span *ngIf="!languageForm.get('nativeName')?.errors?.['pattern']">Le nom natif est requis (minimum 2 caractères)</span>
-            </div>
-          </div>
-
-          <!-- Régions (multi-sélection groupée par continent) -->
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              Région(s)*
-            </label>
-            <div class="space-y-3 p-3 bg-gray-800 border border-gray-700 rounded-md"
+            <label class="block text-sm font-medium text-gray-300 mb-2">Régions où cette langue est parlée *</label>
+            <div class="p-4 bg-gray-800 border border-gray-700 rounded-lg space-y-3"
               [ngClass]="{'border-red-500': languageForm.get('regions')?.value?.length === 0 && languageForm.get('regions')?.touched}">
               <div *ngFor="let group of regionGroups">
-                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wide mb-1">{{ group.continent }}</p>
-                <div class="grid grid-cols-2 gap-1 pl-2">
+                <p class="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-1.5">{{ group.continent }}
+                </p>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-1 pl-2">
                   <label *ngFor="let region of group.regions"
                     class="flex items-center gap-2 cursor-pointer text-sm text-gray-300 hover:text-white py-0.5">
-                    <input type="checkbox"
-                      [value]="region"
+                    <input type="checkbox" [value]="region"
                       [checked]="languageForm.get('regions')?.value?.includes(region)"
-                      (change)="onRegionToggle(region, $event)"
-                      class="w-4 h-4 accent-purple-500 cursor-pointer" />
+                      (change)="onRegionToggle(region, $event)" class="w-3.5 h-3.5 accent-orange-500 cursor-pointer" />
                     {{ region }}
                   </label>
                 </div>
               </div>
             </div>
-            <div *ngIf="languageForm.get('regions')?.value?.length === 0 && languageForm.get('regions')?.touched"
-              class="text-red-500 text-xs mt-1">
-              Au moins une région est requise
+            <p *ngIf="languageForm.get('regions')?.value?.length === 0 && languageForm.get('regions')?.touched"
+              class="text-red-400 text-xs mt-1">Au moins une région est requise</p>
+          </div>
+
+          <!-- Pays -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-300">Pays où cette langue est parlée</label>
+              <button type="button" (click)="addCountry()"
+                class="text-xs px-2.5 py-1 bg-orange-600/20 text-orange-400 border border-orange-600/30 rounded-md hover:bg-orange-600/30 transition-colors">
+                + Ajouter un pays
+              </button>
+            </div>
+
+            <div formArrayName="countries" class="space-y-2">
+              <div *ngFor="let country of countries.controls; let i = index" class="flex gap-2">
+                <select [formControlName]="i"
+                  class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
+                  <option value="">Sélectionnez un pays</option>
+                  <option *ngFor="let code of availableCountries" [value]="code">
+                    {{ getCountryName(code) }}
+                  </option>
+                </select>
+                <button type="button" (click)="removeCountry(i)"
+                  class="px-2.5 py-2 bg-gray-700 text-gray-400 rounded-lg hover:bg-red-900/40 hover:text-red-400 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                      clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <p *ngIf="countries.length === 0" class="text-gray-500 text-xs mt-1">Aucun pays ajouté.</p>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Description (optionnel)</label>
+            <textarea formControlName="description" rows="3"
+              class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
+              placeholder="Informations complémentaires sur cette langue..."></textarea>
+            <p class="text-gray-500 text-xs text-right mt-1">
+              {{ languageForm.get('description')?.value?.length || 0 }}/2000
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ===== SECTION 2: Classification linguistique ===== -->
+      <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-800">
+          <h2 class="text-base font-semibold text-white">Classification linguistique</h2>
+          <p class="text-gray-400 text-xs mt-0.5">Spécifiez les détails techniques et le statut de la langue</p>
+        </div>
+
+        <div class="px-6 py-5 space-y-5">
+
+          <!-- Codes ISO -->
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">ISO 639-1</label>
+              <input type="text" formControlName="iso639_1" maxlength="2"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('iso639_1')?.invalid && languageForm.get('iso639_1')?.touched}"
+                placeholder="ex: pu">
+              <p class="text-gray-500 text-xs mt-1">2 lettres</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">ISO 639-2</label>
+              <input type="text" formControlName="iso639_2" maxlength="3"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('iso639_2')?.invalid && languageForm.get('iso639_2')?.touched}"
+                placeholder="ex: puu">
+              <p class="text-gray-500 text-xs mt-1">3 lettres</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">ISO 639-3</label>
+              <input type="text" formControlName="iso639_3" maxlength="3"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('iso639_3')?.invalid && languageForm.get('iso639_3')?.touched}"
+                placeholder="ex: puu">
+              <p class="text-gray-500 text-xs mt-1">3 lettres</p>
             </div>
           </div>
-        </div>
 
-        <!-- Description -->
-        <div>
-          <label for="description" class="block text-sm font-medium text-gray-300 mb-1">
-            Description (optionnel)
-          </label>
-          <textarea id="description" formControlName="description" rows="3"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            placeholder="Décrivez brièvement cette langue, son histoire, ses particularités..."></textarea>
-        </div>
-      </div>
-
-      <!-- ÉTAPE 2: Classification et codes -->
-      <div *ngIf="currentStep === 2" class="space-y-6">
-        <div class="text-center mb-6">
-          <h3 class="text-2xl font-bold text-blue-400">🏷️ Classification linguistique</h3>
-          <p class="text-gray-400 mt-2">Spécifiez les détails techniques et le statut de la langue</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Codes ISO -->
+          <!-- Statut de la langue (boutons) -->
           <div>
-            <label for="iso639_1" class="block text-sm font-medium text-gray-300 mb-1">
-              Code ISO 639-1
-            </label>
-            <input type="text" id="iso639_1" formControlName="iso639_1"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('iso639_1')?.invalid && languageForm.get('iso639_1')?.touched}"
-              placeholder="ex: fr, sw, wo" maxlength="2">
-            <div *ngIf="languageForm.get('iso639_1')?.invalid && languageForm.get('iso639_1')?.touched"
-              class="text-red-500 text-xs mt-1">Exactement 2 lettres minuscules (ex: fr)</div>
-            <div *ngIf="!languageForm.get('iso639_1')?.invalid || !languageForm.get('iso639_1')?.touched"
-              class="text-xs text-gray-500 mt-1">2 lettres minuscules</div>
-          </div>
-
-          <div>
-            <label for="iso639_2" class="block text-sm font-medium text-gray-300 mb-1">
-              Code ISO 639-2
-            </label>
-            <input type="text" id="iso639_2" formControlName="iso639_2"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('iso639_2')?.invalid && languageForm.get('iso639_2')?.touched}"
-              placeholder="ex: fra, swa, wol" maxlength="3">
-            <div *ngIf="languageForm.get('iso639_2')?.invalid && languageForm.get('iso639_2')?.touched"
-              class="text-red-500 text-xs mt-1">Exactement 3 lettres minuscules (ex: fra)</div>
-            <div *ngIf="!languageForm.get('iso639_2')?.invalid || !languageForm.get('iso639_2')?.touched"
-              class="text-xs text-gray-500 mt-1">3 lettres minuscules</div>
-          </div>
-
-          <div>
-            <label for="iso639_3" class="block text-sm font-medium text-gray-300 mb-1">
-              Code ISO 639-3
-            </label>
-            <input type="text" id="iso639_3" formControlName="iso639_3"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('iso639_3')?.invalid && languageForm.get('iso639_3')?.touched}"
-              placeholder="ex: fra, swa, wol" maxlength="3">
-            <div *ngIf="languageForm.get('iso639_3')?.invalid && languageForm.get('iso639_3')?.touched"
-              class="text-red-500 text-xs mt-1">Exactement 3 lettres minuscules (ex: puu)</div>
-            <div *ngIf="!languageForm.get('iso639_3')?.invalid || !languageForm.get('iso639_3')?.touched"
-              class="text-xs text-gray-500 mt-1">3 lettres minuscules</div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Statut -->
-          <div>
-            <label for="status" class="block text-sm font-medium text-gray-300 mb-1">
-              Statut de la langue*
-            </label>
-            <select id="status" formControlName="status"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <option *ngFor="let option of statusOptions" [value]="option.value">
-                {{ option.label }} - {{ option.description }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Statut d'endangement -->
-          <div>
-            <label for="endangermentStatus" class="block text-sm font-medium text-gray-300 mb-1">
-              Statut de préservation
-            </label>
-            <select id="endangermentStatus" formControlName="endangermentStatus"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-              <option *ngFor="let option of endangermentOptions" [value]="option.value">
-                {{ option.label }} - {{ option.description }}
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Nombre de locuteurs -->
-        <div>
-          <label for="speakerCount" class="block text-sm font-medium text-gray-300 mb-1">
-            Nombre approximatif de locuteurs
-          </label>
-          <input type="number" id="speakerCount" formControlName="speakerCount"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            [ngClass]="{'border-red-500': languageForm.get('speakerCount')?.invalid && languageForm.get('speakerCount')?.touched}"
-            placeholder="ex: 280000000" min="1" max="8000000000">
-          <div *ngIf="languageForm.get('speakerCount')?.invalid && languageForm.get('speakerCount')?.touched"
-            class="text-red-500 text-xs mt-1">Nombre entre 1 et 8 000 000 000</div>
-          <div *ngIf="!languageForm.get('speakerCount')?.invalid || !languageForm.get('speakerCount')?.touched"
-            class="text-xs text-gray-500 mt-1">
-            Estimation du nombre de personnes parlant cette langue (natifs + non-natifs)
-          </div>
-        </div>
-
-        <!-- Famille linguistique -->
-        <div>
-          <label for="family" class="block text-sm font-medium text-gray-300 mb-1">
-            Famille linguistique
-          </label>
-          <input type="text" id="family" formControlName="family"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            [ngClass]="{'border-red-500': languageForm.get('family')?.invalid && languageForm.get('family')?.touched}"
-            placeholder="ex: Bantou, Sémitique, Indo-européen...">
-          <div *ngIf="languageForm.get('family')?.invalid && languageForm.get('family')?.touched"
-            class="text-red-500 text-xs mt-1">Lettres, espaces, apostrophes et tirets uniquement</div>
-        </div>
-      </div>
-
-      <!-- ÉTAPE 3: Informations complémentaires -->
-      <div *ngIf="currentStep === 3" class="space-y-6">
-        <div class="text-center mb-6">
-          <h3 class="text-2xl font-bold text-green-400">🌐 Informations complémentaires</h3>
-          <p class="text-gray-400 mt-2">Ajoutez des détails supplémentaires pour enrichir la fiche</p>
-        </div>
-
-        <!-- Pays où la langue est parlée -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="block text-sm font-medium text-gray-300">Pays où la langue est parlée</label>
-            <button type="button" (click)="addCountry()"
-              class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm">
-              + Ajouter un pays
-            </button>
-          </div>
-
-          <div formArrayName="countries" class="space-y-2">
-            <div *ngFor="let country of countries.controls; let i = index" class="flex gap-2">
-              <select [formControlName]="i"
-                class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                <option value="">Sélectionnez un pays</option>
-                <option *ngFor="let countryCode of availableCountries" [value]="countryCode">
-                  {{ getCountryName(countryCode) }}
-                </option>
-              </select>
-              <button type="button" (click)="removeCountry(i)"
-                class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd"
-                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                    clip-rule="evenodd" />
-                </svg>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Statut de la langue</label>
+            <div class="flex flex-wrap gap-2">
+              <button *ngFor="let opt of statusOptions" type="button"
+                (click)="languageForm.get('status')?.setValue(opt.value)"
+                class="px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors" [ngClass]="languageForm.get('status')?.value === opt.value
+                  ? 'bg-orange-600 border-orange-500 text-white'
+                  : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-500'">
+                {{ opt.label }}
               </button>
             </div>
           </div>
 
-          <div *ngIf="countries.length === 0" class="text-sm text-gray-500 mt-2">
-            Aucun pays ajouté. Cliquez sur "Ajouter un pays" pour commencer.
-          </div>
-        </div>
-
-        <!-- Noms alternatifs -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <label class="block text-sm font-medium text-gray-300">Noms alternatifs</label>
-            <button type="button" (click)="addAlternativeName()"
-              class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm">
-              + Ajouter un nom
-            </button>
-          </div>
-
-          <div formArrayName="alternativeNames" class="space-y-2">
-            <div *ngFor="let name of alternativeNames.controls; let i = index" class="space-y-1">
-              <div class="flex gap-2">
-                <input [formControlName]="i" type="text"
-                  class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  [ngClass]="{'border-red-500': name.invalid && name.touched}"
-                  placeholder="Nom alternatif de la langue">
-                <button type="button" (click)="removeAlternativeName(i)"
-                  class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-              <div *ngIf="name.invalid && name.touched" class="text-red-500 text-xs">
-                <span *ngIf="name.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
-                <span *ngIf="name.errors?.['minlength']">Minimum 2 caractères requis</span>
-              </div>
+          <!-- Statut de préservation (boutons) -->
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Statut de préservation</label>
+            <div class="flex flex-wrap gap-2">
+              <button *ngFor="let opt of endangermentOptions" type="button"
+                (click)="languageForm.get('endangermentStatus')?.setValue(opt.value)"
+                class="px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors" [ngClass]="languageForm.get('endangermentStatus')?.value === opt.value
+                  ? 'bg-orange-600 border-orange-500 text-white'
+                  : 'bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-500'">
+                {{ opt.label }}
+              </button>
             </div>
           </div>
-        </div>
 
-        <!-- Liens de référence -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label for="wikipediaUrl" class="block text-sm font-medium text-gray-300 mb-1">
-              Lien Wikipedia
-            </label>
-            <input type="url" id="wikipediaUrl" formControlName="wikipediaUrl"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('wikipediaUrl')?.invalid && languageForm.get('wikipediaUrl')?.touched}"
-              placeholder="https://fr.wikipedia.org/wiki/...">
-            <div *ngIf="languageForm.get('wikipediaUrl')?.invalid && languageForm.get('wikipediaUrl')?.touched"
-              class="text-red-500 text-xs mt-1">L'URL doit commencer par https://</div>
-          </div>
-
-          <div>
-            <label for="ethnologueUrl" class="block text-sm font-medium text-gray-300 mb-1">
-              Lien Ethnologue
-            </label>
-            <input type="url" id="ethnologueUrl" formControlName="ethnologueUrl"
-              class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              [ngClass]="{'border-red-500': languageForm.get('ethnologueUrl')?.invalid && languageForm.get('ethnologueUrl')?.touched}"
-              placeholder="https://www.ethnologue.com/language/...">
-            <div *ngIf="languageForm.get('ethnologueUrl')?.invalid && languageForm.get('ethnologueUrl')?.touched"
-              class="text-red-500 text-xs mt-1">L'URL doit commencer par https://</div>
-          </div>
-        </div>
-
-        <!-- Sources de référence -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
+          <!-- Famille linguistique + Nombre de locuteurs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-300">Sources de référence</label>
-              <p class="text-xs text-gray-500 mt-0.5">URL ou référence bibliographique · max. 10 · 500 car. chacune</p>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Famille linguistique (optionnel)</label>
+              <input type="text" formControlName="family"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('family')?.invalid && languageForm.get('family')?.touched}"
+                placeholder="Ex: Bantou, Sémitique, Indo-européen...">
             </div>
-            <button type="button" (click)="addSource()" [disabled]="sources.length >= 10"
-              class="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm disabled:opacity-40 disabled:cursor-not-allowed">
-              + Ajouter une source
-            </button>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Nombre approximatif de locuteurs
+                (optionnel)</label>
+              <input type="number" formControlName="speakerCount" min="1" max="8000000000"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('speakerCount')?.invalid && languageForm.get('speakerCount')?.touched}"
+                placeholder="Ex: 1000000">
+            </div>
           </div>
 
-          <div formArrayName="sources" class="space-y-2">
-            <div *ngFor="let src of sources.controls; let i = index" class="space-y-1">
-              <div class="flex gap-2">
-                <input [formControlName]="i" type="text"
-                  class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-                  [ngClass]="{'border-red-500': src.invalid && src.touched}"
-                  placeholder="https://example.com  ou  Auteur, Titre, Année…">
-                <button type="button" (click)="removeSource(i)"
-                  class="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clip-rule="evenodd" />
-                  </svg>
-                </button>
-              </div>
-              <div *ngIf="src.invalid && src.touched" class="text-red-500 text-xs">
-                <span *ngIf="src.errors?.['maxlength']">500 caractères maximum</span>
-                <span *ngIf="src.errors?.['pattern']">Balises HTML et protocole javascript: interdits</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
-      <!-- Navigation et soumission -->
-      <div class="flex justify-between items-center mt-8 pt-6 border-t border-gray-800">
-        <button *ngIf="currentStep > 1" type="button" (click)="previousStep()"
-          class="px-6 py-3 bg-gray-700 text-white rounded-md hover:bg-gray-600 transition-colors flex items-center space-x-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd"
-              d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-              clip-rule="evenodd" />
-          </svg>
-          <span>Précédent</span>
-        </button>
+      <!-- ===== SECTION 3: Informations complémentaires ===== -->
+      <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-800">
+          <h2 class="text-base font-semibold text-white">Informations complémentaires</h2>
+          <p class="text-gray-400 text-xs mt-0.5">Ajoutez des détails supplémentaires pour enrichir la fiche</p>
+        </div>
 
-        <div *ngIf="currentStep === 1"></div> <!-- Spacer pour le premier step -->
+        <div class="px-6 py-5 space-y-5">
 
-        <button *ngIf="currentStep < totalSteps" type="button" (click)="nextStep()" [disabled]="!isCurrentStepValid()"
-          class="px-6 py-3 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
-          <span>Suivant</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd"
-              d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-              clip-rule="evenodd" />
-          </svg>
-        </button>
+          <!-- Noms alternatifs -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-sm font-medium text-gray-300">Noms alternatifs (optionnel)</label>
+              <button type="button" (click)="addAlternativeName()"
+                class="text-xs px-2.5 py-1 bg-orange-600/20 text-orange-400 border border-orange-600/30 rounded-md hover:bg-orange-600/30 transition-colors">
+                + Ajouter
+              </button>
+            </div>
+            <div formArrayName="alternativeNames" class="space-y-2">
+              <div *ngFor="let name of alternativeNames.controls; let i = index">
+                <div class="flex gap-2">
+                  <input [formControlName]="i" type="text"
+                    class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    [ngClass]="{'border-red-500': name.invalid && name.touched}" placeholder="Ex: Pounou">
+                  <button type="button" (click)="removeAlternativeName(i)"
+                    class="px-2.5 py-2 bg-gray-700 text-gray-400 rounded-lg hover:bg-red-900/40 hover:text-red-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+                <p *ngIf="name.invalid && name.touched" class="text-red-400 text-xs mt-1">
+                  <span *ngIf="name.errors?.['pattern']">Lettres, espaces, apostrophes et tirets uniquement</span>
+                  <span *ngIf="name.errors?.['minlength']">Minimum 2 caractères</span>
+                </p>
+              </div>
+            </div>
+          </div>
 
-        <button *ngIf="currentStep === totalSteps" type="submit" [disabled]="isSubmitting || languageForm.invalid"
-          class="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2">
-          <span *ngIf="!isSubmitting">🚀 Soumettre la proposition</span>
-          <span *ngIf="isSubmitting" class="flex items-center">
-            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-              viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-              </path>
-            </svg>
-            Soumission en cours...
-          </span>
-        </button>
+          <!-- Wikipedia + Ethnologue -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Lien Wikipedia (optionnel)</label>
+              <input type="url" formControlName="wikipediaUrl"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('wikipediaUrl')?.invalid && languageForm.get('wikipediaUrl')?.touched}"
+                placeholder="https://fr.wikipedia.org/wiki/...">
+              <p *ngIf="languageForm.get('wikipediaUrl')?.invalid && languageForm.get('wikipediaUrl')?.touched"
+                class="text-red-400 text-xs mt-1">L'URL doit commencer par http:// ou https://</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Lien Ethnologue (optionnel)</label>
+              <input type="url" formControlName="ethnologueUrl"
+                class="w-full px-3 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                [ngClass]="{'border-red-500': languageForm.get('ethnologueUrl')?.invalid && languageForm.get('ethnologueUrl')?.touched}"
+                placeholder="https://www.ethnologue.com/language/...">
+              <p *ngIf="languageForm.get('ethnologueUrl')?.invalid && languageForm.get('ethnologueUrl')?.touched"
+                class="text-red-400 text-xs mt-1">L'URL doit commencer par http:// ou https://</p>
+            </div>
+          </div>
+
+          <!-- Sources de référence -->
+          <div>
+            <div class="flex items-start justify-between mb-2">
+              <div>
+                <label class="block text-sm font-medium text-gray-300">Sources de référence (optionnel)</label>
+                <p class="text-gray-500 text-xs mt-0.5">URL ou référence bibliographique · max. 10 · 500 car. chacune
+                </p>
+              </div>
+              <button type="button" (click)="addSource()" [disabled]="sources.length >= 10"
+                class="text-xs px-2.5 py-1 bg-orange-600/20 text-orange-400 border border-orange-600/30 rounded-md hover:bg-orange-600/30 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                + Ajouter
+              </button>
+            </div>
+            <div formArrayName="sources" class="space-y-2">
+              <div *ngFor="let src of sources.controls; let i = index">
+                <div class="flex gap-2">
+                  <input [formControlName]="i" type="text"
+                    class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    [ngClass]="{'border-red-500': src.invalid && src.touched}"
+                    placeholder="https://… ou Auteur, Titre, Année…">
+                  <button type="button" (click)="removeSource(i)"
+                    class="px-2.5 py-2 bg-gray-700 text-gray-400 rounded-lg hover:bg-red-900/40 hover:text-red-400 transition-colors flex-shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+                <p *ngIf="src.invalid && src.touched" class="text-red-400 text-xs mt-1">
+                  <span *ngIf="src.errors?.['maxlength']">500 caractères maximum</span>
+                  <span *ngIf="src.errors?.['pattern']">Balises HTML et protocole javascript: interdits</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
-    </form>
 
-    <!-- Note informative -->
-    <div class="mt-8 p-4 bg-blue-900/60 border border-blue-700 rounded-lg flex items-start gap-3">
-      <svg class="h-6 w-6 text-blue-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"
-        viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <div>
-        <h3 class="text-lg font-medium text-blue-100 mb-1">📋 Processus de validation</h3>
-        <p class="text-blue-100 text-sm">
-          Votre proposition sera examinée par notre équipe de modérateurs linguistes.
-          Nous vérifions l'exactitude des informations, la pertinence de la langue
-          et sa conformité aux standards internationaux. Vous serez notifié du résultat par email.
+      <!-- Langue active (admin uniquement) -->
+      <div *ngIf="isAdmin" class="bg-gray-900 rounded-xl border border-gray-800 px-6 py-4">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" formControlName="isActive"
+            class="w-4 h-4 rounded text-orange-600 bg-gray-700 border-gray-600 focus:ring-orange-500 accent-orange-500">
+          <div>
+            <span class="text-white text-sm font-medium">Langue active</span>
+            <p class="text-gray-400 text-xs mt-0.5">Une langue active est visible et disponible dans le dictionnaire.
+            </p>
+          </div>
+        </label>
+      </div>
+
+      <!-- Note informative -->
+      <div class="p-4 bg-blue-900/30 border border-blue-700/50 rounded-xl flex items-start gap-3">
+        <svg class="h-5 w-5 text-blue-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-blue-200 text-sm">
+          <ng-container *ngIf="isAdmin">
+            {{ editLanguage
+            ? 'Les modifications seront appliquées immédiatement après enregistrement.'
+            : 'La langue sera créée et visible selon son statut actif.' }}
+          </ng-container>
+          <ng-container *ngIf="!isAdmin">
+            {{ editLanguage
+            ? 'Vos modifications seront examinées par notre équipe avant d\'être appliquées.'
+            : 'Votre proposition sera examinée par notre équipe avant d\'être ajoutée à la liste des langues disponibles.' }}
+          </ng-container>
         </p>
       </div>
-    </div>
+
+      <!-- Bouton de soumission -->
+      <div class="flex justify-end">
+        <button type="submit" [disabled]="isSubmitting || languageForm.invalid"
+          class="px-6 py-3 bg-orange-600 text-white rounded-xl font-medium hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+          <svg *ngIf="isSubmitting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          <span *ngIf="!isSubmitting">
+            {{ isAdmin
+            ? (editLanguage ? 'Enregistrer les modifications' : 'Créer la langue')
+            : (editLanguage ? 'Proposer les modifications' : 'Proposer cette langue') }}
+          </span>
+          <span *ngIf="isSubmitting">Traitement en cours...</span>
+        </button>
+      </div>
+
+    </form>
   </div>
 </div>

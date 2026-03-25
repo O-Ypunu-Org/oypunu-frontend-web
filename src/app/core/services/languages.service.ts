@@ -137,6 +137,21 @@ export class LanguagesService {
   // ===== ENDPOINTS UTILISATEURS AUTHENTIFIÉS =====
 
   /**
+   * Récupère les langues proposées par l'utilisateur connecté
+   */
+  getMyProposals(): Observable<Language[]> {
+    return this.http.get<Language[]>(`${this.baseUrl}/my-proposals`);
+  }
+
+  /**
+   * Met à jour une langue proposée (créateur ou admin/superadmin)
+   * PATCH /languages/:id
+   */
+  updateMyProposal(languageId: string, languageData: Partial<CreateLanguageDto>): Observable<Language> {
+    return this.http.patch<Language>(`${this.baseUrl}/${languageId}`, languageData);
+  }
+
+  /**
    * Propose une nouvelle langue (contributeur+)
    */
   proposeLanguage(languageData: CreateLanguageDto): Observable<Language> {

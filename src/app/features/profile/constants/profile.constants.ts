@@ -12,6 +12,8 @@ export const PROFILE_ADMIN_ROUTES = {
   users: '/admin/users',
   analytics: '/admin/analytics',
   system: '/admin/system',
+  manageLanguages: '/admin/languages',
+  manageCategories: '/admin/categories',
 } as const;
 
 export const PROFILE_ROUTES = {
@@ -21,8 +23,8 @@ export const PROFILE_ROUTES = {
   addWord: '/dictionary/add',
   editProfile: '/profile/edit',
   contributorRequest: '/contributor-request',
-  proposeLanguage: '/admin/languages',
-  proposeCategory: '/admin/categories',
+  proposeLanguage: '/languages/add',
+  proposeCategory: '/categories/add',
 } as const;
 
 // ===== TITRES DE SECTION =====
@@ -74,22 +76,16 @@ export const ADMIN_NAV_ITEMS: Record<'admin' | 'superadmin', AdminNavItem[]> = {
       route: PROFILE_ADMIN_ROUTES.dashboard,
     },
     {
-      key: 'moderation',
-      label: 'Modération',
-      icon: '🔖',
-      route: PROFILE_ADMIN_ROUTES.moderation,
+      key: 'languages',
+      label: 'Gestion des langues',
+      icon: '🌍',
+      route: PROFILE_ADMIN_ROUTES.manageLanguages,
     },
     {
-      key: 'users',
-      label: 'Gestion des utilisateurs',
-      icon: '👥',
-      route: PROFILE_ADMIN_ROUTES.users,
-    },
-    {
-      key: 'analytics',
-      label: 'Analytics',
-      icon: '📊',
-      route: PROFILE_ADMIN_ROUTES.analytics,
+      key: 'categories',
+      label: 'Gestion des catégories',
+      icon: '🏷️',
+      route: PROFILE_ADMIN_ROUTES.manageCategories,
     },
   ],
   superadmin: [
@@ -98,35 +94,18 @@ export const ADMIN_NAV_ITEMS: Record<'admin' | 'superadmin', AdminNavItem[]> = {
       label: 'Tableau de bord',
       icon: '🛡️',
       route: PROFILE_ADMIN_ROUTES.dashboard,
-      variant: 'default',
     },
     {
-      key: 'moderation',
-      label: 'Modération',
-      icon: '🔖',
-      route: PROFILE_ADMIN_ROUTES.moderation,
-      variant: 'default',
+      key: 'languages',
+      label: 'Gestion des langues',
+      icon: '🌍',
+      route: PROFILE_ADMIN_ROUTES.manageLanguages,
     },
     {
-      key: 'users',
-      label: 'Gestion des utilisateurs',
-      icon: '👥',
-      route: PROFILE_ADMIN_ROUTES.users,
-      variant: 'default',
-    },
-    {
-      key: 'analytics',
-      label: 'Analytics',
-      icon: '📊',
-      route: PROFILE_ADMIN_ROUTES.analytics,
-      variant: 'default',
-    },
-    {
-      key: 'system',
-      label: 'Administration système',
-      icon: '⚙️',
-      route: PROFILE_ADMIN_ROUTES.system,
-      variant: 'warning',
+      key: 'categories',
+      label: 'Gestion des catégories',
+      icon: '🏷️',
+      route: PROFILE_ADMIN_ROUTES.manageCategories,
     },
   ],
 };

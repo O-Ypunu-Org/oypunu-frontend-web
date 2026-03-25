@@ -12,6 +12,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, Subject, BehaviorSubject, of } from 'rxjs';
+import { AuthService } from '../../../../core/services/auth.service';
 import {
   takeUntil,
   catchError,
@@ -105,10 +106,20 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   public searchTerm = '';
   private readonly searchSubject = new Subject<string>();
 
+  get isAdmin(): boolean {
+    const role = this.authService.getCurrentUser()?.role;
+    return role === 'admin' || role === 'superadmin';
+  }
+
+  get isContributor(): boolean {
+    return this.authService.getCurrentUser()?.role === 'contributor';
+  }
+
   constructor(
     private readonly adminApiService: AdminApiService,
     private readonly permissionService: PermissionService,
     private readonly route: ActivatedRoute,
+    private readonly authService: AuthService,
   ) {
     this.moderationState$ = this.moderationStateSubject.asObservable();
 

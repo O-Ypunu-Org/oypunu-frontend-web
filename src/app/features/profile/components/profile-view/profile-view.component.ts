@@ -26,6 +26,24 @@ export class ProfileViewComponent implements OnInit, OnDestroy {
   contributionScore:   number | undefined  = undefined;
   fullStats:           any                 = null;
 
+  /** XP minimum pour accéder à la modération (palier Maître = 8 000 XP) */
+  private readonly MODERATION_MIN_XP = 8000;
+  /** Mots approuvés minimum par langue pour modérer cette langue */
+  private readonly MODERATION_MIN_WORDS_PER_LANG = 150;
+
+  /**
+   * True si le contributeur a le XP requis ET au moins une langue
+   * avec le nombre minimum de mots approuvés.
+   */
+  get canContributorModerate(): boolean {
+    if (!this.isContributor) return false;
+    const xp = (this.user as any)?.totalXP ?? 0;
+    if (xp < this.MODERATION_MIN_XP) return false;
+    const contributed: Array<{ languageId: any; approvedWordCount: number }> =
+      (this.user as any)?.contributedLanguages ?? [];
+    return contributed.some(cl => cl.approvedWordCount >= this.MODERATION_MIN_WORDS_PER_LANG);
+  }
+
   private subscriptions = new Subscription();
 
   constructor(

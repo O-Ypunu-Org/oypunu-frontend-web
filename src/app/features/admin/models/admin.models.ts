@@ -464,6 +464,68 @@ export interface PendingCategory {
   readonly updatedAt: Date;
 }
 
+// ===== INTERFACES LANGUES ADMIN =====
+
+/**
+ * Interface pour une langue dans le contexte admin (CRUD complet)
+ */
+export interface LanguageAdmin {
+  readonly id: string;
+  readonly _id: string;
+  readonly name: string;
+  readonly nativeName: string;
+  readonly iso639_1?: string;
+  readonly iso639_2?: string;
+  readonly iso639_3?: string;
+  readonly regions: string[];
+  readonly countries?: string[];
+  readonly family?: string;
+  readonly description?: string;
+  readonly isActive: boolean;
+  readonly isFeatured: boolean;
+  readonly isVisible: boolean;
+  readonly systemStatus: 'active' | 'proposed' | 'deprecated';
+  readonly wordCount: number;
+  readonly userCount: number;
+  readonly contributorCount: number;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+/**
+ * Interface pour créer une langue (admin)
+ */
+export interface CreateLanguageAdminData {
+  readonly name: string;
+  readonly nativeName: string;
+  readonly iso639_1?: string;
+  readonly iso639_2?: string;
+  readonly iso639_3?: string;
+  readonly regions: string[];
+  readonly countries?: string[];
+  readonly family?: string;
+  readonly description?: string;
+  readonly isActive?: boolean;
+}
+
+/**
+ * Interface pour modifier une langue (admin)
+ */
+export interface UpdateLanguageAdminData {
+  readonly name?: string;
+  readonly nativeName?: string;
+  readonly iso639_1?: string;
+  readonly iso639_2?: string;
+  readonly iso639_3?: string;
+  readonly regions?: string[];
+  readonly countries?: string[];
+  readonly family?: string;
+  readonly description?: string;
+  readonly isActive?: boolean;
+  readonly isFeatured?: boolean;
+  readonly sortOrder?: number;
+}
+
 // ===== INTERFACES CATÉGORIES =====
 
 /**

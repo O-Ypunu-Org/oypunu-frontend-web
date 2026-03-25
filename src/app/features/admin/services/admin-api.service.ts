@@ -58,6 +58,10 @@ import {
   CreateCategoryData,
   UpdateCategoryData,
   PendingCategory,
+  // Langues admin
+  LanguageAdmin,
+  CreateLanguageAdminData,
+  UpdateLanguageAdminData,
 } from '../models/admin.models';
 
 /**
@@ -1645,6 +1649,147 @@ export class AdminApiService {
     return this.http
       .post(`${this.baseUrl}/categories/export`, body, { responseType: 'text' })
       .pipe(retry(this.retryCount), catchError(this.handleError));
+  }
+
+  // ===== LANGUAGE ADMIN CRUD ENDPOINTS =====
+
+  /**
+   * Récupère toutes les langues avec pagination et filtres (admin)
+   * GET /languages
+   */
+  getLanguagesAdmin(
+    page: number = 1,
+    limit: number = 20,
+    search?: string,
+    isActive?: boolean
+  ): Observable<PaginatedResponse<LanguageAdmin>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (search) {
+      params = params.set('q', search);
+    }
+
+    return this.http
+      .get<any>(`${environment.apiUrl}/languages`, { params })
+      .pipe(
+        map((response) => {
+          const rawList: any[] = Array.isArray(response)
+            ? response
+            : response.languages || response.data || [];
+
+          let transformed: LanguageAdmin[] = rawList.map((lang: any) => ({
+            ...lang,
+            id: lang._id || lang.id,
+          }));
+
+          if (isActive !== undefined) {
+            transformed = transformed.filter(
+              (lang) => lang.isActive === isActive
+            );
+          }
+
+          return {
+            data: transformed,
+            total: transformed.length,
+            page: 1,
+            limit: transformed.length,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPrevPage: false,
+          };
+        }),
+        retry(this.retryCount),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Recalcule les statistiques (wordCount, userCount) de toutes les langues
+   * POST /languages/migration/update-stats
+   */
+  recalculateLanguageStats(): Observable<{ message: string }> {
+    return this.http
+      .post<{ message: string }>(`${environment.apiUrl}/languages/migration/update-stats`, {})
+      .pipe(retry(this.retryCount), catchError(this.handleError));
+  }
+
+  /**
+   * Crée une langue directement active (admin)
+   * POST /languages/admin/create
+   */
+  createLanguageAdmin(
+    languageData: CreateLanguageAdminData
+  ): Observable<LanguageAdmin> {
+    return this.http
+      .post<any>(`${environment.apiUrl}/languages/admin/create`, languageData)
+      .pipe(
+        map((response) => ({ ...response, id: response._id || response.id })),
+        retry(this.retryCount),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Récupère une langue par son ID
+   * GET /languages/:id
+   */
+  getLanguageById(languageId: string): Observable<LanguageAdmin> {
+    return this.http
+      .get<any>(`${environment.apiUrl}/languages/${languageId}`)
+      .pipe(
+        map((response) => ({ ...response, id: response._id || response.id })),
+        retry(this.retryCount),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Met à jour une langue (admin)
+   * PATCH /languages/:id/admin
+   */
+  updateLanguageAdmin(
+    languageId: string,
+    updateData: UpdateLanguageAdminData
+  ): Observable<LanguageAdmin> {
+    return this.http
+      .patch<any>(
+        `${environment.apiUrl}/languages/${languageId}/admin`,
+        updateData
+      )
+      .pipe(
+        map((response) => ({ ...response, id: response._id || response.id })),
+        retry(this.retryCount),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Supprime une langue (superadmin)
+   * DELETE /languages/:id
+   */
+  deleteLanguageAdmin(languageId: string): Observable<ApiResponse> {
+    return this.http
+      .delete<ApiResponse>(`${environment.apiUrl}/languages/${languageId}`)
+      .pipe(retry(this.retryCount), catchError(this.handleError));
+  }
+
+  /**
+   * Active ou désactive une langue (admin)
+   * PATCH /languages/:id/toggle-status
+   */
+  toggleLanguageStatus(languageId: string): Observable<LanguageAdmin> {
+    return this.http
+      .patch<any>(
+        `${environment.apiUrl}/languages/${languageId}/toggle-status`,
+        {}
+      )
+      .pipe(
+        map((response) => ({ ...response, id: response._id || response.id })),
+        retry(this.retryCount),
+        catchError(this.handleError)
+      );
   }
 
 }

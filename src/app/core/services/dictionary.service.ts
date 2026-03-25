@@ -584,6 +584,11 @@ export class DictionaryService {
     );
   }
 
+  // Récupérer mes propositions de catégories (contributeur+)
+  getMyProposalCategories(): Observable<any[]> {
+    return this._http.get<any[]>(`${environment.apiUrl}/categories/my-proposals`);
+  }
+
   // Proposer une nouvelle catégorie (contributeurs+)
   proposeCategory(categoryData: {
     name: string;
