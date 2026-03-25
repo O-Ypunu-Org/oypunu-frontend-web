@@ -25,6 +25,12 @@ export interface ProfileRecentWord {
 export class ContributorSectionComponent {
   @Input() recentWords: ProfileRecentWord[] = [];
 
+  /**
+   * Le contributeur a atteint le seuil d'éligibilité à la modération
+   * (XP >= 500 ET au moins une langue avec >= 3 mots approuvés).
+   */
+  @Input() canModerate = false;
+
   readonly titles  = SECTION_TITLES;
   readonly routes  = PROFILE_ROUTES;
 

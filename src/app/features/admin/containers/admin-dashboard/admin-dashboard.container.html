@@ -903,7 +903,7 @@
         </svg>
         Actions rapides
       </h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <button *appHasPermission="'canViewUsers'" routerLink="/admin/users"
           class="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg">
           <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -929,20 +929,6 @@
           <div class="text-left">
             <div class="text-white font-medium">Modération</div>
             <div class="text-gray-400 text-sm">Examiner le contenu</div>
-          </div>
-        </button>
-
-        <button *appHasPermission="'canManageCategories'" routerLink="/admin/categories"
-          class="flex items-center gap-3 p-4 bg-gray-700 hover:bg-gray-600 rounded-lg transition-all duration-200 hover:scale-105 hover:shadow-lg">
-          <div class="w-10 h-10 bg-indigo-500/20 rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-          </div>
-          <div class="text-left">
-            <div class="text-white font-medium">Catégories</div>
-            <div class="text-gray-400 text-sm">Gérer les catégories</div>
           </div>
         </button>
 

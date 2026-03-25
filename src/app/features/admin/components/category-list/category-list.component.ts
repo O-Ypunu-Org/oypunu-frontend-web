@@ -294,8 +294,12 @@ export class CategoryListComponent implements OnInit, OnChanges {
    * Obtient le nom de la langue d'une catégorie
    */
   getLanguageName(category: CategoryAdmin): string {
-    // Prioriser languageId puis fallback sur language (legacy)
-    return category.languageId || category.language || 'Non définie';
+    const lang = category.language;
+    if (lang) return lang;
+    const id = category.languageId;
+    if (!id) return '—';
+    // Si c'est un ObjectId brut (24 hex), afficher tronqué
+    return id.length === 24 ? id.slice(-6) : id;
   }
 
   /**

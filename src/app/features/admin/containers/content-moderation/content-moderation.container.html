@@ -103,8 +103,8 @@
         </div>
       </div>
 
-      <!-- ─── 2 · Langues et catégories (Admin+) ───────────────────────── -->
-      <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <!-- ─── 2 · Langues et catégories (Admin uniquement) ───────────── -->
+      <div *ngIf="isAdmin" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-700">
           <h3 class="text-base font-semibold text-white">Langues et catégories</h3>
         </div>
@@ -115,8 +115,8 @@
         </div>
       </div>
 
-      <!-- ─── 3 · Communauté (Admin+) ─────────────────────────────────── -->
-      <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <!-- ─── 3 · Communauté (Admin uniquement) ────────────────────── -->
+      <div *ngIf="isAdmin" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-700">
           <h3 class="text-base font-semibold text-white">Communauté</h3>
         </div>
@@ -127,8 +127,8 @@
         </div>
       </div>
 
-      <!-- ─── 4 · Utilisateurs et accès (Admin+) ──────────────────────── -->
-      <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <!-- ─── 4 · Utilisateurs et accès (Admin uniquement) ────────── -->
+      <div *ngIf="isAdmin" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-700">
           <h3 class="text-base font-semibold text-white">Utilisateurs et accès</h3>
         </div>
@@ -139,8 +139,8 @@
         </div>
       </div>
 
-      <!-- ─── 5 · Contenu avancé (Admin+) ─────────────────────────────── -->
-      <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+      <!-- ─── 5 · Contenu avancé (Admin uniquement) ───────────────── -->
+      <div *ngIf="isAdmin" class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
         <div class="px-5 py-4 border-b border-gray-700">
           <h3 class="text-base font-semibold text-white">Contenu avancé</h3>
         </div>
