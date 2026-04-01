@@ -444,7 +444,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     request$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (_response) => {
           this.isSubmitting = false;
           this.successMessage = this.isAdmin
             ? (this.editLanguage ? 'Langue mise à jour avec succès.' : 'Langue créée avec succès.')
@@ -493,7 +493,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       sources: (formValue.sources as string[])
         .map((s: string) => s.trim())
         .filter((s: string) => s.length > 0),
-      ...(this.isAdmin ? { isActive: formValue.isActive ?? true } : {}),
+      ...(this.isAdmin && this.editLanguage ? { isActive: formValue.isActive ?? true } : {}),
     };
   }
 
