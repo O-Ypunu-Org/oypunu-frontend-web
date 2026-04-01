@@ -16,17 +16,14 @@ export class AppComponent implements OnDestroy {
   showFooter = true;
   isMessagingPage = false;
 
-  confirmState$ = this.confirmDialogService.state$;
-
   private _routerSub: Subscription;
 
   constructor(
     private _themeService: ThemeService,
     private _router: Router,
     private _renderer: Renderer2,
-    private confirmDialogService: ConfirmDialogService
+    public confirmDialogService: ConfirmDialogService
   ) {
-    this.confirmState$ = this.confirmDialogService.state$;
     this._routerSub = this._router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: any) => {
