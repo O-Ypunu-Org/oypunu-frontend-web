@@ -16,7 +16,7 @@ export class AppComponent implements OnDestroy {
   showFooter = true;
   isMessagingPage = false;
 
-  readonly confirmState$ = this.confirmDialogService.state$;
+  confirmState$ = this.confirmDialogService.state$;
 
   private _routerSub: Subscription;
 
@@ -26,6 +26,7 @@ export class AppComponent implements OnDestroy {
     private _renderer: Renderer2,
     private confirmDialogService: ConfirmDialogService
   ) {
+    this.confirmState$ = this.confirmDialogService.state$;
     this._routerSub = this._router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: any) => {
