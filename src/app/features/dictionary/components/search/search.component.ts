@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -87,7 +88,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private _authService: AuthService,
     private _languagesService: LanguagesService,
     private _router: Router,
-    private _route: ActivatedRoute
+    private _route: ActivatedRoute,
+    private _confirmDialog: ConfirmDialogService
   ) {
     this.searchForm = this._fb.group({
       query: [''],
@@ -307,8 +309,15 @@ export class SearchComponent implements OnInit, OnDestroy {
       });
   }
 
-  clearAllHistory(): void {
-    if (!confirm('Supprimer tout votre historique de consultation ?')) return;
+  async clearAllHistory(): Promise<void> {
+    const ok = await this._confirmDialog.confirm({
+      title: 'Effacer l\'historique',
+      message: 'Supprimer tout votre historique de consultation ?',
+      confirmText: 'Effacer',
+      type: 'danger',
+    });
+    if (!ok) return;
+
     this._dictionaryService
       .clearAllConsultations()
       .pipe(takeUntil(this._destroy$))

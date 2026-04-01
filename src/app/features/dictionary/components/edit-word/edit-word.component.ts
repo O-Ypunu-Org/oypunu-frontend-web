@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Observable, of } from 'rxjs';
@@ -58,7 +59,8 @@ export class EditWordComponent implements OnInit, OnDestroy {
     private _authService: AuthService,
     private _route: ActivatedRoute,
     private _router: Router,
-    private _http: HttpClient
+    private _http: HttpClient,
+    private _confirmDialog: ConfirmDialogService
   ) {
     this.editWordForm = this._fb.group({
       pronunciation: [''],
@@ -597,21 +599,20 @@ export class EditWordComponent implements OnInit, OnDestroy {
   /**
    * Propose de créer un nouveau mot dans la langue sélectionnée
    */
-  proposeCreateNewWord(translationIndex: number): void {
+  async proposeCreateNewWord(translationIndex: number): Promise<void> {
     const translation = this.translationsArray.at(translationIndex);
     const language = translation.get('language')?.value;
     const searchTerm = translation.get('searchTerm')?.value;
 
     if (language && searchTerm) {
-      const confirmCreate = confirm(
-        `Le mot "${searchTerm}" n'existe pas en ${this.getLanguageName(
-          language
-        )}. ` +
-          'Voulez-vous être redirigé vers le formulaire de création de mot ?'
-      );
+      const ok = await this._confirmDialog.confirm({
+        title: 'Créer un nouveau mot',
+        message: `Le mot "${searchTerm}" n'existe pas en ${this.getLanguageName(language)}. Voulez-vous être redirigé vers le formulaire de création de mot ?`,
+        confirmText: 'Créer',
+        type: 'info',
+      });
 
-      if (confirmCreate) {
-        // Naviguer vers le formulaire d'ajout avec les données pré-remplies
+      if (ok) {
         this._router.navigate(['/dictionary/add'], {
           queryParams: {
             word: searchTerm,

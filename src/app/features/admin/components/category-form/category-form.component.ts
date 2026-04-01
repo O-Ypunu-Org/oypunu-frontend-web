@@ -20,6 +20,7 @@ import {
   ChangeDetectionStrategy 
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
@@ -345,7 +346,8 @@ export class CategoryFormComponent implements OnInit, OnChanges {
 
   constructor(
     private formBuilder: FormBuilder,
-    private dictionaryService: DictionaryService
+    private dictionaryService: DictionaryService,
+    private confirmDialog: ConfirmDialogService
   ) {
     this.categoryForm = this.createForm();
   }
@@ -553,17 +555,17 @@ export class CategoryFormComponent implements OnInit, OnChanges {
   /**
    * Annulation du formulaire
    */
-  onCancel(): void {
+  async onCancel(): Promise<void> {
     console.log('❌ Annulation du formulaire');
-    
+
     if (this.categoryForm.dirty) {
-      const confirmCancel = confirm(
-        'Vous avez des modifications non sauvegardées. Voulez-vous vraiment annuler ?'
-      );
-      
-      if (!confirmCancel) {
-        return;
-      }
+      const ok = await this.confirmDialog.confirm({
+        title: 'Annuler les modifications',
+        message: 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment annuler ?',
+        confirmText: 'Annuler les modifications',
+        type: 'warning',
+      });
+      if (!ok) return;
     }
 
     this.cancel.emit();
@@ -572,16 +574,16 @@ export class CategoryFormComponent implements OnInit, OnChanges {
   /**
    * Réinitialisation du formulaire
    */
-  onReset(): void {
+  async onReset(): Promise<void> {
     console.log('🔄 Réinitialisation du formulaire');
-    
-    const confirmReset = confirm(
-      'Voulez-vous vraiment réinitialiser le formulaire ? Toutes les modifications seront perdues.'
-    );
-    
-    if (!confirmReset) {
-      return;
-    }
+
+    const ok = await this.confirmDialog.confirm({
+      title: 'Réinitialiser le formulaire',
+      message: 'Voulez-vous vraiment réinitialiser le formulaire ? Toutes les modifications seront perdues.',
+      confirmText: 'Réinitialiser',
+      type: 'warning',
+    });
+    if (!ok) return;
 
     if (this.isEditMode && this.category) {
       // En mode édition, revenir aux valeurs originales

@@ -12,6 +12,7 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -41,7 +42,8 @@ export class AddCategoryComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private dictionaryService: DictionaryService,
-    private router: Router
+    private router: Router,
+    private confirmDialog: ConfirmDialogService
   ) {
     this.categoryForm = this.createForm();
   }
@@ -186,14 +188,17 @@ export class AddCategoryComponent implements OnInit, OnDestroy {
   /**
    * Annulation du formulaire
    */
-  onCancel(): void {
+  async onCancel(): Promise<void> {
     if (this.categoryForm.dirty) {
-      const confirm = window.confirm(
-        'Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?'
-      );
-      if (!confirm) return;
+      const ok = await this.confirmDialog.confirm({
+        title: 'Quitter sans sauvegarder',
+        message: 'Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?',
+        confirmText: 'Quitter',
+        type: 'warning',
+      });
+      if (!ok) return;
     }
-    
+
     this.router.navigate(['/dictionary']);
   }
 
