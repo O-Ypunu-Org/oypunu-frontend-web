@@ -10,6 +10,7 @@
  */
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { Observable, Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import {
   takeUntil,
@@ -149,7 +150,8 @@ export class SystemAdminContainer implements OnInit, OnDestroy {
 
   constructor(
     private readonly adminApiService: AdminApiService,
-    private readonly permissionService: PermissionService
+    private readonly permissionService: PermissionService,
+    private readonly confirmDialog: ConfirmDialogService
   ) {
     this.systemState$ = this.systemStateSubject.asObservable();
 
@@ -444,38 +446,48 @@ export class SystemAdminContainer implements OnInit, OnDestroy {
       });
   }
 
-  private clearSystemCache(): void {
-    if (confirm('Vider le cache système ?')) {
-      // Utiliser une API générique de maintenance système
-      this.adminApiService.exportReport('full', 'json', '7d')
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            console.log('Cache système vidé');
-            this.loadSystemData(); // Recharger les données système
-          },
-          error: (error) => {
-            console.error('Erreur lors du vidage de cache:', error);
-          }
-        });
-    }
+  private async clearSystemCache(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Vider le cache',
+      message: 'Vider le cache système ?',
+      confirmText: 'Vider',
+      type: 'warning',
+    });
+    if (!ok) return;
+
+    this.adminApiService.exportReport('full', 'json', '7d')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Cache système vidé');
+          this.loadSystemData();
+        },
+        error: (error) => {
+          console.error('Erreur lors du vidage de cache:', error);
+        }
+      });
   }
 
-  private restartService(serviceName?: string): void {
-    if (confirm(`Redémarrer le service ${serviceName || 'système'} ?`)) {
-      // Utiliser une API générique de gestion système  
-      this.adminApiService.exportReport('full', 'json', '7d')
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            console.log('Service redémarré:', serviceName);
-            this.loadSystemData(); // Recharger les données système
-          },
-          error: (error) => {
-            console.error('Erreur lors du redémarrage de service:', error);
-          }
-        });
-    }
+  private async restartService(serviceName?: string): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Redémarrer le service',
+      message: `Redémarrer le service ${serviceName || 'système'} ?`,
+      confirmText: 'Redémarrer',
+      type: 'warning',
+    });
+    if (!ok) return;
+
+    this.adminApiService.exportReport('full', 'json', '7d')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Service redémarré:', serviceName);
+          this.loadSystemData();
+        },
+        error: (error) => {
+          console.error('Erreur lors du redémarrage de service:', error);
+        }
+      });
   }
 
   // ===== MÉTHODES MOCK POUR LES DONNÉES =====

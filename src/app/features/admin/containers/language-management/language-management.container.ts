@@ -26,6 +26,7 @@ import {
   LanguageAdmin,
   PaginatedResponse,
 } from '../../models/admin.models';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 
 export interface LanguageFilters {
   readonly search?: string;
@@ -91,6 +92,7 @@ export class LanguageManagementContainer implements OnInit, OnDestroy {
   constructor(
     private adminApiService: AdminApiService,
     private router: Router,
+    private confirmDialog: ConfirmDialogService,
   ) {}
 
   ngOnInit(): void {
@@ -161,14 +163,14 @@ export class LanguageManagementContainer implements OnInit, OnDestroy {
 
   // ===== ACTIONS =====
 
-  onDeleteLanguage(language: LanguageAdmin): void {
-    if (
-      !confirm(
-        `Supprimer définitivement la langue "${language.name}" ?\n\nCette action est irréversible. Impossible si la langue contient des mots.`,
-      )
-    ) {
-      return;
-    }
+  async onDeleteLanguage(language: LanguageAdmin): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Supprimer la langue',
+      message: `Supprimer définitivement la langue "${language.name}" ?\n\nCette action est irréversible. Impossible si la langue contient des mots.`,
+      confirmText: 'Supprimer',
+      type: 'danger',
+    });
+    if (!ok) return;
 
     this.setLoading(true);
 
@@ -193,11 +195,15 @@ export class LanguageManagementContainer implements OnInit, OnDestroy {
       });
   }
 
-  onToggleStatus(language: LanguageAdmin): void {
+  async onToggleStatus(language: LanguageAdmin): Promise<void> {
     const action = language.isActive ? 'désactiver' : 'activer';
-    if (!confirm(`Voulez-vous ${action} la langue "${language.name}" ?`)) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: language.isActive ? 'Désactiver la langue' : 'Activer la langue',
+      message: `Voulez-vous ${action} la langue "${language.name}" ?`,
+      confirmText: language.isActive ? 'Désactiver' : 'Activer',
+      type: 'warning',
+    });
+    if (!ok) return;
 
     this.setLoading(true);
 
