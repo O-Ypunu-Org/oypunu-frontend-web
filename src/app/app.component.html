@@ -11,7 +11,7 @@
 
 <!-- Dialog de confirmation global -->
 <app-confirmation-modal
-  *ngIf="(confirmState$ | async) as confirmState"
+  *ngIf="(confirmDialogService.state$ | async) as confirmState"
   [isVisible]="confirmState.isVisible"
   [config]="confirmState.config"
   (confirmed)="onConfirmDialogConfirmed()"
