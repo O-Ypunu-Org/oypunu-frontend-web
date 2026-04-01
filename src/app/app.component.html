@@ -8,3 +8,12 @@
 
 <!-- Conteneur de notifications -->
 <app-toast-container></app-toast-container>
+
+<!-- Dialog de confirmation global -->
+<app-confirmation-modal
+  *ngIf="(confirmState$ | async) as confirmState"
+  [isVisible]="confirmState.isVisible"
+  [config]="confirmState.config"
+  (confirmed)="onConfirmDialogConfirmed()"
+  (cancelled)="onConfirmDialogCancelled()">
+</app-confirmation-modal>

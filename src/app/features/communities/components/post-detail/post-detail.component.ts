@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommunityPostsService } from '../../../../core/services/community-posts.service';
 import { AuthService } from '../../../../core/services/auth.service';
@@ -32,7 +33,8 @@ export class PostDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private postsService: CommunityPostsService,
-    public authService: AuthService
+    public authService: AuthService,
+    private confirmDialog: ConfirmDialogService
   ) {}
 
   ngOnInit(): void {
@@ -160,30 +162,41 @@ export class PostDetailComponent implements OnInit {
     });
   }
 
-  deleteComment(commentId: string): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) {
-      this.postsService.deleteComment(commentId).subscribe({
-        next: () => this.loadComments(),
-        error: (error) => console.error('Erreur de suppression:', error),
-      });
-    }
+  async deleteComment(commentId: string): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Supprimer le commentaire',
+      message: 'Êtes-vous sûr de vouloir supprimer ce commentaire ?',
+      confirmText: 'Supprimer',
+      type: 'danger',
+    });
+    if (!ok) return;
+
+    this.postsService.deleteComment(commentId).subscribe({
+      next: () => this.loadComments(),
+      error: (error) => console.error('Erreur de suppression:', error),
+    });
   }
 
-  deletePost(): void {
-    if (confirm('Êtes-vous sûr de vouloir supprimer cette publication ?')) {
-      if (this.post) {
-        this.postsService.deletePost(this.post._id).subscribe({
-          next: () => {
-            // Rediriger vers la liste des publications de la communauté
-            if (this.post && this.post.communityId) {
-              this.router.navigate(['/communities', this.post.communityId._id]);
-            } else {
-              this.router.navigate(['/communities']);
-            }
-          },
-          error: (error) => console.error('Erreur de suppression:', error),
-        });
-      }
+  async deletePost(): Promise<void> {
+    const ok = await this.confirmDialog.confirm({
+      title: 'Supprimer la publication',
+      message: 'Êtes-vous sûr de vouloir supprimer cette publication ?',
+      confirmText: 'Supprimer',
+      type: 'danger',
+    });
+    if (!ok) return;
+
+    if (this.post) {
+      this.postsService.deletePost(this.post._id).subscribe({
+        next: () => {
+          if (this.post && this.post.communityId) {
+            this.router.navigate(['/communities', this.post.communityId._id]);
+          } else {
+            this.router.navigate(['/communities']);
+          }
+        },
+        error: (error) => console.error('Erreur de suppression:', error),
+      });
     }
   }
 

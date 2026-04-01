@@ -14,6 +14,7 @@ import { Subject, BehaviorSubject } from 'rxjs';
 import { map, takeUntil, finalize } from 'rxjs/operators';
 
 import { AdminApiService } from '../../services/admin-api.service';
+import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import {
   CategoryAdmin,
   CreateCategoryData,
@@ -358,7 +359,10 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
     map((cats) => cats.filter((c) => !c.isActive).length),
   );
 
-  constructor(private adminApiService: AdminApiService) {}
+  constructor(
+    private adminApiService: AdminApiService,
+    private confirmDialog: ConfirmDialogService,
+  ) {}
 
   ngOnInit(): void {
     console.log('🏗️ CategoryManagementContainer - Initialisation');
@@ -480,16 +484,16 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
   /**
    * Suppression d'une catégorie
    */
-  onDeleteCategory(category: CategoryAdmin): void {
+  async onDeleteCategory(category: CategoryAdmin): Promise<void> {
     console.log('🗑️ Suppression de la catégorie:', category.name);
 
-    if (
-      !confirm(
-        `Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ?`,
-      )
-    ) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: 'Supprimer la catégorie',
+      message: `Êtes-vous sûr de vouloir supprimer la catégorie "${category.name}" ?`,
+      confirmText: 'Supprimer',
+      type: 'danger',
+    });
+    if (!ok) return;
 
     this.setLoading(true);
     this.adminApiService
@@ -660,17 +664,19 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
   /**
    * Actions en lot - Activation
    */
-  onBulkActivate(): void {
+  async onBulkActivate(): Promise<void> {
     const selectedIds = this._selectedCategories$.value;
     if (selectedIds.length === 0) return;
 
     console.log('🔢 Activation en lot:', selectedIds);
 
-    if (
-      !confirm(`Activer ${selectedIds.length} catégorie(s) sélectionnée(s) ?`)
-    ) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: 'Activer les catégories',
+      message: `Activer ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
+      confirmText: 'Activer',
+      type: 'info',
+    });
+    if (!ok) return;
 
     this.performBulkAction(
       selectedIds,
@@ -682,19 +688,19 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
   /**
    * Actions en lot - Désactivation
    */
-  onBulkDeactivate(): void {
+  async onBulkDeactivate(): Promise<void> {
     const selectedIds = this._selectedCategories$.value;
     if (selectedIds.length === 0) return;
 
     console.log('🔢 Désactivation en lot:', selectedIds);
 
-    if (
-      !confirm(
-        `Désactiver ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
-      )
-    ) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: 'Désactiver les catégories',
+      message: `Désactiver ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
+      confirmText: 'Désactiver',
+      type: 'warning',
+    });
+    if (!ok) return;
 
     this.performBulkAction(
       selectedIds,
@@ -706,19 +712,19 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
   /**
    * Actions en lot - Suppression
    */
-  onBulkDelete(): void {
+  async onBulkDelete(): Promise<void> {
     const selectedIds = this._selectedCategories$.value;
     if (selectedIds.length === 0) return;
 
     console.log('🔢 Suppression en lot:', selectedIds);
 
-    if (
-      !confirm(
-        `Supprimer définitivement ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
-      )
-    ) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: 'Supprimer les catégories',
+      message: `Supprimer définitivement ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
+      confirmText: 'Supprimer',
+      type: 'danger',
+    });
+    if (!ok) return;
 
     this.performBulkAction(
       selectedIds,
@@ -730,17 +736,19 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
   /**
    * Actions en lot - Approbation (pour les contributeurs)
    */
-  onBulkApprove(): void {
+  async onBulkApprove(): Promise<void> {
     const selectedIds = this._selectedCategories$.value;
     if (selectedIds.length === 0) return;
 
     console.log('✅ Approbation en lot:', selectedIds);
 
-    if (
-      !confirm(`Approuver ${selectedIds.length} catégorie(s) sélectionnée(s) ?`)
-    ) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: 'Approuver les catégories',
+      message: `Approuver ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
+      confirmText: 'Approuver',
+      type: 'info',
+    });
+    if (!ok) return;
 
     this.performBulkAction(
       selectedIds,
@@ -752,25 +760,27 @@ export class CategoryManagementContainer implements OnInit, OnDestroy {
   /**
    * Actions en lot - Rejet (pour les contributeurs)
    */
-  onBulkReject(): void {
+  async onBulkReject(): Promise<void> {
     const selectedIds = this._selectedCategories$.value;
     if (selectedIds.length === 0) return;
 
     console.log('❌ Rejet en lot:', selectedIds);
 
-    const reason = prompt('Raison du rejet (optionnel):');
-    if (reason === null) return; // User cancelled
-
-    if (
-      !confirm(`Rejeter ${selectedIds.length} catégorie(s) sélectionnée(s) ?`)
-    ) {
-      return;
-    }
+    const ok = await this.confirmDialog.confirm({
+      title: 'Rejeter les catégories',
+      message: `Rejeter ${selectedIds.length} catégorie(s) sélectionnée(s) ?`,
+      confirmText: 'Rejeter',
+      type: 'danger',
+      showInput: true,
+      inputLabel: 'Raison du rejet (optionnel)',
+      inputPlaceholder: 'Expliquez la raison du rejet...',
+    });
+    if (!ok) return;
 
     this.performBulkActionWithReason(
       selectedIds,
       'reject',
-      reason,
+      '',
       'Catégories rejetées avec succès',
     );
   }
