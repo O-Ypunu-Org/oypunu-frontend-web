@@ -117,9 +117,26 @@ export class AdminApiService {
    */
   getAdminDashboard(): Observable<AdminDashboard> {
     return this.http
-      .get<ApiResponse<AdminDashboard>>(`${this.baseUrl}/dashboard/admin`)
+      .get<any>(`${this.baseUrl}/dashboard/admin`)
       .pipe(
-        map((response) => response.data!),
+        map((response) => ({
+          stats: {
+            totalUsers: response.totalUsers || 0,
+            activeUsers: response.activeUsers || 0,
+            suspendedUsers: response.userStats?.suspendedUsers || 0,
+            totalWords: response.totalWords || 0,
+            pendingWords: response.pendingWords || 0,
+            approvedWords: response.approvedWords || 0,
+            rejectedWords: response.rejectedWords || 0,
+            totalCommunities: response.totalCommunities || 0,
+            activeCommunities: response.activeCommunities || 0,
+            totalPosts: 0,
+            totalMessages: 0,
+            newUsersThisMonth: response.monthlyGrowth?.users || 0,
+            newWordsThisWeek: response.monthlyGrowth?.words || 0,
+          },
+          recentActivity: response.recentActivity || [],
+        })),
         retry(this.retryCount),
         catchError(this.handleError)
       );
@@ -1682,6 +1699,7 @@ export class AdminApiService {
           let transformed: LanguageAdmin[] = rawList.map((lang: any) => ({
             ...lang,
             id: lang._id || lang.id,
+            isActive: lang.isActive !== undefined ? lang.isActive : lang.systemStatus === 'active',
           }));
 
           if (isActive !== undefined) {
