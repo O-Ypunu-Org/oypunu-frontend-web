@@ -805,6 +805,19 @@ export class DictionaryService {
       );
   }
 
+  deleteAudio(wordId: string, accent: string): Observable<Word | null> {
+    if (!this._authService.isAuthenticated()) return of(null);
+    return this._http
+      .delete<any>(`${this._WORDS_API_URL}/${wordId}/audio/${accent}`)
+      .pipe(
+        map((response) => (response ? this._normalizeId(response) : null)),
+        catchError((error) => {
+          this.logger.error('Error deleting audio file:', error);
+          throw error;
+        }),
+      );
+  }
+
   /**
    * Met à jour un mot avec fichier audio en une seule requête
    */

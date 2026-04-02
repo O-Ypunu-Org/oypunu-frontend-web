@@ -43,6 +43,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
   audioFile: File | null = null;
   audioAccent = 'fr-FR';
   isUploadingAudio = false;
+  isDeletingAudio: { [accent: string]: boolean } = {};
 
   // Nouvelles propriétés pour le système de traduction intelligente
   private _destroy$ = new Subject<void>();
@@ -476,6 +477,36 @@ export class EditWordComponent implements OnInit, OnDestroy {
   // Retourne le nombre de fichiers audio
   audioFilesCount(audioFiles: any): number {
     return Object.keys(audioFiles || {}).length;
+  }
+
+  getAudioAccents(): Array<{ accent: string; url: string }> {
+    if (!this.word?.audioFiles) return [];
+    return Object.entries(this.word.audioFiles).map(([accent, audioData]) => ({
+      accent,
+      url: (audioData as any).url,
+    }));
+  }
+
+  playAudio(url: string): void {
+    if (!url) return;
+    const audio = new Audio(url);
+    audio.play().catch((err) => console.error('Erreur lecture audio', err));
+  }
+
+  deleteAudio(accent: string): void {
+    if (!this.wordId || this.isDeletingAudio[accent]) return;
+    this.isDeletingAudio[accent] = true;
+    this._dictionaryService.deleteAudio(this.wordId, accent).subscribe({
+      next: (updatedWord) => {
+        if (updatedWord) this.word = updatedWord;
+        this.isDeletingAudio[accent] = false;
+        this.successMessage = `Fichier audio "${accent}" supprimé.`;
+      },
+      error: () => {
+        this.isDeletingAudio[accent] = false;
+        this.errorMessage = `Erreur lors de la suppression de l'audio "${accent}".`;
+      },
+    });
   }
 
   // === NOUVELLES MÉTHODES POUR LE SYSTÈME DE TRADUCTION INTELLIGENTE ===
