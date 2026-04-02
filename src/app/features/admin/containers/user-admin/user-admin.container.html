@@ -67,26 +67,21 @@
         <!-- Filtre par rôle -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Rôle</label>
-          <select [value]="state.filters.role || ''" (change)="onRoleFilterChange($event)"
-            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="">Tous les rôles</option>
-            <option value="user">Utilisateur</option>
-            <option value="contributor">Contributeur</option>
-            <option value="admin">Administrateur</option>
-            <option value="superadmin">Super-Administrateur</option>
-          </select>
+          <app-custom-dropdown
+            [ngModel]="state.filters.role || ''"
+            [options]="roleFilterOptions"
+            (valueChange)="onRoleFilterValueChange($event)">
+          </app-custom-dropdown>
         </div>
 
         <!-- Filtre par statut -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Statut</label>
-          <select [value]="state.filters.status || ''" (change)="onStatusFilterChange($event)"
-            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option value="">Tous les statuts</option>
-            <option value="active">Actif</option>
-            <option value="suspended">Suspendu</option>
-            <option value="banned">Banni</option>
-          </select>
+          <app-custom-dropdown
+            [ngModel]="state.filters.status || ''"
+            [options]="statusFilterOptions"
+            (valueChange)="onStatusFilterValueChange($event)">
+          </app-custom-dropdown>
         </div>
       </div>
 

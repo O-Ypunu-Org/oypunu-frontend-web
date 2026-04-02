@@ -4,12 +4,11 @@
     <div class="flex flex-wrap gap-4 items-center">
       <div>
         <label class="block text-sm font-medium text-gray-300 mb-1">Trier par</label>
-        <select [(ngModel)]="filters.sortBy" (ngModelChange)="onSortChange($event)"
-          class="bg-gray-700 text-white rounded-md p-2 text-sm">
-          <option *ngFor="let option of sortOptions" [value]="option.value">
-            {{ option.label }}
-          </option>
-        </select>
+        <app-custom-dropdown
+          [(ngModel)]="filters.sortBy"
+          (ngModelChange)="onSortChange($event)"
+          [options]="sortOptionsDropdown">
+        </app-custom-dropdown>
       </div>
     </div>
   </div>
@@ -77,21 +76,19 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Type de publication</label>
-          <select [(ngModel)]="newPostForm.postType" name="postType"
-            class="w-full bg-gray-700 text-white rounded-md p-2">
-            <option *ngFor="let type of postTypes" [value]="type.value">
-              {{ type.label }}
-            </option>
-          </select>
+          <app-custom-dropdown
+            [(ngModel)]="newPostForm.postType"
+            name="postType"
+            [options]="postTypesOptions">
+          </app-custom-dropdown>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-1">Niveau de difficulté</label>
-          <select [(ngModel)]="newPostForm.difficulty" name="difficulty"
-            class="w-full bg-gray-700 text-white rounded-md p-2">
-            <option *ngFor="let diff of difficulties" [value]="diff.value">
-              {{ diff.label }}
-            </option>
-          </select>
+          <app-custom-dropdown
+            [(ngModel)]="newPostForm.difficulty"
+            name="difficulty"
+            [options]="difficultiesOptions">
+          </app-custom-dropdown>
         </div>
       </div>
 
@@ -138,16 +135,13 @@
 
         <!-- Liste déroulante pour sélectionner une langue -->
         <div class="relative">
-          <select (change)="onLanguageSelect($event)" class="w-full bg-gray-700 text-white rounded-md p-2"
-            [disabled]="isLoadingLanguages">
-            <option value="">
-              {{ isLoadingLanguages ? 'Chargement des langues...' : 'Sélectionner une langue' }}
-            </option>
-            <option *ngFor="let language of getUnselectedLanguages()" [value]="language.code">
-              {{ language.name }} ({{ language.nativeName }})
-              <span class="text-gray-400" *ngIf="language.wordCount > 0">- {{ language.wordCount }} mots</span>
-            </option>
-          </select>
+          <app-custom-dropdown
+            [(ngModel)]="selectedLanguageForPost"
+            [options]="unselectedLanguageOptions"
+            [placeholder]="isLoadingLanguages ? 'Chargement des langues...' : 'Sélectionner une langue'"
+            [disabled]="isLoadingLanguages"
+            (valueChange)="onLanguageCodeSelected($event)">
+          </app-custom-dropdown>
         </div>
       </div>
 

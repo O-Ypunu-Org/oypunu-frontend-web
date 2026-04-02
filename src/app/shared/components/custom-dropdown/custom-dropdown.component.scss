@@ -41,6 +41,10 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      &.option-hoverable:hover {
+        background-color: var(--surface-border);
+      }
     }
   }
 }

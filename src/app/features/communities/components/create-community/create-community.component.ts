@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { Router } from '@angular/router';
 import { CommunitiesService } from '../../../../core/services/communities.service';
 
@@ -18,6 +19,13 @@ export class CreateCommunityComponent implements OnInit {
   newTag: string = '';
   coverImagePreview: string | null = null;
   availableLanguages: Array<{ _id: string; name: string; nativeName: string }> = [];
+
+  get languageOptions(): DropdownOption[] {
+    return this.availableLanguages.map((lang) => ({
+      value: lang._id,
+      label: lang.nativeName || lang.name,
+    }));
+  }
 
   constructor(
     private formBuilder: FormBuilder,

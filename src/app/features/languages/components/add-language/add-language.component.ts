@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -241,9 +242,19 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
   };
 
   // Liste des codes pays disponibles (pour maintenir l'ordre)
-  availableCountries = Object.keys(this.countryNames).sort((a, b) => 
+  availableCountries = Object.keys(this.countryNames).sort((a, b) =>
     this.countryNames[a].localeCompare(this.countryNames[b])
   );
+
+  get countryOptions(): DropdownOption[] {
+    return [
+      { value: '', label: 'Sélectionnez un pays' },
+      ...this.availableCountries.map((code) => ({
+        value: code,
+        label: this.getCountryName(code),
+      })),
+    ];
+  }
 
   private destroy$ = new Subject<void>();
 

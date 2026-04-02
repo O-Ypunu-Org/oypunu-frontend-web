@@ -109,13 +109,12 @@
 
             <div formArrayName="countries" class="space-y-2">
               <div *ngFor="let country of countries.controls; let i = index" class="flex gap-2">
-                <select [formControlName]="i"
-                  class="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-orange-500">
-                  <option value="">Sélectionnez un pays</option>
-                  <option *ngFor="let code of availableCountries" [value]="code">
-                    {{ getCountryName(code) }}
-                  </option>
-                </select>
+                <app-custom-dropdown
+                  [formControlName]="i"
+                  [options]="countryOptions"
+                  placeholder="Sélectionnez un pays"
+                  class="flex-1">
+                </app-custom-dropdown>
                 <button type="button" (click)="removeCountry(i)"
                   class="px-2.5 py-2 bg-gray-700 text-gray-400 rounded-lg hover:bg-red-900/40 hover:text-red-400 transition-colors">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

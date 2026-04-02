@@ -11,6 +11,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { Observable, Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import {
   takeUntil,
@@ -127,6 +128,14 @@ interface LogFilters {
   styleUrls: ['./system-admin.container.scss'],
 })
 export class SystemAdminContainer implements OnInit, OnDestroy {
+  readonly logLevelOptions: DropdownOption[] = [
+    { value: '', label: 'Tous les niveaux' },
+    { value: 'info', label: 'Info' },
+    { value: 'warn', label: 'Warning' },
+    { value: 'error', label: 'Erreur' },
+    { value: 'critical', label: 'Critique' },
+  ];
+
   private readonly destroy$ = new Subject<void>();
 
   // État de l'administration système
@@ -239,6 +248,10 @@ export class SystemAdminContainer implements OnInit, OnDestroy {
 
   public createBackup(): void {
     console.log('Create backup');
+  }
+
+  public onLogLevelValueFilter(value: string): void {
+    this.currentLogFilters = { ...this.currentLogFilters, level: (value as any) || undefined };
   }
 
   public onLogLevelFilter(event: Event): void {

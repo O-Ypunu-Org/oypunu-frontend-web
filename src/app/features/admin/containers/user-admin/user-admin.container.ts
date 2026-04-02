@@ -11,6 +11,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserManagementTableComponent } from '../../components/user-management/user-management-table.component';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { Observable, Subject, BehaviorSubject, forkJoin } from 'rxjs';
 import {
   takeUntil,
@@ -62,6 +63,20 @@ interface UserAdminState {
   styleUrls: ['./user-admin.container.scss'],
 })
 export class UserAdminContainer implements OnInit, OnDestroy {
+  readonly roleFilterOptions: DropdownOption[] = [
+    { value: '', label: 'Tous les rôles' },
+    { value: 'user', label: 'Utilisateur' },
+    { value: 'contributor', label: 'Contributeur' },
+    { value: 'admin', label: 'Administrateur' },
+    { value: 'superadmin', label: 'Super-Administrateur' },
+  ];
+  readonly statusFilterOptions: DropdownOption[] = [
+    { value: '', label: 'Tous les statuts' },
+    { value: 'active', label: 'Actif' },
+    { value: 'suspended', label: 'Suspendu' },
+    { value: 'banned', label: 'Banni' },
+  ];
+
   private readonly destroy$ = new Subject<void>();
 
   // État de la gestion utilisateur
@@ -200,6 +215,14 @@ export class UserAdminContainer implements OnInit, OnDestroy {
   /**
    * Gestion du filtre par rôle
    */
+  public onRoleFilterValueChange(value: string): void {
+    this.updateFilters({ role: (value as UserRole) || undefined });
+  }
+
+  public onStatusFilterValueChange(value: string): void {
+    this.updateFilters({ status: (value as 'active' | 'suspended' | 'banned' | '') || undefined });
+  }
+
   public onRoleFilterChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const role = target.value as UserRole | '';

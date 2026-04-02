@@ -17,6 +17,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DictionaryService } from '../../../../core/services/dictionary.service';
 import { Category } from '../../../../core/models/category';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'app-add-word',
@@ -637,6 +638,34 @@ export class AddWordComponent implements OnInit, OnDestroy {
 
   setConfidence(index: number, value: number): void {
     this.translations.at(index).get('confidence')?.setValue(value);
+  }
+
+  get languageOptions(): DropdownOption[] {
+    return this.languages.map((lang) => ({
+      value: lang.id,
+      label: `${lang.name}${lang.wordCount !== undefined ? ` (${lang.wordCount} mots)` : ''}`,
+    }));
+  }
+
+  get categoryOptions(): DropdownOption[] {
+    return this.categories.map((cat) => ({
+      value: cat.id ?? cat._id ?? '',
+      label: cat.name,
+    }));
+  }
+
+  get partsOfSpeechOptions(): DropdownOption[] {
+    return this.partsOfSpeech.map((pos) => ({
+      value: pos.code,
+      label: pos.name,
+    }));
+  }
+
+  getTranslationLanguageOptions(index: number): DropdownOption[] {
+    return this.getAvailableLanguagesForTranslation(index).map((lang) => ({
+      value: lang.id,
+      label: lang.name,
+    }));
   }
 
   getAvailableLanguagesForTranslation(index: number): any[] {

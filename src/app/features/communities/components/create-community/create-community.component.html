@@ -27,14 +27,12 @@
       <!-- Langue -->
       <div class="mb-4">
         <label for="language" class="block text-sm font-medium text-gray-300 mb-1">Langue*</label>
-        <select id="language" formControlName="language"
-          class="w-full bg-gray-800 text-white border border-gray-700 rounded-md py-2 px-3"
-          [ngClass]="{'border-red-500': submitted && f['language'].errors}">
-          <option value="">Sélectionnez une langue</option>
-          <option *ngFor="let lang of availableLanguages" [value]="lang._id">
-            {{ lang.nativeName || lang.name }}
-          </option>
-        </select>
+        <app-custom-dropdown
+          formControlName="language"
+          [options]="languageOptions"
+          placeholder="Sélectionnez une langue"
+          [isInvalid]="!!(submitted && f['language'].errors)">
+        </app-custom-dropdown>
         <div *ngIf="submitted && f['language'].errors" class="text-red-400 text-sm mt-1">
           <div *ngIf="f['language'].errors['required']">La langue est requise</div>
         </div>

@@ -12,6 +12,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export interface DropdownOption {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 @Component({
@@ -32,15 +33,18 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() label: string = '';
   @Input() multiple: boolean = false;
   @Input() placeholder: string = 'Sélectionner...';
-  @Input() closeOnSelect: boolean = true; // Propriété pour contrôler si la dropdown se ferme à la sélection
+  @Input() closeOnSelect: boolean = true;
+  @Input() disabled: boolean = false;
+  @Input() isInvalid: boolean = false;
+
   @Output() selectionChange = new EventEmitter<string[]>();
+  @Output() valueChange = new EventEmitter<string>();
 
   isOpen: boolean = false;
   selectedValues: string[] = [];
 
   constructor(private elementRef: ElementRef) {}
 
-  // Implémenter ControlValueAccessor
   onChange: any = () => {};
   onTouched: any = () => {};
 
@@ -50,53 +54,44 @@ export class CustomDropdownComponent implements ControlValueAccessor {
     } else if (Array.isArray(value)) {
       this.selectedValues = [...value];
     } else {
-      this.selectedValues = [value];
+      this.selectedValues = [String(value)];
     }
   }
 
-  registerOnChange(fn: any): void {
-    this.onChange = fn;
+  registerOnChange(fn: any): void { this.onChange = fn; }
+  registerOnTouched(fn: any): void { this.onTouched = fn; }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
   }
 
-  registerOnTouched(fn: any): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState?(isDisabled: boolean): void {
-    // Implémentation pour désactiver le composant si nécessaire
-  }
-
-  // Méthodes pour le dropdown
   toggleDropdown(): void {
+    if (this.disabled) return;
     this.isOpen = !this.isOpen;
-    if (this.isOpen) {
-      this.onTouched();
-    }
+    if (this.isOpen) this.onTouched();
   }
 
-  toggleOption(value: string, event: MouseEvent): void {
+  toggleOption(option: DropdownOption, event: MouseEvent): void {
     event.stopPropagation();
+    if (option.disabled) return;
 
     if (this.multiple) {
-      const index = this.selectedValues.indexOf(value);
+      const index = this.selectedValues.indexOf(option.value);
       if (index === -1) {
-        this.selectedValues = [...this.selectedValues, value];
+        this.selectedValues = [...this.selectedValues, option.value];
       } else {
-        this.selectedValues = this.selectedValues.filter((v) => v !== value);
+        this.selectedValues = this.selectedValues.filter((v) => v !== option.value);
       }
-
-      // Fermer la dropdown si l'option closeOnSelect est true, même en mode multiple
-      if (this.closeOnSelect) {
-        this.isOpen = false;
-      }
+      if (this.closeOnSelect) this.isOpen = false;
     } else {
-      this.selectedValues = [value];
-      // En mode simple sélection, toujours fermer
+      this.selectedValues = [option.value];
       this.isOpen = false;
     }
 
-    this.onChange(this.multiple ? this.selectedValues : this.selectedValues[0]);
+    const emitValue = this.multiple ? this.selectedValues : this.selectedValues[0];
+    this.onChange(emitValue);
     this.selectionChange.emit(this.selectedValues);
+    if (!this.multiple) this.valueChange.emit(this.selectedValues[0]);
   }
 
   isSelected(value: string): boolean {
@@ -104,16 +99,12 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   }
 
   getSelectedLabels(): string {
-    if (this.selectedValues.length === 0) {
-      return this.placeholder;
-    }
-
+    if (this.selectedValues.length === 0) return this.placeholder;
     return this.selectedValues
       .map((v) => this.options.find((opt) => opt.value === v)?.label || v)
       .join(', ');
   }
 
-  // Détecter les clics en dehors du dropdown pour le fermer
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent): void {
     if (!this.elementRef.nativeElement.contains(event.target) && this.isOpen) {
@@ -121,7 +112,6 @@ export class CustomDropdownComponent implements ControlValueAccessor {
     }
   }
 
-  // Empêcher la propagation du clic dans le dropdown pour éviter de le fermer
   onDropdownClick(event: MouseEvent): void {
     event.stopPropagation();
   }
