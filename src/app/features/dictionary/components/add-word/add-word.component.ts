@@ -53,6 +53,13 @@ export class AddWordComponent implements OnInit, OnDestroy {
   isSearchingTranslationWords: { [key: number]: boolean } = {};
   selectedTranslationWords: { [key: number]: any } = {};
 
+  // Niveaux de certitude pour les traductions
+  confidenceLevels = [
+    { label: 'Incertain', value: 0.3 },
+    { label: 'Assez sûr', value: 0.8 },
+    { label: 'Certain', value: 1.0 },
+  ];
+
   // Options pour les parties du discours
   partsOfSpeech = [
     { code: 'noun', name: 'Nom' },
@@ -626,6 +633,10 @@ export class AddWordComponent implements OnInit, OnDestroy {
 
   removeTranslation(index: number): void {
     this.translations.removeAt(index);
+  }
+
+  setConfidence(index: number, value: number): void {
+    this.translations.at(index).get('confidence')?.setValue(value);
   }
 
   getAvailableLanguagesForTranslation(index: number): any[] {
