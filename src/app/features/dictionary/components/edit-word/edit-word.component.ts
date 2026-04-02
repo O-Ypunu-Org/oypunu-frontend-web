@@ -475,7 +475,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
 
   // Retourne le nombre de fichiers audio
   audioFilesCount(audioFiles: any): number {
-    return audioFiles?.length || 0;
+    return Object.keys(audioFiles || {}).length;
   }
 
   // === NOUVELLES MÉTHODES POUR LE SYSTÈME DE TRADUCTION INTELLIGENTE ===
@@ -487,22 +487,18 @@ export class EditWordComponent implements OnInit, OnDestroy {
     // Utiliser l'API du dictionnaire pour récupérer les langues disponibles dans la base de données
     // Cette API retourne les langues qui ont effectivement des mots dans la base
     this._http
-      .get<
-        {
-          code: string;
-          name: string;
-          nativeName: string;
-          wordCount: number;
-        }[]
-      >(`${environment.apiUrl}/words/languages`)
+      .get<{
+        languages: { code: string; name: string; nativeName: string; wordCount: number }[];
+        total: number;
+      }>(`${environment.apiUrl}/words/available-languages`)
       .pipe(takeUntil(this._destroy$))
       .subscribe({
-        next: (languages) => {
-          this.availableLanguages = languages.map((lang) => ({
+        next: (response) => {
+          this.availableLanguages = (response.languages || []).map((lang) => ({
             code: lang.code,
             name: lang.name,
             flag: this.getLanguageFlag(lang.code),
-            translationCount: lang.wordCount, // Optionnel : pour afficher le nombre de mots
+            translationCount: lang.wordCount,
           }));
           console.log(
             '🌍 Langues disponibles chargées:',
