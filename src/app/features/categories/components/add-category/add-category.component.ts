@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -32,6 +33,13 @@ export class AddCategoryComponent implements OnInit, OnDestroy {
   selectedLanguageId = '';
   selectedLanguage: Language | null = null;
   availableLanguages: Language[] = [];
+
+  get languageOptions(): DropdownOption[] {
+    return this.availableLanguages.map((lang) => ({
+      value: lang._id as string,
+      label: `${lang.name}${lang.nativeName && lang.nativeName !== lang.name ? ` (${lang.nativeName})` : ''}`,
+    }));
+  }
   isLoadingLanguages = false;
   
   private destroy$ = new Subject<void>();

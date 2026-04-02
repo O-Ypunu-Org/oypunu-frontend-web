@@ -1,3 +1,4 @@
+import { DropdownOption } from '../custom-dropdown/custom-dropdown.component';
 import {
   Component,
   ElementRef,
@@ -28,6 +29,19 @@ interface AudioRecorderState {
 export class AudioRecorderComponent implements OnDestroy {
   @Input() wordId!: string;
   @Input() accent: string = 'fr-fr';
+
+  readonly accentOptions: DropdownOption[] = [
+    { value: 'fr-fr', label: 'Français (France)' },
+    { value: 'fr-ca', label: 'Français (Canada)' },
+    { value: 'en-us', label: 'Anglais (États-Unis)' },
+    { value: 'en-gb', label: 'Anglais (Royaume-Uni)' },
+    { value: 'es-es', label: 'Espagnol (Espagne)' },
+    { value: 'es-mx', label: 'Espagnol (Mexique)' },
+    { value: 'de-de', label: 'Allemand' },
+    { value: 'it-it', label: 'Italien' },
+    { value: 'pt-br', label: 'Portugais (Brésil)' },
+    { value: 'standard', label: 'Standard' },
+  ];
   @Input() existingAudioUrl?: string;
 
   @Output() audioUploaded = new EventEmitter<any>();

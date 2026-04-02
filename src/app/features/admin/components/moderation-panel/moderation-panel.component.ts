@@ -9,6 +9,7 @@
  * @since 2025-01-01
  */
 
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import {
   Component,
   Input,
@@ -134,6 +135,28 @@ export interface ModerationStats {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerationPanelComponent {
+  readonly typeOptions: DropdownOption[] = [
+    { value: '', label: 'Tous' },
+    { value: 'word', label: 'Mots' },
+    { value: 'definition', label: 'Définitions' },
+    { value: 'comment', label: 'Commentaires' },
+    { value: 'report', label: 'Signalements' },
+    { value: 'user_profile', label: 'Profils' },
+  ];
+  readonly statusOptions: DropdownOption[] = [
+    { value: '', label: 'Tous' },
+    { value: 'pending', label: 'En attente' },
+    { value: 'flagged', label: 'Signalés' },
+    { value: 'escalated', label: 'Escaladés' },
+  ];
+  readonly priorityOptions: DropdownOption[] = [
+    { value: '', label: 'Toutes' },
+    { value: 'critical', label: 'Critique' },
+    { value: 'high', label: 'Haute' },
+    { value: 'medium', label: 'Moyenne' },
+    { value: 'low', label: 'Basse' },
+  ];
+
   // ===== INPUTS =====
 
   @Input() items: ModerationItem[] = [];
@@ -238,6 +261,11 @@ export class ModerationPanelComponent {
   /**
    * Gestion du changement de filtres
    */
+  public onFilterValueChange(field: keyof ModerationFilters, value: string): void {
+    const newFilters = { ...this.filters, [field]: value || undefined };
+    this.filterChanged.emit(newFilters);
+  }
+
   public onFilterChange(field: keyof ModerationFilters, event: Event): void {
     const target = event.target as HTMLInputElement | HTMLSelectElement;
     let value: any = target.value || undefined;

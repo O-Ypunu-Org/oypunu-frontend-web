@@ -14,6 +14,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -35,6 +36,13 @@ export class AddCategoryComponent implements OnInit, OnDestroy {
   
   // Langues disponibles
   languages: { id: string; code: string; name: string; nativeName?: string }[] = [];
+
+  get languageOptions(): DropdownOption[] {
+    return this.languages.map((lang) => ({
+      value: lang.id,
+      label: `${lang.name}${lang.nativeName && lang.nativeName !== lang.name ? ` (${lang.nativeName})` : ''}`,
+    }));
+  }
   isLoadingLanguages = false;
   
   private destroy$ = new Subject<void>();

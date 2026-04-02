@@ -11,6 +11,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subject, BehaviorSubject, combineLatest } from 'rxjs';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { takeUntil, map, catchError } from 'rxjs/operators';
 
 import { AnalyticsApiService } from '../../services/analytics-api.service';
@@ -64,6 +65,13 @@ interface MetricCard {
   styleUrls: ['./analytics-overview.container.scss'],
 })
 export class AnalyticsOverviewContainer implements OnInit, OnDestroy {
+  readonly periodOptions: DropdownOption[] = [
+    { value: 'day', label: "Aujourd'hui" },
+    { value: 'week', label: 'Cette semaine' },
+    { value: 'month', label: 'Ce mois' },
+    { value: 'year', label: 'Cette année' },
+  ];
+
   private readonly destroy$ = new Subject<void>();
 
   // État des analytics
@@ -153,6 +161,13 @@ export class AnalyticsOverviewContainer implements OnInit, OnDestroy {
   /**
    * Change la période d'affichage
    */
+  public onPeriodValueChange(value: string): void {
+    const period = value as 'day' | 'week' | 'month' | 'year';
+    const currentState = this.analyticsStateSubject.value;
+    this.analyticsStateSubject.next({ ...currentState, selectedPeriod: period });
+    this.loadAnalytics();
+  }
+
   public onPeriodChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const period = target.value as 'day' | 'week' | 'month' | 'year';

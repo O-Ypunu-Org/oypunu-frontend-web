@@ -8,6 +8,7 @@ import {
   PostFormData,
   PostFilters,
 } from '../../../../core/models/community-posts';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'app-community-posts',
@@ -74,6 +75,28 @@ export class CommunityPostsComponent implements OnInit {
     { value: 'activity', label: 'Activité récente' },
     { value: 'controversial', label: 'Controversé' },
   ];
+
+  // Dropdown options (DropdownOption[])
+  get postTypesOptions(): DropdownOption[] { return this.postTypes; }
+  get difficultiesOptions(): DropdownOption[] { return this.difficulties; }
+  get sortOptionsDropdown(): DropdownOption[] { return this.sortOptions; }
+  get unselectedLanguageOptions(): DropdownOption[] {
+    return this.getUnselectedLanguages().map((lang) => ({
+      value: lang.code,
+      label: `${lang.name} (${lang.nativeName})`,
+    }));
+  }
+
+  // Valeur temporaire pour le sélecteur de langue (réinitialisée après sélection)
+  selectedLanguageForPost = '';
+
+  onLanguageCodeSelected(code: string): void {
+    if (code && !this.newPostForm.languages?.includes(code)) {
+      this.newPostForm.languages = this.newPostForm.languages || [];
+      this.newPostForm.languages.push(code);
+    }
+    setTimeout(() => { this.selectedLanguageForPost = ''; }, 0);
+  }
 
   // Langues disponibles chargées depuis l'API
   availableLanguages: {

@@ -41,35 +41,29 @@
     <div class="filter-row">
       <div class="filter-group">
         <label>Type:</label>
-        <select [value]="filters?.type || ''" (change)="onFilterChange('type', $event)" class="filter-select">
-          <option value="">Tous</option>
-          <option value="word">Mots</option>
-          <option value="definition">Définitions</option>
-          <option value="comment">Commentaires</option>
-          <option value="report">Signalements</option>
-          <option value="user_profile">Profils</option>
-        </select>
+        <app-custom-dropdown
+          [ngModel]="filters?.type || ''"
+          [options]="typeOptions"
+          (valueChange)="onFilterValueChange('type', $event)">
+        </app-custom-dropdown>
       </div>
 
       <div class="filter-group">
         <label>Statut:</label>
-        <select [value]="filters?.status || ''" (change)="onFilterChange('status', $event)" class="filter-select">
-          <option value="">Tous</option>
-          <option value="pending">En attente</option>
-          <option value="flagged">Signalés</option>
-          <option value="escalated">Escaladés</option>
-        </select>
+        <app-custom-dropdown
+          [ngModel]="filters?.status || ''"
+          [options]="statusOptions"
+          (valueChange)="onFilterValueChange('status', $event)">
+        </app-custom-dropdown>
       </div>
 
       <div class="filter-group">
         <label>Priorité:</label>
-        <select [value]="filters?.priority || ''" (change)="onFilterChange('priority', $event)" class="filter-select">
-          <option value="">Toutes</option>
-          <option value="critical">Critique</option>
-          <option value="high">Haute</option>
-          <option value="medium">Moyenne</option>
-          <option value="low">Basse</option>
-        </select>
+        <app-custom-dropdown
+          [ngModel]="filters?.priority || ''"
+          [options]="priorityOptions"
+          (valueChange)="onFilterValueChange('priority', $event)">
+        </app-custom-dropdown>
       </div>
 
       <div class="filter-group">

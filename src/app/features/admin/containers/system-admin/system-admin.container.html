@@ -151,13 +151,11 @@
       <div class="section-header">
         <h2>Logs système</h2>
         <div class="logs-filters">
-          <select (change)="onLogLevelFilter($event)" class="filter-select">
-            <option value="">Tous les niveaux</option>
-            <option value="info">Info</option>
-            <option value="warn">Warning</option>
-            <option value="error">Erreur</option>
-            <option value="critical">Critique</option>
-          </select>
+          <app-custom-dropdown
+            [ngModel]="''"
+            [options]="logLevelOptions"
+            (valueChange)="onLogLevelValueFilter($event)">
+          </app-custom-dropdown>
           <input type="text" placeholder="Rechercher dans les logs..." (input)="onLogSearch($event)"
             class="search-input">
           <button (click)="exportLogs()" class="btn btn-outline btn-sm">
