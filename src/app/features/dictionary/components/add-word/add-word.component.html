@@ -102,25 +102,22 @@
 
         <!-- Langue -->
         <div>
-          <label for="language" class="block text-sm font-medium text-gray-300 mb-1">Langue*</label>
-          <select id="language" formControlName="languageId"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            [ngClass]="{'border-red-500': wordForm.get('languageId')?.invalid && wordForm.get('languageId')?.touched}">
-            <option value="" disabled>Sélectionnez une langue ({{ languages.length }} disponibles)</option>
-            <option *ngFor="let language of languages; trackBy: trackByLanguageId" [value]="language.id">
-              {{ language.name }} ({{ language.wordCount || 0 }} mots)
-            </option>
-          </select>
+          <label class="block text-sm font-medium text-gray-300 mb-1">Langue*</label>
+          <app-custom-dropdown formControlName="languageId" [options]="languageOptions"
+            [placeholder]="'Sélectionnez une langue (' + languages.length + ' disponibles)'"
+            [isInvalid]="!!(wordForm.get('languageId')?.invalid && wordForm.get('languageId')?.touched)">
+          </app-custom-dropdown>
           <div *ngIf="wordForm.get('languageId')?.invalid && wordForm.get('languageId')?.touched"
             class="text-red-500 text-xs mt-1">
             La langue est requise
           </div>
-          
+
           <!-- Lien pour proposer une nouvelle langue -->
           <div class="mt-2">
-            <a routerLink="/languages/add" 
-               class="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <a routerLink="/languages/add"
+              class="text-sm text-purple-600 hover:text-purple-700 flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Votre langue n'est pas listée ? Proposez-la ici
@@ -156,22 +153,20 @@
 
         <!-- Catégorie -->
         <div>
-          <label for="categoryId" class="block text-sm font-medium text-gray-300 mb-1">Catégorie</label>
-          <select id="categoryId" formControlName="categoryId"
-            class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option [ngValue]="''">Sélectionnez une catégorie (facultatif)</option>
-            <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-          </select>
-          
+          <label class="block text-sm font-medium text-gray-300 mb-1">Catégorie</label>
+          <app-custom-dropdown formControlName="categoryId" [options]="categoryOptions"
+            placeholder="Sélectionnez une catégorie (facultatif)">
+          </app-custom-dropdown>
+
           <!-- Lien contextuel pour proposer une nouvelle catégorie -->
           <div class="mt-2 flex items-center justify-between">
             <div class="text-xs text-gray-500">
               La catégorie n'existe pas encore pour cette langue ?
             </div>
-            <a [routerLink]="['/categories/add']" 
-               [queryParams]="getAddCategoryParams()"
-               class="text-sm text-purple-600 hover:text-purple-700 transition-colors flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-800">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <a [routerLink]="['/categories/add']" [queryParams]="getAddCategoryParams()"
+              class="text-sm text-purple-600 hover:text-purple-700 transition-colors flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-800">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Proposer une catégorie
@@ -217,12 +212,10 @@
             <!-- Partie du discours -->
             <div class="mb-4">
               <label class="block text-sm font-medium text-gray-300 mb-1">Partie du discours*</label>
-              <select formControlName="partOfSpeech"
-                class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                [ngClass]="{'border-red-500': meaning.get('partOfSpeech')?.invalid && meaning.get('partOfSpeech')?.touched}">
-                <option value="" disabled>Sélectionnez une partie du discours</option>
-                <option *ngFor="let pos of partsOfSpeech" [value]="pos.code">{{ pos.name }}</option>
-              </select>
+              <app-custom-dropdown formControlName="partOfSpeech" [options]="partsOfSpeechOptions"
+                placeholder="Sélectionnez une partie du discours"
+                [isInvalid]="!!(meaning.get('partOfSpeech')?.invalid && meaning.get('partOfSpeech')?.touched)">
+              </app-custom-dropdown>
               <div *ngIf="meaning.get('partOfSpeech')?.invalid && meaning.get('partOfSpeech')?.touched"
                 class="text-red-500 text-xs mt-1">
                 La partie du discours est requise
@@ -311,8 +304,8 @@
             <p class="text-sm text-gray-400">Ajoutez des traductions de ce mot dans d'autres langues</p>
           </div>
           <button type="button" (click)="toggleTranslationSection()"
-            class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-            {{ showTranslationSection ? '➖ Masquer' : '➕ Ajouter des traductions' }}
+            class="px-3 py-1 border border-gray-600 text-gray-300 rounded hover:border-gray-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-gray-500 text-sm transition-colors">
+            {{ showTranslationSection ? 'Masquer' : '+ Ajouter des traductions' }}
           </button>
         </div>
 
@@ -344,17 +337,11 @@
                   <!-- Langue de traduction -->
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Langue*</label>
-                    <select formControlName="languageId" (change)="onTranslationLanguageChange(i)"
-                      class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      [ngClass]="{'border-red-500': translation.get('languageId')?.invalid && translation.get('languageId')?.touched}">
-                      <option value="">Sélectionnez une langue</option>
-                      <option *ngFor="let lang of getAvailableLanguagesForTranslation(i)" [value]="lang.id">
-                        {{ lang.name }}
-                        <span *ngIf="lang.wordCount" class="text-xs text-gray-400">
-                          ({{ lang.wordCount }} mots)
-                        </span>
-                      </option>
-                    </select>
+                    <app-custom-dropdown formControlName="languageId" [options]="getTranslationLanguageOptions(i)"
+                      placeholder="Sélectionnez une langue"
+                      [isInvalid]="!!(translation.get('languageId')?.invalid && translation.get('languageId')?.touched)"
+                      (valueChange)="onTranslationLanguageChange(i)">
+                    </app-custom-dropdown>
                     <div *ngIf="translation.get('languageId')?.invalid && translation.get('languageId')?.touched"
                       class="text-red-500 text-xs mt-1">
                       La langue est requise
@@ -369,39 +356,38 @@
                         (recherchez un mot existant en {{ getLanguageNameById(translation.get('languageId')?.value) }})
                       </span>
                     </label>
-                    
+
                     <!-- Champ de recherche -->
                     <div class="relative">
-                      <input type="text" 
-                        [ngModel]="translationWordSearch[i] || ''"
+                      <input type="text" [ngModel]="translationWordSearch[i] || ''"
                         (ngModelChange)="translationWordSearch[i] = $event; searchWordsInTargetLanguage(i, getLanguageCodeById(translation.get('languageId')?.value), $event)"
                         [ngModelOptions]="{standalone: true}"
                         class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         [ngClass]="{'border-red-500': translation.get('translatedWord')?.invalid && translation.get('translatedWord')?.touched}"
                         placeholder="Tapez pour rechercher un mot existant..."
                         [disabled]="!translation.get('languageId')?.value" />
-                      
+
                       <!-- Indicateur de recherche -->
-                      <div *ngIf="isSearchingTranslationWords[i]" 
+                      <div *ngIf="isSearchingTranslationWords[i]"
                         class="absolute right-3 top-1/2 transform -translate-y-1/2">
                         <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400"></div>
                       </div>
                     </div>
 
                     <!-- Résultats de recherche -->
-                    <div *ngIf="translationWordResults[i] && translationWordResults[i].length > 0" 
+                    <div *ngIf="translationWordResults[i] && translationWordResults[i].length > 0"
                       class="mt-2 max-h-40 overflow-y-auto bg-gray-800 border border-gray-600 rounded-md">
-                      <div *ngFor="let word of translationWordResults[i]" 
-                        (click)="selectTranslationWord(i, word)"
+                      <div *ngFor="let word of translationWordResults[i]" (click)="selectTranslationWord(i, word)"
                         class="px-3 py-2 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0">
                         <div class="flex justify-between items-center">
                           <div>
                             <span class="font-medium text-white">{{ word.word }}</span>
-                            <span *ngIf="word.categoryName" class="text-xs text-gray-400 ml-2">({{ word.categoryName }})</span>
+                            <span *ngIf="word.categoryName" class="text-xs text-gray-400 ml-2">({{ word.categoryName
+                              }})</span>
                           </div>
                           <span class="text-xs text-blue-400">Cliquer pour sélectionner</span>
                         </div>
-                        <div *ngIf="word.meanings && word.meanings[0]?.definitions[0]?.definition" 
+                        <div *ngIf="word.meanings && word.meanings[0]?.definitions[0]?.definition"
                           class="text-xs text-gray-300 mt-1 truncate">
                           {{ word.meanings[0].definitions[0].definition }}
                         </div>
@@ -409,25 +395,27 @@
                     </div>
 
                     <!-- Message si aucun résultat -->
-                    <div *ngIf="translation.get('languageId')?.value && translationWordSearch[i] && translationWordSearch[i].length > 1 && !isSearchingTranslationWords[i] && (!translationWordResults[i] || translationWordResults[i].length === 0) && !selectedTranslationWords[i]"
+                    <div
+                      *ngIf="translation.get('languageId')?.value && translationWordSearch[i] && translationWordSearch[i].length > 1 && !isSearchingTranslationWords[i] && (!translationWordResults[i] || translationWordResults[i].length === 0) && !selectedTranslationWords[i]"
                       class="mt-2 text-xs text-yellow-400 bg-yellow-900/30 p-2 rounded">
                       ⚠️ Aucun mot trouvé. Vous pouvez continuer à taper pour créer une nouvelle traduction.
                     </div>
 
                     <!-- Champ caché pour la valeur du formulaire -->
                     <input type="hidden" formControlName="translatedWord" />
-                    
+
                     <!-- Message de validation -->
-                    <div *ngIf="translation.get('translatedWord')?.invalid && translation.get('translatedWord')?.touched"
+                    <div
+                      *ngIf="translation.get('translatedWord')?.invalid && translation.get('translatedWord')?.touched"
                       class="text-red-500 text-xs mt-1">
                       La traduction est requise
                     </div>
 
                     <!-- Indication du mot sélectionné -->
-                    <div *ngIf="selectedTranslationWords[i]" 
+                    <div *ngIf="selectedTranslationWords[i]"
                       class="mt-2 text-xs text-green-400 bg-green-900/30 p-2 rounded flex items-center justify-between">
                       <span>✅ Mot sélectionné: <strong>{{ selectedTranslationWords[i].word }}</strong></span>
-                      <button type="button" (click)="onTranslationLanguageChange(i)" 
+                      <button type="button" (click)="onTranslationLanguageChange(i)"
                         class="text-red-400 hover:text-red-300 underline">
                         Annuler
                       </button>
@@ -449,8 +437,7 @@
                   <div>
                     <label class="block text-sm font-medium text-gray-300 mb-1">Niveau de certitude</label>
                     <div class="flex gap-2">
-                      <button type="button"
-                        *ngFor="let option of confidenceLevels"
+                      <button type="button" *ngFor="let option of confidenceLevels"
                         (click)="setConfidence(i, option.value)"
                         [class]="translation.get('confidence')?.value === option.value
                           ? 'flex-1 py-2 rounded-lg border-2 border-purple-500 bg-purple-600 text-white text-sm font-medium transition-colors'
@@ -465,7 +452,7 @@
               <!-- Bouton ajouter traduction -->
               <button type="button" (click)="addTranslation()"
                 class="w-full py-2 border-2 border-dashed border-gray-600 text-gray-400 rounded-lg hover:border-purple-600 hover:text-purple-600 transition-colors">
-                ➕ Ajouter une autre traduction
+                + Ajouter une autre traduction
               </button>
             </div>
           </div>

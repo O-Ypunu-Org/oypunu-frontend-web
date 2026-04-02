@@ -1,4 +1,5 @@
 import { UserRole } from './../../../../core/models/admin';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 /**
  * @fileoverview Composant présentationnel User Permissions Modal - SOLID Principles
  *
@@ -81,6 +82,15 @@ export interface PermissionChange {
 })
 export class UserPermissionsModalComponent {
   public UserRole: typeof UserRole = UserRole;
+
+  get roleOptions(): DropdownOption[] {
+    return [
+      { value: 'user', label: 'Utilisateur' },
+      { value: 'contributor', label: 'Contributeur' },
+      { value: 'admin', label: 'Administrateur', disabled: !this.canAssignRole(UserRole.ADMIN) },
+      { value: 'superadmin', label: 'Super Admin', disabled: !this.canAssignRole(UserRole.SUPERADMIN) },
+    ];
+  }
 
   // ===== INPUTS =====
 
@@ -187,6 +197,14 @@ export class UserPermissionsModalComponent {
   /**
    * Gestion du changement de rôle
    */
+  public onRoleValueChange(value: string): void {
+    const newRole = value as UserRole;
+    this.selectedRole = newRole;
+    if (this.user) {
+      this.roleChanged.emit({ user: this.user, newRole });
+    }
+  }
+
   public onRoleChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
     const newRole = target.value as UserRole;

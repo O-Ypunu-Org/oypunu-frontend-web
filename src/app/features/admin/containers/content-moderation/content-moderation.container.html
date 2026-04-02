@@ -209,14 +209,11 @@
         <!-- Sévérité (si applicable) -->
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Sévérité</label>
-          <select [value]="state.contentFilters.severity || ''"
-            class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-            <option value="">Toutes les sévérités</option>
-            <option value="low">Faible</option>
-            <option value="medium">Moyenne</option>
-            <option value="high">Haute</option>
-            <option value="critical">Critique</option>
-          </select>
+          <app-custom-dropdown
+            [ngModel]="state.contentFilters.severity || ''"
+            [options]="severityOptions"
+            (valueChange)="onSeverityValueChange($event)">
+          </app-custom-dropdown>
         </div>
 
         <!-- Bouton effacer -->

@@ -11,6 +11,7 @@
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { Observable, Subject, BehaviorSubject, of } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import {
@@ -77,6 +78,13 @@ interface ExtendedModerationState {
   styleUrls: ['./content-moderation.container.scss'],
 })
 export class ContentModerationContainer implements OnInit, OnDestroy {
+  readonly severityOptions: DropdownOption[] = [
+    { value: '', label: 'Toutes les sévérités' },
+    { value: 'low', label: 'Faible' },
+    { value: 'medium', label: 'Moyenne' },
+    { value: 'high', label: 'Haute' },
+    { value: 'critical', label: 'Critique' },
+  ];
   private readonly destroy$ = new Subject<void>();
 
   // État de la modération étendue
@@ -911,6 +919,17 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
     const target = event.target as HTMLSelectElement;
     const status = target.value as ModerationStatus | '';
     this.updateFilters({ status: status || undefined });
+  }
+
+  public onSeverityValueChange(value: string): void {
+    const currentState = this.moderationStateSubject.value;
+    this.moderationStateSubject.next({
+      ...currentState,
+      contentFilters: {
+        ...currentState.contentFilters,
+        severity: (value as any) || undefined,
+      },
+    });
   }
 
   /**

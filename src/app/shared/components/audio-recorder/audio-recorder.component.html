@@ -108,19 +108,11 @@
         <label for="accent-select" class="block text-sm font-medium text-gray-400 mb-1">
           Accent/Dialecte
         </label>
-        <select id="accent-select" [(ngModel)]="accent" [disabled]="state.isUploading"
-          class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-          <option value="fr-fr">Français (France)</option>
-          <option value="fr-ca">Français (Canada)</option>
-          <option value="en-us">Anglais (États-Unis)</option>
-          <option value="en-gb">Anglais (Royaume-Uni)</option>
-          <option value="es-es">Espagnol (Espagne)</option>
-          <option value="es-mx">Espagnol (Mexique)</option>
-          <option value="de-de">Allemand</option>
-          <option value="it-it">Italien</option>
-          <option value="pt-br">Portugais (Brésil)</option>
-          <option value="standard">Standard</option>
-        </select>
+        <app-custom-dropdown
+          [(ngModel)]="accent"
+          [options]="accentOptions"
+          [disabled]="state.isUploading">
+        </app-custom-dropdown>
       </div>
 
       <!-- Upload Button -->

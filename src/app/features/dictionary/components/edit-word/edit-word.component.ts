@@ -2,28 +2,22 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ConfirmDialogService } from '../../../../core/services/confirm-dialog.service';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Observable, of } from 'rxjs';
+import { Subject, of } from 'rxjs';
 import {
   takeUntil,
   debounceTime,
   distinctUntilChanged,
-  switchMap,
   catchError,
 } from 'rxjs/operators';
 import {
   DictionaryService,
   UpdateWordDto,
 } from '../../../../core/services/dictionary.service';
+import { DropdownOption } from '../../../../shared/components/custom-dropdown/custom-dropdown.component';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { Word } from '../../../../core/models/word';
 import { AuthService } from '../../../../core/services/auth.service';
-import {
-  LanguageOption,
-  TranslationSuggestion,
-  CreateTranslationRequest,
-} from '../../../../core/models/translation';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../../../environments/environment';
+import { LanguageOption } from '../../../../core/models/translation';
 
 @Component({
   selector: 'app-edit-word',
@@ -60,7 +54,6 @@ export class EditWordComponent implements OnInit, OnDestroy {
     private _authService: AuthService,
     private _route: ActivatedRoute,
     private _router: Router,
-    private _http: HttpClient,
     private _confirmDialog: ConfirmDialogService
   ) {
     this.editWordForm = this._fb.group({
@@ -196,7 +189,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
       language: [translation?.language || '', Validators.required],
       translatedWord: [translation?.translatedWord || '', Validators.required],
       context: this._fb.array(translation?.context || []),
-      confidence: [translation?.confidence || 0],
+      confidence: [translation?.confidence ?? 0.8],
       verifiedBy: this._fb.array(translation?.verifiedBy || []),
       // Nouveaux champs pour la recherche intelligente
       searchTerm: [''], // Champ de recherche temporaire
@@ -296,6 +289,34 @@ export class EditWordComponent implements OnInit, OnDestroy {
 
   removeTranslation(index: number): void {
     this.translationsArray.removeAt(index);
+  }
+
+  readonly partsOfSpeechOptions: DropdownOption[] = [
+    { value: 'noun', label: 'Nom' },
+    { value: 'verb', label: 'Verbe' },
+    { value: 'adjective', label: 'Adjectif' },
+    { value: 'adverb', label: 'Adverbe' },
+    { value: 'pronoun', label: 'Pronom' },
+    { value: 'preposition', label: 'Préposition' },
+    { value: 'conjunction', label: 'Conjonction' },
+    { value: 'interjection', label: 'Interjection' },
+  ];
+
+  getAvailableTargetLanguageOptions(): DropdownOption[] {
+    return this.getAvailableTargetLanguages().map((lang) => ({
+      value: lang.code,
+      label: `${lang.flag} - ${lang.name}`,
+    }));
+  }
+
+  confidenceLevels = [
+    { label: 'Incertain', value: 0.3 },
+    { label: 'Assez sûr', value: 0.8 },
+    { label: 'Certain', value: 1.0 },
+  ];
+
+  setTranslationConfidence(index: number, value: number): void {
+    this.translationsArray.at(index).get('confidence')?.setValue(value);
   }
 
   addArrayItem(formArray: FormArray, value: string = ''): void {
@@ -515,32 +536,21 @@ export class EditWordComponent implements OnInit, OnDestroy {
    * Charge les langues disponibles depuis le système de traduction
    */
   private loadAvailableLanguages(): void {
-    // Utiliser l'API du dictionnaire pour récupérer les langues disponibles dans la base de données
-    // Cette API retourne les langues qui ont effectivement des mots dans la base
-    this._http
-      .get<{
-        languages: { code: string; name: string; nativeName: string; wordCount: number }[];
-        total: number;
-      }>(`${environment.apiUrl}/words/available-languages`)
+    this._dictionaryService
+      .getAvailableLanguages()
       .pipe(takeUntil(this._destroy$))
       .subscribe({
-        next: (response) => {
-          this.availableLanguages = (response.languages || []).map((lang) => ({
+        next: (languages) => {
+          this.availableLanguages = languages.map((lang: any) => ({
             code: lang.code,
+            id: lang.id,
             name: lang.name,
             flag: this.getLanguageFlag(lang.code),
             translationCount: lang.wordCount,
           }));
-          console.log(
-            '🌍 Langues disponibles chargées:',
-            this.availableLanguages
-          );
         },
-        error: (error) => {
-          console.error('Erreur lors du chargement des langues:', error);
-          // Fallback avec langues par défaut
-          this.availableLanguages =
-            this._translationService.getLanguageOptions();
+        error: () => {
+          this.availableLanguages = this._translationService.getLanguageOptions();
         },
       });
   }
@@ -560,7 +570,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
       ja: '🇯🇵',
       zh: '🇨🇳',
     };
-    return flags[code] || '🌐';
+    return flags[code] || (code ? code.toLowerCase() : '?');
   }
 
   /**
@@ -694,9 +704,10 @@ export class EditWordComponent implements OnInit, OnDestroy {
    * Retourne les langues disponibles en excluant la langue source du mot
    */
   getAvailableTargetLanguages(): LanguageOption[] {
-    const sourceLanguage = this.word?.language;
+    const sourceCode = this.word?.language;
+    const sourceId = (this.word as any)?.languageId;
     return this.availableLanguages.filter(
-      (lang) => lang.code !== sourceLanguage
+      (lang: any) => lang.code !== sourceCode && lang.id !== sourceId
     );
   }
 

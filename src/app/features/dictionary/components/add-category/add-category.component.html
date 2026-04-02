@@ -101,28 +101,13 @@
               <span class="text-sm">Chargement des langues...</span>
             </div>
 
-            <select
+            <app-custom-dropdown
               *ngIf="!isLoadingLanguages"
-              id="languageId"
-              class="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2"
-              [class.border-gray-300]="!isFieldInvalid('languageId')"
-              [class.border-red-500]="isFieldInvalid('languageId')"
-              [class.focus:ring-blue-500]="!isFieldInvalid('languageId')"
-              [class.focus:ring-red-500]="isFieldInvalid('languageId')"
               formControlName="languageId"
-            >
-              <option value="">Sélectionnez une langue</option>
-              <option 
-                *ngFor="let language of languages"
-                [value]="language.id"
-                [title]="language.nativeName"
-              >
-                {{ language.name }}
-                <span *ngIf="language.nativeName && language.nativeName !== language.name">
-                  ({{ language.nativeName }})
-                </span>
-              </option>
-            </select>
+              [options]="languageOptions"
+              placeholder="Sélectionnez une langue"
+              [isInvalid]="isFieldInvalid('languageId')">
+            </app-custom-dropdown>
 
             <div *ngIf="isFieldInvalid('languageId')" class="text-red-600 text-sm mt-1">
               <div *ngIf="categoryForm.get('languageId')?.errors?.['required']">

@@ -7,12 +7,11 @@
     </div>
 
     <div class="period-selector">
-      <select [value]="state.selectedPeriod" (change)="onPeriodChange($event)" class="period-select">
-        <option value="day">Aujourd'hui</option>
-        <option value="week">Cette semaine</option>
-        <option value="month">Ce mois</option>
-        <option value="year">Cette année</option>
-      </select>
+      <app-custom-dropdown
+        [ngModel]="state.selectedPeriod"
+        [options]="periodOptions"
+        (valueChange)="onPeriodValueChange($event)">
+      </app-custom-dropdown>
     </div>
   </div>
 

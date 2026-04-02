@@ -90,13 +90,11 @@
         </div>
         <div class="role-selector">
           <label for="role-select" class="sr-only">Sélectionner un rôle</label>
-          <select id="role-select" [value]="selectedRole || user.role" (change)="onRoleChange($event)"
-            class="role-select">
-            <option value="user">Utilisateur</option>
-            <option value="contributor">Contributeur</option>
-            <option value="admin" [disabled]="!canAssignRole(UserRole.ADMIN)">Administrateur</option>
-            <option value="superadmin" [disabled]="!canAssignRole(UserRole.SUPERADMIN)">Super Admin</option>
-          </select>
+          <app-custom-dropdown
+            [ngModel]="selectedRole || user.role"
+            [options]="roleOptions"
+            (valueChange)="onRoleValueChange($event)">
+          </app-custom-dropdown>
         </div>
       </div>
 
