@@ -77,7 +77,7 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-400">Langue</label>
-              <p class="mt-1 text-white">{{ word.language | uppercase }}</p>
+              <p class="mt-1 text-white">{{ getWordLanguageName() }}</p>
             </div>
             <div *ngIf="word.categoryId">
               <label class="block text-sm font-medium text-gray-400">Catégorie</label>
