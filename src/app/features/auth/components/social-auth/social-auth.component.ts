@@ -10,25 +10,25 @@ import { ActivatedRoute, Router } from '@angular/router';
 export class SocialAuthComponent implements OnInit {
   isProcessing = true;
   errorMessage = '';
-  // Déclaration de window comme propriété
-  window: Window = window;
 
   constructor(private _route: ActivatedRoute, private _router: Router) {}
 
   ngOnInit(): void {
-    // Récupérer le token depuis les paramètres d'URL
     this._route.queryParams.subscribe((params) => {
       const token = params['token'];
 
       if (token) {
         try {
-          // Stocker le token pour que la fenêtre parente puisse le récupérer
+          // Écrire dans localStorage : la fenêtre principale écoute l'événement
+          // 'storage' qui se déclenche immédiatement dans les autres onglets/fenêtres,
+          // sans dépendre de window.opener (effacé par COOP cross-origin).
           localStorage.setItem('social_auth_token', token);
 
-          // Fermer la fenêtre actuelle
-          setTimeout(() => {
+          // Tentative de fermeture si la fenêtre a un opener accessible
+          if (window.opener) {
             window.close();
-          }, 3000);
+          }
+          // Sinon, la fenêtre principale fermera cette popup via authWindow.close()
         } catch (error) {
           this.isProcessing = false;
           this.errorMessage =
@@ -42,7 +42,6 @@ export class SocialAuthComponent implements OnInit {
     });
   }
 
-  // Fermer la popup
   closeWindow(): void {
     window.close();
   }
