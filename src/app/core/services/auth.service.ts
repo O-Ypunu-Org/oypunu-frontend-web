@@ -238,38 +238,63 @@ export class AuthService {
     authWindow: Window,
   ): Observable<AuthResponse> {
     return new Observable<AuthResponse>((observer) => {
-      // Fonction pour vérifier si la fenêtre est fermée
-      const checkClosed = setInterval(() => {
-        if (authWindow.closed) {
-          clearInterval(checkClosed);
+      let resolved = false;
 
-          // Vérifier si l'utilisateur a été authentifié
+      const cleanup = () => {
+        window.removeEventListener('storage', storageHandler);
+        clearInterval(checkClosed);
+      };
+
+      const processToken = (token: string) => {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+        // Fermer la popup depuis la fenêtre principale (window.opener peut être null
+        // côté popup à cause du header COOP cross-origin du backend)
+        if (!authWindow.closed) authWindow.close();
+
+        this._http
+          .get<AuthResponse>(
+            `${this._API_URL}/social-auth-callback?token=${token}`,
+          )
+          .pipe(
+            tap((response) => {
+              localStorage.setItem('access_token', response.tokens.access_token);
+              if (response.tokens.refresh_token) {
+                localStorage.setItem('refresh_token', response.tokens.refresh_token);
+              }
+              localStorage.setItem('user', JSON.stringify(response.user));
+              this._currentUserSubject.next(response.user);
+            }),
+          )
+          .subscribe({
+            next: (response) => observer.next(response),
+            error: (error) => observer.error(error),
+            complete: () => observer.complete(),
+          });
+      };
+
+      // Méthode principale : événement 'storage' — se déclenche immédiatement
+      // dans cette fenêtre quand la popup écrit dans localStorage (même origine),
+      // sans dépendre de window.opener ni de window.close().
+      const storageHandler = (event: StorageEvent) => {
+        if (event.key !== 'social_auth_token' || !event.newValue) return;
+        localStorage.removeItem('social_auth_token');
+        processToken(event.newValue);
+      };
+
+      window.addEventListener('storage', storageHandler);
+
+      // Fallback : détection fermeture popup (annulation utilisateur)
+      const checkClosed = setInterval(() => {
+        if (authWindow.closed && !resolved) {
+          // Token écrit avant fermeture ?
           const token = localStorage.getItem('social_auth_token');
           if (token) {
-            // Supprimer le token temporaire
             localStorage.removeItem('social_auth_token');
-
-            // Obtenir les informations de l'utilisateur
-            this._http
-              .get<AuthResponse>(
-                `${this._API_URL}/social-auth-callback?token=${token}`,
-              )
-              .pipe(
-                tap((response) => {
-                  localStorage.setItem('access_token', response.tokens.access_token);
-                  if (response.tokens.refresh_token) {
-                    localStorage.setItem('refresh_token', response.tokens.refresh_token);
-                  }
-                  localStorage.setItem('user', JSON.stringify(response.user));
-                  this._currentUserSubject.next(response.user);
-                }),
-              )
-              .subscribe({
-                next: (response) => observer.next(response),
-                error: (error) => observer.error(error),
-                complete: () => observer.complete(),
-              });
+            processToken(token);
           } else {
+            cleanup();
             observer.error(
               new Error("L'authentification sociale a échoué ou a été annulée"),
             );
@@ -278,13 +303,10 @@ export class AuthService {
         }
       }, 500);
 
-      // Fonction pour nettoyer l'intervalle si l'utilisateur annule l'observation
       return {
         unsubscribe: () => {
-          clearInterval(checkClosed);
-          if (!authWindow.closed) {
-            authWindow.close();
-          }
+          cleanup();
+          if (!authWindow.closed) authWindow.close();
         },
       };
     });
