@@ -705,10 +705,32 @@ export class EditWordComponent implements OnInit, OnDestroy {
    */
   getAvailableTargetLanguages(): LanguageOption[] {
     const sourceCode = this.word?.language;
-    const sourceId = (this.word as any)?.languageId;
+    const sourceId =
+      (this.word as any)?.languageId ||
+      (this.word as any)?.language?._id ||
+      (this.word as any)?.language?.id;
     return this.availableLanguages.filter(
-      (lang: any) => lang.code !== sourceCode && lang.id !== sourceId
+      (lang: any) =>
+        lang.id !== sourceId &&
+        (sourceCode ? lang.code !== sourceCode : true)
     );
+  }
+
+  /**
+   * Retourne le nom de la langue du mot en cours d'édition
+   */
+  getWordLanguageName(): string {
+    const sourceId =
+      (this.word as any)?.languageId ||
+      (this.word as any)?.language?._id ||
+      (this.word as any)?.language?.id;
+    const sourceCode = this.word?.language;
+    const lang = this.availableLanguages.find(
+      (l: any) =>
+        (sourceId && l.id === sourceId) ||
+        (sourceCode && typeof sourceCode === 'string' && l.code === sourceCode)
+    );
+    return lang?.name || (typeof sourceCode === 'string' ? sourceCode?.toUpperCase() : '') || '';
   }
 
   /**
