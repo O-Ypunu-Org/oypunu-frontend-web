@@ -25,7 +25,7 @@ export class RegisterComponent implements OnInit {
     private _router: Router,
     private _route: ActivatedRoute,
     private _authService: AuthService,
-    private _toastService: ToastService
+    private _toastService: ToastService,
   ) {
     this.registerForm = this._fb.group(
       {
@@ -39,11 +39,18 @@ export class RegisterComponent implements OnInit {
           ],
         ],
         email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(12), Validators.maxLength(128)]],
+        password: [
+          '',
+          [
+            Validators.required,
+            Validators.minLength(12),
+            Validators.maxLength(128),
+          ],
+        ],
         confirmPassword: ['', Validators.required],
         hasAcceptedTerms: [false, [Validators.requiredTrue]],
       },
-      { validators: this.passwordMatchValidator }
+      { validators: this.passwordMatchValidator },
     );
   }
 
@@ -67,7 +74,7 @@ export class RegisterComponent implements OnInit {
     if (this.registerForm.invalid) {
       this._toastService.warning(
         'Formulaire invalide',
-        'Veuillez corriger les erreurs dans le formulaire avant de continuer'
+        'Veuillez corriger les erreurs dans le formulaire avant de continuer',
       );
       return;
     }
@@ -76,7 +83,8 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { username, email, password, hasAcceptedTerms } = this.registerForm.value;
+    const { username, email, password, hasAcceptedTerms } =
+      this.registerForm.value;
 
     this._authService
       .register(username, email, password, undefined, hasAcceptedTerms)
@@ -89,7 +97,7 @@ export class RegisterComponent implements OnInit {
             this._toastService.success(
               '🎉 Inscription réussie !',
               `Bienvenue ${response.user.username} ! Votre compte a été créé avec succès.`,
-              4000
+              4000,
             );
 
             // Redirection immédiate vers l'accueil
@@ -101,7 +109,7 @@ export class RegisterComponent implements OnInit {
             this._toastService.success(
               '📧 Inscription réussie !',
               'Un email de vérification a été envoyé à votre adresse. Vérifiez votre boîte email.',
-              8000
+              8000,
             );
 
             // Feedback visuel avec compte à rebours après un délai
@@ -127,7 +135,7 @@ export class RegisterComponent implements OnInit {
     this._toastService.info(
       '⏱️ Redirection en cours',
       `Redirection vers la page de connexion dans ${countdown} secondes...`,
-      5000
+      5000,
     );
 
     // Démarrer le compte à rebours sans créer de nouveaux toasts
@@ -185,98 +193,38 @@ export class RegisterComponent implements OnInit {
 
   /**
    * Inscription avec Google
+   * Redirige vers Google OAuth - le retour est géré par SocialAuthComponent
    */
   registerWithGoogle(): void {
-    this.isSubmitting = true;
-
     this._toastService.info(
       'Redirection en cours...',
-      'Vous allez être redirigé vers Google pour créer votre compte'
+      'Vous allez être redirigé vers Google pour créer votre compte',
     );
-
-    this._authService.loginWithGoogle().subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        const username = response.user?.username || 'utilisateur';
-        this._toastService.success(
-          '🎉 Inscription Google réussie !',
-          `Bienvenue ${username} ! Votre compte a été créé via Google.`,
-          4000
-        );
-
-        setTimeout(() => {
-          this._router.navigate(['/dictionary']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this._handleSocialRegistrationError(error, 'Google');
-      },
-    });
+    this._authService.loginWithGoogle();
   }
 
   /**
    * Inscription avec Facebook
+   * Redirige vers Facebook OAuth - le retour est géré par SocialAuthComponent
    */
   registerWithFacebook(): void {
-    this.isSubmitting = true;
-
     this._toastService.info(
       'Redirection en cours...',
-      'Vous allez être redirigé vers Facebook pour créer votre compte'
+      'Vous allez être redirigé vers Facebook pour créer votre compte',
     );
-
-    this._authService.loginWithFacebook().subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        const username = response.user?.username || 'utilisateur';
-        this._toastService.success(
-          '🎉 Inscription Facebook réussie !',
-          `Bienvenue ${username} ! Votre compte a été créé via Facebook.`,
-          4000
-        );
-
-        setTimeout(() => {
-          this._router.navigate(['/dictionary']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this._handleSocialRegistrationError(error, 'Facebook');
-      },
-    });
+    this._authService.loginWithFacebook();
   }
 
   /**
    * Inscription avec Twitter
+   * Redirige vers Twitter OAuth - le retour est géré par SocialAuthComponent
    */
   registerWithTwitter(): void {
-    this.isSubmitting = true;
-
     this._toastService.info(
       'Redirection en cours...',
-      'Vous allez être redirigé vers Twitter pour créer votre compte'
+      'Vous allez être redirigé vers Twitter pour créer votre compte',
     );
-
-    this._authService.loginWithTwitter().subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        const username = response.user?.username || 'utilisateur';
-        this._toastService.success(
-          '🎉 Inscription Twitter réussie !',
-          `Bienvenue ${username} ! Votre compte a été créé via Twitter.`,
-          4000
-        );
-
-        setTimeout(() => {
-          this._router.navigate(['/dictionary']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this._handleSocialRegistrationError(error, 'Twitter');
-      },
-    });
+    this._authService.loginWithTwitter();
   }
 
   /**
