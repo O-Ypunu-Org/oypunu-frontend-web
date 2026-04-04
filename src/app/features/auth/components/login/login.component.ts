@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
     private _fb: FormBuilder,
     private _router: Router,
     private _authService: AuthService,
-    private _toastService: ToastService
+    private _toastService: ToastService,
   ) {
     this.loginForm = this._fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -37,7 +37,7 @@ export class LoginComponent implements OnInit {
     if (this.loginForm.invalid) {
       this._toastService.warning(
         'Formulaire invalide',
-        'Veuillez vérifier vos informations de connexion'
+        'Veuillez vérifier vos informations de connexion',
       );
       return;
     }
@@ -50,15 +50,15 @@ export class LoginComponent implements OnInit {
     this._authService.login(email, password).subscribe({
       next: (response) => {
         this.isSubmitting = false;
-        
+
         // Message de bienvenue personnalisé
         const username = response.user?.username || 'utilisateur';
         this._toastService.success(
           '🎉 Connexion réussie !',
           `Bienvenue ${username} ! Vous êtes maintenant connecté.`,
-          4000
+          4000,
         );
-        
+
         // Redirection avec un petit délai pour laisser voir le message
         setTimeout(() => {
           this._router.navigate(['/dictionary']);
@@ -72,93 +72,27 @@ export class LoginComponent implements OnInit {
   }
 
   loginWithGoogle(): void {
-    this.isSubmitting = true;
-    this.errorMessage = '';
-
     this._toastService.info(
       'Redirection en cours...',
-      'Vous allez être redirigé vers Google pour vous connecter'
+      'Vous allez être redirigé vers Google pour vous connecter',
     );
-
-    this._authService.loginWithGoogle().subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        const username = response.user?.username || 'utilisateur';
-        this._toastService.success(
-          '🎉 Connexion Google réussie !',
-          `Bienvenue ${username} ! Connecté via Google.`,
-          4000
-        );
-        
-        setTimeout(() => {
-          this._router.navigate(['/dictionary']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this.handleSocialLoginError(error, 'Google');
-      },
-    });
+    this._authService.loginWithGoogle();
   }
 
   loginWithFacebook(): void {
-    this.isSubmitting = true;
-    this.errorMessage = '';
-
     this._toastService.info(
       'Redirection en cours...',
-      'Vous allez être redirigé vers Facebook pour vous connecter'
+      'Vous allez être redirigé vers Facebook pour vous connecter',
     );
-
-    this._authService.loginWithFacebook().subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        const username = response.user?.username || 'utilisateur';
-        this._toastService.success(
-          '🎉 Connexion Facebook réussie !',
-          `Bienvenue ${username} ! Connecté via Facebook.`,
-          4000
-        );
-        
-        setTimeout(() => {
-          this._router.navigate(['/dictionary']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this.handleSocialLoginError(error, 'Facebook');
-      },
-    });
+    this._authService.loginWithFacebook();
   }
 
   loginWithTwitter(): void {
-    this.isSubmitting = true;
-    this.errorMessage = '';
-
     this._toastService.info(
       'Redirection en cours...',
-      'Vous allez être redirigé vers Twitter pour vous connecter'
+      'Vous allez être redirigé vers Twitter pour vous connecter',
     );
-
-    this._authService.loginWithTwitter().subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        const username = response.user?.username || 'utilisateur';
-        this._toastService.success(
-          '🎉 Connexion Twitter réussie !',
-          `Bienvenue ${username} ! Connecté via Twitter.`,
-          4000
-        );
-        
-        setTimeout(() => {
-          this._router.navigate(['/dictionary']);
-        }, 1500);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        this.handleSocialLoginError(error, 'Twitter');
-      },
-    });
+    this._authService.loginWithTwitter();
   }
 
   /**
@@ -166,10 +100,10 @@ export class LoginComponent implements OnInit {
    */
   private handleLoginError(error: any): void {
     console.error('Erreur de connexion:', error);
-    
+
     let title = 'Erreur de connexion';
     let message = 'Une erreur inattendue est survenue';
-    
+
     // Gestion spécifique selon le type d'erreur
     if (error.status === 401) {
       title = 'Identifiants incorrects';
@@ -179,7 +113,8 @@ export class LoginComponent implements OnInit {
       message = 'Votre compte a été désactivé. Contactez le support.';
     } else if (error.status === 429) {
       title = 'Trop de tentatives';
-      message = 'Trop de tentatives de connexion. Réessayez dans quelques minutes.';
+      message =
+        'Trop de tentatives de connexion. Réessayez dans quelques minutes.';
     } else if (error.status === 0) {
       title = 'Problème de connexion';
       message = 'Vérifiez votre connexion internet et réessayez.';
@@ -187,7 +122,7 @@ export class LoginComponent implements OnInit {
       title = 'Email non vérifié';
       message = 'Vérifiez votre email pour activer votre compte.';
     }
-    
+
     this._toastService.error(title, message, 6000);
   }
 
@@ -196,10 +131,10 @@ export class LoginComponent implements OnInit {
    */
   private handleSocialLoginError(error: any, provider: string): void {
     console.error(`Erreur de connexion ${provider}:`, error);
-    
+
     let title = `Erreur de connexion ${provider}`;
     let message = 'Une erreur est survenue lors de la connexion';
-    
+
     if (error.status === 401) {
       title = 'Autorisation refusée';
       message = `L'autorisation ${provider} a été refusée ou annulée.`;
@@ -213,7 +148,7 @@ export class LoginComponent implements OnInit {
       title = 'Popup bloquée';
       message = 'Autorisez les popups pour vous connecter via ' + provider;
     }
-    
+
     this._toastService.error(title, message, 6000);
   }
 }
