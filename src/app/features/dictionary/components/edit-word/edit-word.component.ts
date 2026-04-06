@@ -584,10 +584,13 @@ export class EditWordComponent implements OnInit, OnDestroy {
     this.isSearchingWords[translationIndex] = true;
     this.clearSearchResults(translationIndex);
 
+    const langObj = this.availableLanguages.find((l) => l.code === language);
+    const langFilter = (langObj as any)?.id || language;
+
     this._dictionaryService
       .searchWords({
         query: searchTerm,
-        languages: [language],
+        languages: [langFilter],
         limit: 10,
         page: 1,
       })
@@ -695,7 +698,8 @@ export class EditWordComponent implements OnInit, OnDestroy {
   /**
    * Retourne le nom d'une langue à partir de son code
    */
-  getLanguageName(code: string): string {
+  getLanguageName(code: string | undefined): string {
+    if (!code) return '';
     const language = this.availableLanguages.find((l) => l.code === code);
     return language?.name || code.toUpperCase();
   }
