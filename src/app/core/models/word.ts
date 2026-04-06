@@ -6,6 +6,8 @@ export interface WordTranslation {
   context?: string[];
   confidence?: number;
   verifiedBy?: string[];
+  languageId?: string | { _id?: string; id?: string; name?: string; flagEmoji?: string };
+  targetWordId?: string;
 }
 
 export interface Word {
