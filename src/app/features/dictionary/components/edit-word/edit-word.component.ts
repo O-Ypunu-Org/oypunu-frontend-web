@@ -194,7 +194,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
       // Nouveaux champs pour la recherche intelligente
       searchTerm: [''], // Champ de recherche temporaire
       selectedWordId: [translation?.selectedWordId || null], // ID du mot sélectionné
-      targetWordId: [translation?.targetWordId || null], // ID du mot cible lié (pour chainage)
+      targetWordId: [translation?.targetWordId || null], // ID du mot cible lié (chainage)
     });
 
     // Écouter les changements sur le champ de recherche pour déclencher la recherche
@@ -374,8 +374,9 @@ export class EditWordComponent implements OnInit, OnDestroy {
       const cleanTranslations = this.editWordForm.value.translations
         .filter((translation: any) => translation.language && translation.translatedWord)
         .map((translation: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { searchTerm, selectedWordId, ...cleanTranslation } = translation;
-          // targetWordId est conservé et envoyé au backend pour le chainage
+          // targetWordId est conservé dans cleanTranslation pour le chainage
 
           // Convertir context string en tableau si nécessaire
           if (cleanTranslation.context && typeof cleanTranslation.context === 'string') {
