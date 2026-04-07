@@ -342,7 +342,20 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
   }
 
   onShare(): void {
-    // Partage non encore implémenté
+    if (!this.word) return;
+    const url = window.location.href;
+    const definition = this.word.meanings?.[0]?.definitions?.[0]?.definition ?? '';
+    const text = definition ? `${this.word.word} — ${definition}` : this.word.word;
+
+    if (navigator.share) {
+      navigator.share({ title: this.word.word, text, url }).catch(() => {/* dismissed */});
+    } else {
+      navigator.clipboard.writeText(url).then(() => {
+        this._toastService.success('Lien copié', 'Le lien du mot a été copié dans le presse-papiers');
+      }).catch(() => {
+        this._toastService.info('Partage', `Lien : ${url}`);
+      });
+    }
   }
 
   onEditWord(): void {
