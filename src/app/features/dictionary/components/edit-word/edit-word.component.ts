@@ -194,6 +194,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
       // Nouveaux champs pour la recherche intelligente
       searchTerm: [''], // Champ de recherche temporaire
       selectedWordId: [translation?.selectedWordId || null], // ID du mot sélectionné
+      targetWordId: [translation?.targetWordId || null], // ID du mot cible lié (pour chainage)
     });
 
     // Écouter les changements sur le champ de recherche pour déclencher la recherche
@@ -373,8 +374,9 @@ export class EditWordComponent implements OnInit, OnDestroy {
       const cleanTranslations = this.editWordForm.value.translations
         .filter((translation: any) => translation.language && translation.translatedWord)
         .map((translation: any) => {
-          const { searchTerm, selectedWordId, targetWordId, ...cleanTranslation } = translation;
-          
+          const { searchTerm, selectedWordId, ...cleanTranslation } = translation;
+          // targetWordId est conservé et envoyé au backend pour le chainage
+
           // Convertir context string en tableau si nécessaire
           if (cleanTranslation.context && typeof cleanTranslation.context === 'string') {
             const contextStr = cleanTranslation.context.trim();
@@ -629,6 +631,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
       translation.patchValue({
         translatedWord: word.word,
         selectedWordId: word.id || (word as any)._id,
+        targetWordId: word.id || (word as any)._id,
         searchTerm: word.word,
       });
       this.clearSearchResults(translationIndex);
