@@ -1,5 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
+import { forkJoin, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Word, WordTranslation } from '../../../core/models/word';
 import { DictionaryService } from '../../../core/services/dictionary.service';
 
@@ -9,13 +11,49 @@ import { DictionaryService } from '../../../core/services/dictionary.service';
   styleUrls: ['./word-translations.component.scss'],
   standalone: false,
 })
-export class WordTranslationsComponent {
+export class WordTranslationsComponent implements OnChanges {
   @Input() word!: Word;
+
+  // Map targetWordId → true si le mot cible a au moins un fichier audio
+  translationAudioMap = new Map<string, boolean>();
 
   constructor(
     private router: Router,
     private dictionaryService: DictionaryService,
   ) {}
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['word'] && this.word?.translations?.length) {
+      this.checkTranslationAudio();
+    }
+  }
+
+  private checkTranslationAudio(): void {
+    this.translationAudioMap = new Map();
+    const translations = this.word?.translations || [];
+
+    const checks = translations.map(t => {
+      const targetId = (t as any).targetWordId as string | undefined;
+      if (!targetId) return of({ id: null as string | null, hasAudio: false });
+      return this.dictionaryService.getWordById(targetId).pipe(
+        map(w => ({
+          id: targetId,
+          hasAudio: !!(w?.audioFiles && Object.keys(w.audioFiles).length > 0),
+        })),
+        catchError(() => of({ id: targetId, hasAudio: false })),
+      );
+    });
+
+    forkJoin(checks).subscribe(results => {
+      const map = new Map<string, boolean>();
+      results.forEach(r => { if (r.id) map.set(r.id, r.hasAudio); });
+      this.translationAudioMap = map;
+    });
+  }
+
+  getTranslationTargetId(translation: WordTranslation): string | null {
+    return (translation as any).targetWordId || null;
+  }
 
   // Langues disponibles avec leurs noms
   private languageNames: { [key: string]: string } = {
