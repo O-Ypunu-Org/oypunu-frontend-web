@@ -24,8 +24,9 @@
       <!-- Spacer -->
       <div class="flex-1"></div>
 
-      <!-- Bouton audio -->
+      <!-- Bouton audio — affiché seulement si le mot cible a un fichier audio -->
       <button
+        *ngIf="getTranslationTargetId(translation) && translationAudioMap.get(getTranslationTargetId(translation)!)"
         type="button"
         (click)="playTranslationAudio(translation, $event)"
         class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-primary-400 hover:bg-gray-700 transition-colors shrink-0"
