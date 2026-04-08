@@ -93,7 +93,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this._destroy$))
       .subscribe(({wordId, isFavorite}) => {
         if (this.word && this.word.id === wordId) {
-          console.log(`🔥 WordDetails: Synchronisation statut favori ${wordId}: ${isFavorite}`);
           this.word.isFavorite = isFavorite;
         }
       });
@@ -169,8 +168,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
   }
 
   toggleFavorite(): void {
-    console.log('bouton favoris cliqué. Id du mot: ' + this.word?.id);
-
     if (!this.word) return;
 
     if (!this.isAuthenticated) {
@@ -184,27 +181,10 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
       this.guestLimits = this._guestLimitsService.getCurrentLimits();
       return;
     }
-    console.log('avant la condition de mise en favoris');
-
-    // Utiliser toggleFavorite qui gère automatiquement l'état avec mise à jour optimiste
-    console.log(`🔥 WordDetails: Toggle favori pour ${this.word.id} (état actuel: ${this.word.isFavorite})`);
-    
     this._dictionaryService
       .toggleFavorite(this.word)
       .pipe(takeUntil(this._destroy$))
-      .subscribe({
-        next: (response) => {
-          console.log(`🔥 WordDetails: Réponse toggleFavorite:`, response);
-          if (response.success) {
-            console.log(`🔥 WordDetails: Toggle confirmé par API`);
-          } else {
-            console.log(`🔥 WordDetails: Toggle échoué, état restauré automatiquement`);
-          }
-        },
-        error: (error) => {
-          console.error(`🔥 WordDetails: Erreur toggle (état restauré):`, error);
-        }
-      });
+      .subscribe({ error: () => {} });
   }
 
   playAudio(audioUrl: string): void {
@@ -424,8 +404,6 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
    */
   navigateToWord(wordText: string): void {
     if (!wordText || !this.word) return;
-    
-    console.log(`🔍 Navigation vers: "${wordText}"`);
     
     // Rechercher le mot dans la même langue que le mot actuel
     const currentLanguage = this.word.language;
