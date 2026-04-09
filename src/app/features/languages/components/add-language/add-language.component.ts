@@ -125,7 +125,8 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     {
       value: 'endangered',
       label: 'En danger',
-      description: 'Les enfants ne parlent plus la langue comme langue maternelle',
+      description:
+        'Les enfants ne parlent plus la langue comme langue maternelle',
     },
     {
       value: 'unknown',
@@ -137,113 +138,113 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
   // Mapping des codes ISO pays vers leurs noms
   countryNames: { [key: string]: string } = {
     // Afrique
-    'DZ': 'Algérie',
-    'AO': 'Angola',
-    'BJ': 'Bénin',
-    'BW': 'Botswana',
-    'BF': 'Burkina Faso',
-    'BI': 'Burundi',
-    'CM': 'Cameroun',
-    'CV': 'Cap-Vert',
-    'CF': 'République centrafricaine',
-    'TD': 'Tchad',
-    'KM': 'Comores',
-    'CG': 'République du Congo',
-    'CD': 'République démocratique du Congo',
-    'CI': 'Côte d\'Ivoire',
-    'DJ': 'Djibouti',
-    'EG': 'Égypte',
-    'GQ': 'Guinée équatoriale',
-    'ER': 'Érythrée',
-    'ET': 'Éthiopie',
-    'GA': 'Gabon',
-    'GM': 'Gambie',
-    'GH': 'Ghana',
-    'GN': 'Guinée',
-    'GW': 'Guinée-Bissau',
-    'KE': 'Kenya',
-    'LS': 'Lesotho',
-    'LR': 'Libéria',
-    'LY': 'Libye',
-    'MG': 'Madagascar',
-    'MW': 'Malawi',
-    'ML': 'Mali',
-    'MR': 'Mauritanie',
-    'MU': 'Maurice',
-    'MA': 'Maroc',
-    'MZ': 'Mozambique',
-    'NA': 'Namibie',
-    'NE': 'Niger',
-    'NG': 'Nigéria',
-    'RW': 'Rwanda',
-    'ST': 'Sao Tomé-et-Principe',
-    'SN': 'Sénégal',
-    'SC': 'Seychelles',
-    'SL': 'Sierra Leone',
-    'SO': 'Somalie',
-    'ZA': 'Afrique du Sud',
-    'SS': 'Soudan du Sud',
-    'SD': 'Soudan',
-    'SZ': 'Eswatini',
-    'TZ': 'Tanzanie',
-    'TG': 'Togo',
-    'TN': 'Tunisie',
-    'UG': 'Ouganda',
-    'ZM': 'Zambie',
-    'ZW': 'Zimbabwe',
+    DZ: 'Algérie',
+    AO: 'Angola',
+    BJ: 'Bénin',
+    BW: 'Botswana',
+    BF: 'Burkina Faso',
+    BI: 'Burundi',
+    CM: 'Cameroun',
+    CV: 'Cap-Vert',
+    CF: 'République centrafricaine',
+    TD: 'Tchad',
+    KM: 'Comores',
+    CG: 'République du Congo',
+    CD: 'République démocratique du Congo',
+    CI: "Côte d'Ivoire",
+    DJ: 'Djibouti',
+    EG: 'Égypte',
+    GQ: 'Guinée équatoriale',
+    ER: 'Érythrée',
+    ET: 'Éthiopie',
+    GA: 'Gabon',
+    GM: 'Gambie',
+    GH: 'Ghana',
+    GN: 'Guinée',
+    GW: 'Guinée-Bissau',
+    KE: 'Kenya',
+    LS: 'Lesotho',
+    LR: 'Libéria',
+    LY: 'Libye',
+    MG: 'Madagascar',
+    MW: 'Malawi',
+    ML: 'Mali',
+    MR: 'Mauritanie',
+    MU: 'Maurice',
+    MA: 'Maroc',
+    MZ: 'Mozambique',
+    NA: 'Namibie',
+    NE: 'Niger',
+    NG: 'Nigéria',
+    RW: 'Rwanda',
+    ST: 'Sao Tomé-et-Principe',
+    SN: 'Sénégal',
+    SC: 'Seychelles',
+    SL: 'Sierra Leone',
+    SO: 'Somalie',
+    ZA: 'Afrique du Sud',
+    SS: 'Soudan du Sud',
+    SD: 'Soudan',
+    SZ: 'Eswatini',
+    TZ: 'Tanzanie',
+    TG: 'Togo',
+    TN: 'Tunisie',
+    UG: 'Ouganda',
+    ZM: 'Zambie',
+    ZW: 'Zimbabwe',
     // Europe
-    'FR': 'France',
-    'BE': 'Belgique',
-    'CH': 'Suisse',
-    'LU': 'Luxembourg',
-    'MC': 'Monaco',
-    'DE': 'Allemagne',
-    'AT': 'Autriche',
-    'IT': 'Italie',
-    'ES': 'Espagne',
-    'PT': 'Portugal',
-    'GB': 'Royaume-Uni',
-    'IE': 'Irlande',
-    'NL': 'Pays-Bas',
+    FR: 'France',
+    BE: 'Belgique',
+    CH: 'Suisse',
+    LU: 'Luxembourg',
+    MC: 'Monaco',
+    DE: 'Allemagne',
+    AT: 'Autriche',
+    IT: 'Italie',
+    ES: 'Espagne',
+    PT: 'Portugal',
+    GB: 'Royaume-Uni',
+    IE: 'Irlande',
+    NL: 'Pays-Bas',
     // Amérique
-    'CA': 'Canada',
-    'US': 'États-Unis',
-    'MX': 'Mexique',
-    'BR': 'Brésil',
-    'AR': 'Argentine',
-    'CL': 'Chili',
-    'CO': 'Colombie',
-    'PE': 'Pérou',
-    'VE': 'Venezuela',
-    'UY': 'Uruguay',
-    'PY': 'Paraguay',
-    'BO': 'Bolivie',
-    'EC': 'Équateur',
-    'GY': 'Guyana',
-    'SR': 'Suriname',
-    'GF': 'Guyane française',
+    CA: 'Canada',
+    US: 'États-Unis',
+    MX: 'Mexique',
+    BR: 'Brésil',
+    AR: 'Argentine',
+    CL: 'Chili',
+    CO: 'Colombie',
+    PE: 'Pérou',
+    VE: 'Venezuela',
+    UY: 'Uruguay',
+    PY: 'Paraguay',
+    BO: 'Bolivie',
+    EC: 'Équateur',
+    GY: 'Guyana',
+    SR: 'Suriname',
+    GF: 'Guyane française',
     // Asie
-    'CN': 'Chine',
-    'IN': 'Inde',
-    'JP': 'Japon',
-    'KR': 'Corée du Sud',
-    'TH': 'Thaïlande',
-    'VN': 'Vietnam',
-    'ID': 'Indonésie',
-    'MY': 'Malaisie',
-    'SG': 'Singapour',
-    'PH': 'Philippines',
-    'MM': 'Myanmar',
-    'KH': 'Cambodge',
-    'LA': 'Laos',
-    'BD': 'Bangladesh',
-    'PK': 'Pakistan',
-    'AF': 'Afghanistan',
+    CN: 'Chine',
+    IN: 'Inde',
+    JP: 'Japon',
+    KR: 'Corée du Sud',
+    TH: 'Thaïlande',
+    VN: 'Vietnam',
+    ID: 'Indonésie',
+    MY: 'Malaisie',
+    SG: 'Singapour',
+    PH: 'Philippines',
+    MM: 'Myanmar',
+    KH: 'Cambodge',
+    LA: 'Laos',
+    BD: 'Bangladesh',
+    PK: 'Pakistan',
+    AF: 'Afghanistan',
   };
 
   // Liste des codes pays disponibles (pour maintenir l'ordre)
   availableCountries = Object.keys(this.countryNames).sort((a, b) =>
-    this.countryNames[a].localeCompare(this.countryNames[b])
+    this.countryNames[a].localeCompare(this.countryNames[b]),
   );
 
   get countryOptions(): DropdownOption[] {
@@ -256,6 +257,18 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     ];
   }
 
+  getCountryOptionsForIndex(index: number): DropdownOption[] {
+    const otherSelected = this.countries.controls
+      .map((c, i) => (i !== index ? c.value : null))
+      .filter((v): v is string => !!v);
+    return [
+      { value: '', label: 'Sélectionnez un pays' },
+      ...this.availableCountries
+        .filter((code) => !otherSelected.includes(code))
+        .map((code) => ({ value: code, label: this.getCountryName(code) })),
+    ];
+  }
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -264,7 +277,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     private adminApiService: AdminApiService,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
   ) {
     this.languageForm = this.createForm();
   }
@@ -322,15 +335,19 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
     });
     // Pays
     (lang.countries ?? []).forEach((c: string) =>
-      this.countries.push(this.fb.control(c, Validators.required))
+      this.countries.push(this.fb.control(c, Validators.required)),
     );
     // Noms alternatifs
     (lang.alternativeNames ?? []).forEach((n: string) =>
-      this.alternativeNames.push(this.fb.control(n, [Validators.required, Validators.minLength(2)]))
+      this.alternativeNames.push(
+        this.fb.control(n, [Validators.required, Validators.minLength(2)]),
+      ),
     );
     // Sources
     (lang.sources ?? []).forEach((s: string) =>
-      this.sources.push(this.fb.control(s, [Validators.required, Validators.maxLength(500)]))
+      this.sources.push(
+        this.fb.control(s, [Validators.required, Validators.maxLength(500)]),
+      ),
     );
   }
 
@@ -342,8 +359,22 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
   private createForm(): FormGroup {
     return this.fb.group({
       // Étape 1: Informations de base
-      name: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/)]],
-      nativeName: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/)]],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/),
+        ],
+      ],
+      nativeName: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(2),
+          Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/),
+        ],
+      ],
       regions: [[], Validators.required],
       description: ['', [Validators.maxLength(2000)]],
 
@@ -394,7 +425,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
 
   // Gestion des FormArrays
   addCountry(): void {
-    this.countries.push(this.fb.control('', Validators.required));
+    this.countries.insert(0, this.fb.control('', Validators.required));
   }
 
   removeCountry(index: number): void {
@@ -407,7 +438,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.minLength(2),
         Validators.pattern(/^[a-zA-ZÀ-ÿ\s'\-]+$/),
-      ])
+      ]),
     );
   }
 
@@ -422,7 +453,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.maxLength(500),
         Validators.pattern(/^(?!.*<[^>]+>)(?!.*javascript:).+$/i),
-      ])
+      ]),
     );
   }
 
@@ -452,30 +483,32 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
         ? this.adminApiService.createLanguageAdmin(formData)
         : this.languagesService.proposeLanguage(formData);
 
-    request$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (_response) => {
-          this.isSubmitting = false;
-          this.successMessage = this.isAdmin
-            ? (this.editLanguage ? 'Langue mise à jour avec succès.' : 'Langue créée avec succès.')
-            : 'Votre proposition de langue a été soumise avec succès ! Elle sera examinée par nos modérateurs.';
+    request$.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (_response) => {
+        this.isSubmitting = false;
+        this.successMessage = this.isAdmin
+          ? this.editLanguage
+            ? 'Langue mise à jour avec succès.'
+            : 'Langue créée avec succès.'
+          : 'Votre proposition de langue a été soumise avec succès ! Elle sera examinée par nos modérateurs.';
 
-          setTimeout(() => {
-            this.router.navigate([this.isAdmin ? '/admin/languages' : '/profile']);
-          }, 2000);
-        },
-        error: (error) => {
-          this.isSubmitting = false;
-          if (error.error?.message) {
-            this.errorMessage = Array.isArray(error.error.message)
-              ? error.error.message.join(', ')
-              : error.error.message;
-          } else {
-            this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
-          }
-        },
-      });
+        setTimeout(() => {
+          this.router.navigate([
+            this.isAdmin ? '/admin/languages' : '/profile',
+          ]);
+        }, 2000);
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+        if (error.error?.message) {
+          this.errorMessage = Array.isArray(error.error.message)
+            ? error.error.message.join(', ')
+            : error.error.message;
+        } else {
+          this.errorMessage = 'Une erreur est survenue. Veuillez réessayer.';
+        }
+      },
+    });
   }
 
   private prepareSubmitData(): CreateLanguageDto {
@@ -486,7 +519,7 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       nativeName: formValue.nativeName.trim(),
       regions: formValue.regions || [],
       countries: formValue.countries.filter(
-        (country: string) => country.trim() !== ''
+        (country: string) => country.trim() !== '',
       ),
       status: formValue.status,
       description: formValue.description?.trim() || undefined,
@@ -497,14 +530,16 @@ export class AddLanguageComponent implements OnInit, OnDestroy {
       speakerCount: formValue.speakerCount || undefined,
       family: formValue.family?.trim() || undefined,
       alternativeNames: formValue.alternativeNames.filter(
-        (name: string) => name.trim() !== ''
+        (name: string) => name.trim() !== '',
       ),
       wikipediaUrl: formValue.wikipediaUrl?.trim() || undefined,
       ethnologueUrl: formValue.ethnologueUrl?.trim() || undefined,
       sources: (formValue.sources as string[])
         .map((s: string) => s.trim())
         .filter((s: string) => s.length > 0),
-      ...(this.isAdmin && this.editLanguage ? { isActive: formValue.isActive ?? true } : {}),
+      ...(this.isAdmin && this.editLanguage
+        ? { isActive: formValue.isActive ?? true }
+        : {}),
     };
   }
 

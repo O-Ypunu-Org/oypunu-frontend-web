@@ -111,7 +111,7 @@
               <div *ngFor="let country of countries.controls; let i = index" class="flex gap-2">
                 <app-custom-dropdown
                   [formControlName]="i"
-                  [options]="countryOptions"
+                  [options]="getCountryOptionsForIndex(i)"
                   placeholder="Sélectionnez un pays"
                   class="flex-1">
                 </app-custom-dropdown>
