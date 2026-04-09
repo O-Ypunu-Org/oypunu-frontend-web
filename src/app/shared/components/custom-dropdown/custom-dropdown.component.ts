@@ -6,6 +6,8 @@ import {
   HostListener,
   ElementRef,
   forwardRef,
+  ViewChild,
+  ElementRef as ElRef,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
@@ -36,17 +38,34 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   @Input() closeOnSelect: boolean = true;
   @Input() disabled: boolean = false;
   @Input() isInvalid: boolean = false;
+  /** Activer la recherche dans la liste (activée automatiquement si > 7 options) */
+  @Input() searchable: boolean | null = null;
+  @Input() searchPlaceholder: string = 'Rechercher...';
 
   @Output() selectionChange = new EventEmitter<string[]>();
   @Output() valueChange = new EventEmitter<string>();
 
+  @ViewChild('searchInput') searchInput?: ElRef<HTMLInputElement>;
+
   isOpen: boolean = false;
   selectedValues: string[] = [];
+  searchQuery: string = '';
 
   constructor(private elementRef: ElementRef) {}
 
   onChange: any = () => {};
   onTouched: any = () => {};
+
+  get isSearchable(): boolean {
+    if (this.searchable !== null) return this.searchable;
+    return this.options.length > 7;
+  }
+
+  get filteredOptions(): DropdownOption[] {
+    if (!this.searchQuery.trim()) return this.options;
+    const q = this.searchQuery.toLowerCase();
+    return this.options.filter((opt) => opt.label.toLowerCase().includes(q));
+  }
 
   writeValue(value: any): void {
     if (value === null || value === undefined) {
@@ -58,8 +77,12 @@ export class CustomDropdownComponent implements ControlValueAccessor {
     }
   }
 
-  registerOnChange(fn: any): void { this.onChange = fn; }
-  registerOnTouched(fn: any): void { this.onTouched = fn; }
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
 
   setDisabledState(isDisabled: boolean): void {
     this.disabled = isDisabled;
@@ -68,7 +91,14 @@ export class CustomDropdownComponent implements ControlValueAccessor {
   toggleDropdown(): void {
     if (this.disabled) return;
     this.isOpen = !this.isOpen;
-    if (this.isOpen) this.onTouched();
+    if (this.isOpen) {
+      this.onTouched();
+      this.searchQuery = '';
+      // Focus le champ de recherche après ouverture
+      if (this.isSearchable) {
+        setTimeout(() => this.searchInput?.nativeElement?.focus(), 50);
+      }
+    }
   }
 
   toggleOption(option: DropdownOption, event: MouseEvent): void {
@@ -80,7 +110,9 @@ export class CustomDropdownComponent implements ControlValueAccessor {
       if (index === -1) {
         this.selectedValues = [...this.selectedValues, option.value];
       } else {
-        this.selectedValues = this.selectedValues.filter((v) => v !== option.value);
+        this.selectedValues = this.selectedValues.filter(
+          (v) => v !== option.value,
+        );
       }
       if (this.closeOnSelect) this.isOpen = false;
     } else {
@@ -88,7 +120,10 @@ export class CustomDropdownComponent implements ControlValueAccessor {
       this.isOpen = false;
     }
 
-    const emitValue = this.multiple ? this.selectedValues : this.selectedValues[0];
+    this.searchQuery = '';
+    const emitValue = this.multiple
+      ? this.selectedValues
+      : this.selectedValues[0];
     this.onChange(emitValue);
     this.selectionChange.emit(this.selectedValues);
     if (!this.multiple) this.valueChange.emit(this.selectedValues[0]);
@@ -105,14 +140,29 @@ export class CustomDropdownComponent implements ControlValueAccessor {
       .join(', ');
   }
 
+  onSearchKeydown(event: KeyboardEvent): void {
+    event.stopPropagation();
+    if (event.key === 'Escape') {
+      this.isOpen = false;
+    } else if (event.key === 'Enter') {
+      const first = this.filteredOptions.find((o) => !o.disabled);
+      if (first) this.toggleOption(first, event as any);
+    }
+  }
+
   @HostListener('document:click', ['$event'])
   onClickOutside(event: MouseEvent): void {
     if (!this.elementRef.nativeElement.contains(event.target) && this.isOpen) {
       this.isOpen = false;
+      this.searchQuery = '';
     }
   }
 
   onDropdownClick(event: MouseEvent): void {
     event.stopPropagation();
+  }
+
+  trackByValue(index: number, option: DropdownOption): string {
+    return option.value;
   }
 }
