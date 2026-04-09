@@ -4,22 +4,18 @@
   <!-- Trigger -->
   <div
     class="dropdown-header relative w-full px-3 py-2 rounded-md text-white cursor-pointer select-none flex items-center justify-between transition-colors"
-    [class.bg-gray-900]="!disabled"
-    [class.bg-gray-950]="disabled"
-    [class.border]="true"
-    [class.border-red-500]="isInvalid && !isOpen"
-    [class.border-gray-700]="!isInvalid && !isOpen"
-    [class.focus-border]="isOpen && !isInvalid"
-    [class.opacity-50]="disabled"
-    [class.cursor-not-allowed]="disabled"
+    [class.bg-gray-900]="!disabled" [class.bg-gray-950]="disabled" [class.border]="true"
+    [class.border-red-500]="isInvalid && !isOpen" [class.border-gray-700]="!isInvalid && !isOpen"
+    [class.focus-border]="isOpen && !isInvalid" [class.opacity-50]="disabled" [class.cursor-not-allowed]="disabled"
     (click)="toggleDropdown()">
 
-    <span class="truncate" [class.text-gray-500]="selectedValues.length === 0" [class.text-white]="selectedValues.length > 0">
+    <span class="truncate" [class.text-gray-500]="selectedValues.length === 0"
+      [class.text-white]="selectedValues.length > 0">
       {{ getSelectedLabels() }}
     </span>
 
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 flex-shrink-0 ml-2 transition-transform duration-200"
-      [class.rotate-180]="isOpen"
+    <svg xmlns="http://www.w3.org/2000/svg"
+      class="h-4 w-4 text-gray-400 flex-shrink-0 ml-2 transition-transform duration-200" [class.rotate-180]="isOpen"
       viewBox="0 0 20 20" fill="currentColor">
       <path fill-rule="evenodd"
         d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -29,36 +25,52 @@
 
   <!-- Options list -->
   <div *ngIf="isOpen"
-    class="dropdown-options absolute z-50 mt-1 w-full rounded-md shadow-lg overflow-hidden"
-    style="background: var(--surface-elevated); border: 1px solid var(--surface-border);">
+    class="dropdown-options absolute z-50 mt-1 w-full rounded-md shadow-lg overflow-hidden flex flex-col"
+    style="background: var(--surface-elevated); border: 1px solid var(--surface-border); max-height: 280px;">
 
-    <!-- Empty state -->
-    <div *ngIf="options.length === 0"
-      class="px-3 py-2 text-sm text-gray-500 italic">
-      Aucune option disponible
+    <!-- Champ de recherche -->
+    <div *ngIf="isSearchable" class="dropdown-search p-2 border-b" style="border-color: var(--surface-border);">
+      <div class="relative">
+        <svg xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-gray-400 absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 20 20"
+          fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clip-rule="evenodd" />
+        </svg>
+        <input #searchInput type="text" [(ngModel)]="searchQuery" [placeholder]="searchPlaceholder"
+          class="w-full pl-8 pr-3 py-1.5 text-sm text-white rounded bg-gray-800 border border-gray-700 focus:outline-none focus:border-primary-600 placeholder-gray-500"
+          (keydown)="onSearchKeydown($event)" (click)="$event.stopPropagation()" />
+      </div>
     </div>
 
-    <div *ngFor="let option of options"
-      class="dropdown-option px-3 py-2 flex items-center justify-between text-sm transition-colors"
-      [ngClass]="{
-        'cursor-pointer': !option.disabled,
-        'cursor-not-allowed': option.disabled,
-        'text-white': !option.disabled && !isSelected(option.value),
-        'text-gray-500': option.disabled,
-        'text-purple-400 bg-gray-800': isSelected(option.value) && !option.disabled,
-        'option-hoverable': !option.disabled && !isSelected(option.value)
-      }"
-      (click)="toggleOption(option, $event)">
+    <!-- Liste filtrée -->
+    <div class="dropdown-list overflow-y-auto flex-1">
 
-      <span class="truncate">{{ option.label }}</span>
+      <!-- Empty state -->
+      <div *ngIf="filteredOptions.length === 0" class="px-3 py-3 text-sm text-gray-500 italic text-center">
+        {{ searchQuery ? 'Aucun résultat pour "' + searchQuery + '"' : 'Aucune option disponible' }}
+      </div>
 
-      <svg *ngIf="isSelected(option.value) && !option.disabled"
-        xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-500 flex-shrink-0 ml-2"
-        viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd"
-          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-          clip-rule="evenodd" />
-      </svg>
+      <div *ngFor="let option of filteredOptions; trackBy: trackByValue"
+        class="dropdown-option px-3 py-2 flex items-center justify-between text-sm transition-colors" [ngClass]="{
+          'cursor-pointer': !option.disabled,
+          'cursor-not-allowed': option.disabled,
+          'text-white': !option.disabled && !isSelected(option.value),
+          'text-gray-500': option.disabled,
+          'text-purple-400 bg-gray-800': isSelected(option.value) && !option.disabled,
+          'option-hoverable': !option.disabled && !isSelected(option.value)
+        }" (click)="toggleOption(option, $event)">
+
+        <span class="truncate">{{ option.label }}</span>
+
+        <svg *ngIf="isSelected(option.value) && !option.disabled" xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-purple-500 flex-shrink-0 ml-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+            clip-rule="evenodd" />
+        </svg>
+      </div>
     </div>
   </div>
 </div>

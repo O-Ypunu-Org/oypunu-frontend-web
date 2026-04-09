@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Word, WordTranslation } from '../../../core/models/word';
 import { DictionaryService } from '../../../core/services/dictionary.service';
+import { LanguagesService } from '../../../core/services/languages.service';
 
 @Component({
   selector: 'app-word-translations',
@@ -11,16 +12,40 @@ import { DictionaryService } from '../../../core/services/dictionary.service';
   styleUrls: ['./word-translations.component.scss'],
   standalone: false,
 })
-export class WordTranslationsComponent implements OnChanges {
+export class WordTranslationsComponent implements OnChanges, OnInit {
   @Input() word!: Word;
 
   // Map targetWordId → true si le mot cible a au moins un fichier audio
   translationAudioMap = new Map<string, boolean>();
 
+  // Dictionnaire enrichi depuis l'API : code ISO ou ObjectId → nom affiché
+  private _apiLanguageNames: Record<string, string> = {};
+  private _apiLanguageFlags: Record<string, string> = {};
+
   constructor(
     private router: Router,
     private dictionaryService: DictionaryService,
+    private languagesService: LanguagesService,
   ) {}
+
+  ngOnInit(): void {
+    this.languagesService.getActiveLanguages().pipe(
+      catchError(() => of([])),
+    ).subscribe(languages => {
+      const names: Record<string, string> = {};
+      for (const lang of (languages as any[])) {
+        if (lang._id) names[lang._id] = lang.name;
+        if (lang.iso639_1) names[lang.iso639_1] = lang.name;
+        if (lang.iso639_2) names[lang.iso639_2] = lang.name;
+        if (lang.iso639_3) names[lang.iso639_3] = lang.name;
+        if (lang.flagEmoji) {
+          if (lang._id) this._apiLanguageFlags[lang._id] = lang.flagEmoji;
+          if (lang.iso639_1) this._apiLanguageFlags[lang.iso639_1] = lang.flagEmoji;
+        }
+      }
+      this._apiLanguageNames = names;
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['word'] && this.word?.translations?.length) {
@@ -76,9 +101,11 @@ export class WordTranslationsComponent implements OnChanges {
    */
   getLanguageName(code: string | undefined): string {
     if (!code) return 'Langue inconnue';
-    // Dynamic map first (ObjectId keys populated from languageId objects)
+    // 1. Map dynamique issue du populate backend (clés ObjectId ou code)
     if (this._langKeyToName[code]) return this._langKeyToName[code];
-    // Fallback to static ISO code map
+    // 2. Map issue de l'API languages (couvre tous les codes ISO-1, ISO-2, ISO-3 et ObjectIds)
+    if (this._apiLanguageNames[code]) return this._apiLanguageNames[code];
+    // 3. Fallback statique (grandes langues ISO-1)
     return this.languageNames[code] || code;
   }
 
@@ -87,9 +114,11 @@ export class WordTranslationsComponent implements OnChanges {
    */
   getLanguageFlag(code: string | undefined): string {
     if (!code) return '_';
-    // Drapeau stocké depuis le backend (flagEmoji)
+    // 1. Map dynamique issue du populate backend
     if (this._langKeyToFlag[code]) return this._langKeyToFlag[code];
-    // Fallback : map statique par code ISO
+    // 2. Map issue de l'API languages
+    if (this._apiLanguageFlags[code]) return this._apiLanguageFlags[code];
+    // 3. Fallback statique par code ISO-1
     const flags: { [key: string]: string } = {
       fr: '🇫🇷',
       en: '🇺🇸',
@@ -142,7 +171,9 @@ export class WordTranslationsComponent implements OnChanges {
     }
     // Cas 2 : language ISO code défini
     if (translation.language) {
-      this._langKeyToName[translation.language] = translation.language;
+      // Stocker le nom complet s'il est connu, sinon le code brut
+      this._langKeyToName[translation.language] =
+        this.languageNames[translation.language] || translation.language;
       return translation.language;
     }
     return 'autre';

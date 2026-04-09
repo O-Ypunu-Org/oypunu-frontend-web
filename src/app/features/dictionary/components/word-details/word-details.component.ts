@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { DictionaryService } from '../../../../core/services/dictionary.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { GuestLimitsService } from '../../../../core/services/guest-limits.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { LanguagesService } from '../../../../core/services/languages.service';
 import { Word } from '../../../../core/models/word';
 
 @Component({
@@ -56,6 +58,9 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
   // Map catégorie ID → nom (chargée après fetch du mot)
   categoriesMap: Record<string, string> = {};
 
+  // Map enrichie depuis l'API : code ISO ou ObjectId → nom affiché
+  private _apiLanguageNames: Record<string, string> = {};
+
   private _destroy$ = new Subject<void>();
 
   constructor(
@@ -64,10 +69,25 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
     private _dictionaryService: DictionaryService,
     private _authService: AuthService,
     private _guestLimitsService: GuestLimitsService,
-    private _toastService: ToastService
+    private _toastService: ToastService,
+    private _languagesService: LanguagesService,
   ) {}
 
   ngOnInit(): void {
+    // Charger les langues disponibles pour résoudre les codes ISO-2/ISO-3
+    this._languagesService.getActiveLanguages().pipe(
+      catchError(() => of([])),
+      takeUntil(this._destroy$),
+    ).subscribe(languages => {
+      const names: Record<string, string> = {};
+      for (const lang of languages) {
+        if (lang._id) names[lang._id] = lang.name;
+        if (lang.iso639_1) names[lang.iso639_1] = lang.name;
+        if (lang.iso639_2) names[lang.iso639_2] = lang.name;
+        if (lang.iso639_3) names[lang.iso639_3] = lang.name;
+      }
+      this._apiLanguageNames = names;
+    });
     // Vérifier si l'utilisateur est authentifié
     this._authService.currentUser$
       .pipe(takeUntil(this._destroy$))
@@ -279,12 +299,14 @@ export class WordDetailsComponent implements OnInit, OnDestroy {
    */
   getLanguageDisplay(): string {
     const word = this.word as any;
-    const lang = word?.language || word?.languageId;
-    if (!lang) return '';
-    if (typeof lang === 'object' && lang.name) return lang.name;
-    if (typeof lang === 'object' && lang.nativeName) return lang.nativeName;
-    const str = String(lang);
-    return this.languages[str] ?? str;
+    // Priorité 1 : languageId populé (objet avec name) — couvre les langues sans ISO-1
+    if (word?.languageId && typeof word.languageId === 'object') {
+      return word.languageId.name || word.languageId.nativeName || '';
+    }
+    // Priorité 2 : code résolu via l'API languages (couvre ISO-1, ISO-2, ISO-3)
+    const code = word?.language;
+    if (!code) return '';
+    return this._apiLanguageNames[code] || this.languages[code] || code;
   }
 
   /**
