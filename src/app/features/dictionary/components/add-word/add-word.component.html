@@ -259,10 +259,10 @@
                   </div>
 
                   <div class="mt-2">
-                    <label class="block text-xs text-gray-400 mb-1">Exemples (séparés par des virgules)</label>
+                    <label class="block text-xs text-gray-400 mb-1">Exemples (séparés par #)</label>
                     <textarea formControlName="examples" rows="2"
                       class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      placeholder="Exemple 1, Exemple 2, Exemple 3"></textarea>
+                      placeholder="Exemple 1#Exemple 2#Exemple 3"></textarea>
                   </div>
                 </div>
               </div>
@@ -270,27 +270,26 @@
 
             <!-- Synonymes -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-300 mb-1">Synonymes (séparés par des virgules)</label>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Synonymes (séparés par #)</label>
               <input type="text" formControlName="synonyms"
                 class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="mot1, mot2, mot3" />
+                placeholder="mot1#mot2#mot3" />
             </div>
 
             <!-- Antonymes -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-300 mb-1">Antonymes (séparés par des virgules)</label>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Antonymes (séparés par #)</label>
               <input type="text" formControlName="antonyms"
                 class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="mot1, mot2, mot3" />
+                placeholder="mot1#mot2#mot3" />
             </div>
 
             <!-- Exemples additionnels -->
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-1">Exemples additionnels (séparés par des
-                virgules)</label>
+              <label class="block text-sm font-medium text-gray-300 mb-1">Exemples additionnels (séparés par #)</label>
               <textarea formControlName="examples" rows="2"
                 class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                placeholder="Phrase d'exemple 1, Phrase d'exemple 2"></textarea>
+                placeholder="Phrase d'exemple 1#Phrase d'exemple 2"></textarea>
             </div>
           </div>
         </div>

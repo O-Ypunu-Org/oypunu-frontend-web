@@ -35,10 +35,16 @@ export class AddCategoryComponent implements OnInit, OnDestroy {
   availableLanguages: Language[] = [];
 
   get languageOptions(): DropdownOption[] {
-    return this.availableLanguages.map((lang) => ({
-      value: lang._id as string,
-      label: `${lang.name}${lang.nativeName && lang.nativeName !== lang.name ? ` (${lang.nativeName})` : ''}`,
-    }));
+    return this.availableLanguages.map((lang: any) => {
+      const parts: string[] = [];
+      if (lang.nativeName && lang.nativeName !== lang.name) parts.push(lang.nativeName);
+      parts.push(`${lang.wordCount ?? 0} mot${(lang.wordCount ?? 0) !== 1 ? 's' : ''}`);
+      parts.push(`${lang.categoryCount ?? 0} catégorie${(lang.categoryCount ?? 0) !== 1 ? 's' : ''}`);
+      return {
+        value: lang._id as string,
+        label: `${lang.name} · ${parts.join(' · ')}`,
+      };
+    });
   }
   isLoadingLanguages = false;
   

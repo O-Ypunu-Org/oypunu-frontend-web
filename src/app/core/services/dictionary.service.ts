@@ -1243,38 +1243,33 @@ export class DictionaryService {
       );
   }
 
-  // Récupère les langues disponibles avec comptage des mots
+  // Récupère les langues disponibles avec comptage des mots et des catégories
   getAvailableLanguages(): Observable<any[]> {
     const languages$ = this._http
       .get<any[]>(`${environment.apiUrl}/languages`)
       .pipe(catchError(() => of([])));
-    const counts$ = this._http
-      .get<{
-        languages: any[];
-      }>(`${environment.apiUrl}/words/available-languages`)
-      .pipe(
-        map((r) => r?.languages || []),
-        catchError(() => of([])),
-      );
+    const categories$ = this._http
+      .get<any[]>(`${environment.apiUrl}/categories`)
+      .pipe(map((r) => (Array.isArray(r) ? r : [])), catchError(() => of([])));
 
-    return forkJoin([languages$, counts$]).pipe(
-      map(([languages, counts]) => {
+    return forkJoin([languages$, categories$]).pipe(
+      map(([languages, categories]) => {
         const active = (Array.isArray(languages) ? languages : []).filter(
           (lang: any) =>
             lang.isVisible === true && lang.systemStatus === 'active',
         );
 
-        // Construire un index des comptes réels par languageId ou par nom
-        const countMap = new Map<string, number>();
-        for (const c of counts) {
-          if (c.code) countMap.set(String(c.code), c.wordCount || 0);
-          if (c.name) countMap.set(c.name, c.wordCount || 0);
+        // Comptes de catégories actives par languageId
+        const catCountMap = new Map<string, number>();
+        for (const cat of categories) {
+          if (!cat.isActive && cat.systemStatus !== 'active') continue;
+          const langId =
+            cat.languageId?._id || cat.languageId?.id || cat.languageId || cat.language;
+          if (langId) catCountMap.set(String(langId), (catCountMap.get(String(langId)) ?? 0) + 1);
         }
 
         return active.map((lang: any) => {
-          const id = lang._id || lang.id;
-          const wordCount =
-            countMap.get(String(id)) ?? countMap.get(lang.name) ?? 0;
+          const id = String(lang._id || lang.id || '');
           return {
             id,
             code:
@@ -1284,7 +1279,8 @@ export class DictionaryService {
               lang.name.toLowerCase().slice(0, 2),
             name: lang.name,
             nativeName: lang.nativeName,
-            wordCount,
+            wordCount: lang.wordCount ?? 0,      // directement depuis le document Language
+            categoryCount: catCountMap.get(id) ?? 0,
           };
         });
       }),
