@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { timeout, tap, catchError } from 'rxjs/operators';
+import { Observable, throwError, forkJoin, of } from 'rxjs';
+import { timeout, tap, catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 
 export interface Language {
@@ -30,6 +30,8 @@ export interface Language {
   wikipediaUrl?: string;
   ethnologueUrl?: string;
   sortOrder?: number;
+  wordCount?: number;
+  categoryCount?: number;
 }
 
 export interface CreateLanguageDto {
@@ -94,7 +96,31 @@ export class LanguagesService {
     if (region) params = params.set('region', region);
     if (featured !== undefined) params = params.set('featured', featured.toString());
 
-    return this.http.get<Language[]>(this.baseUrl, { params });
+    const languages$ = this.http.get<Language[]>(this.baseUrl, { params });
+    const categories$ = this.http
+      .get<any[]>(`${environment.apiUrl}/categories`)
+      .pipe(map((r) => (Array.isArray(r) ? r : [])), catchError(() => of([])));
+
+    return forkJoin([languages$, categories$]).pipe(
+      map(([languages, categories]) => {
+        const catCountMap = new Map<string, number>();
+        for (const cat of categories) {
+          if (!cat.isActive && cat.systemStatus !== 'active') continue;
+          const langId =
+            cat.languageId?._id || cat.languageId?.id || cat.languageId || cat.language;
+          if (langId) catCountMap.set(String(langId), (catCountMap.get(String(langId)) ?? 0) + 1);
+        }
+
+        return languages.map((lang) => {
+          const id = String((lang as any)._id || lang._id || '');
+          return {
+            ...lang,
+            wordCount: (lang as any).wordCount ?? 0,   // directement depuis le document Language
+            categoryCount: catCountMap.get(id) ?? 0,
+          };
+        });
+      }),
+    );
   }
 
   /**
