@@ -383,7 +383,7 @@ export class EditWordComponent implements OnInit, OnDestroy {
             const contextStr = cleanTranslation.context.trim();
             if (contextStr) {
               cleanTranslation.context = contextStr
-                .split(',')
+                .split('#')
                 .map((item: string) => item.trim())
                 .filter((item: string) => item !== '');
             } else {
