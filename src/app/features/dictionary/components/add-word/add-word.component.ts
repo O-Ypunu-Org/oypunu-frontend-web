@@ -229,13 +229,13 @@ export class AddWordComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Conversion des chaînes séparées par des virgules en tableaux
+  // Conversion des chaînes séparées par # en tableaux
   private _parseCommaSeparatedString(value: string): string[] {
     if (!value || value.trim() === '') {
       return [];
     }
     return value
-      .split(',')
+      .split('#')
       .map((item) => item.trim())
       .filter((item) => item !== '');
   }
@@ -289,9 +289,9 @@ export class AddWordComponent implements OnInit, OnDestroy {
           ) {
             const contextStr = cleanTranslation.context.trim();
             if (contextStr) {
-              // Séparer par virgules et nettoyer
+              // Séparer par # et nettoyer
               cleanTranslation.context = contextStr
-                .split(',')
+                .split('#')
                 .map((item: string) => item.trim())
                 .filter((item: string) => item !== '');
             } else {
@@ -641,10 +641,18 @@ export class AddWordComponent implements OnInit, OnDestroy {
   }
 
   get languageOptions(): DropdownOption[] {
-    return this.languages.map((lang) => ({
-      value: lang.id,
-      label: `${lang.name}${lang.wordCount !== undefined ? ` (${lang.wordCount} mots)` : ''}`,
-    }));
+    return this.languages.map((lang: any) => {
+      const parts: string[] = [];
+      if (lang.nativeName && lang.nativeName !== lang.name) parts.push(lang.nativeName);
+      parts.push(`${lang.wordCount ?? 0} mot${(lang.wordCount ?? 0) !== 1 ? 's' : ''}`);
+      if (lang.categoryCount !== undefined) {
+        parts.push(`${lang.categoryCount} catégorie${lang.categoryCount !== 1 ? 's' : ''}`);
+      }
+      return {
+        value: lang.id,
+        label: `${lang.name} · ${parts.join(' · ')}`,
+      };
+    });
   }
 
   get categoryOptions(): DropdownOption[] {
