@@ -1360,24 +1360,26 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       'name' in content &&
       'languageId' in content &&
       'systemStatus' in content &&
-      'submittedBy' in content
+      !('regions' in content) &&
+      !('word' in content)
     ) {
       // Pour les catégories, utiliser l'endpoint spécifique de modération de catégories
-      contentType = ModerableContentType.WORD; // Pas de type spécifique pour les catégories
+      contentType = ModerableContentType.CATEGORY;
       // Pour les catégories, seules les actions 'approve' et 'reject' sont supportées
+      const categoryId = (content as any).id || (content as any)._id;
       if (type === 'escalate') {
         console.warn(
           'Action escalate non supportée pour les catégories, conversion en reject',
         );
         apiCall = this.adminApiService.moderateCategory(
-          content.id,
+          categoryId,
           'reject',
           reason || 'Escaladé pour révision',
           notes,
         );
       } else {
         apiCall = this.adminApiService.moderateCategory(
-          content.id,
+          categoryId,
           type,
           reason,
           notes,
@@ -1474,7 +1476,8 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Erreur lors de la modération:', error);
-        // TODO: Afficher un toast d'erreur
+        const message = error?.error?.message || error?.message || 'Une erreur est survenue lors de la modération.';
+        alert(`Erreur de modération : ${message}`);
       },
     });
   }
