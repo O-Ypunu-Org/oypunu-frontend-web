@@ -16,15 +16,15 @@ import {
   TranslationState,
   TranslationNotification,
   LanguageOption,
-  LearningInsights
+  LearningInsights,
 } from '../models/translation';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TranslationService {
   private readonly apiUrl = `${environment.apiUrl}/translation`;
-  
+
   // État global des traductions
   private translationStateSubject = new BehaviorSubject<TranslationState>({
     loading: false,
@@ -32,18 +32,20 @@ export class TranslationService {
     translations: [],
     availableLanguages: [],
     suggestions: [],
-    selectedLanguage: null
+    selectedLanguage: null,
   });
 
   // Notifications temps réel
-  private notificationSubject = new BehaviorSubject<TranslationNotification | null>(null);
+  private notificationSubject =
+    new BehaviorSubject<TranslationNotification | null>(null);
 
   // Cache pour les langues disponibles (optimisation)
   private languageCache = new Map<string, AvailableLanguage[]>();
   private cacheExpiry = 5 * 60 * 1000; // 5 minutes
 
   // Observables publics
-  public readonly translationState$ = this.translationStateSubject.asObservable();
+  public readonly translationState$ =
+    this.translationStateSubject.asObservable();
   public readonly notifications$ = this.notificationSubject.asObservable();
 
   constructor(private http: HttpClient) {}
@@ -52,9 +54,11 @@ export class TranslationService {
    * Récupère les statistiques globales des langues
    */
   getLanguageStats(): Observable<LanguageStats[]> {
-    return this.http.get<LanguageStats[]>(`${this.apiUrl}/languages`).pipe(
-      catchError(this.handleError<LanguageStats[]>('getLanguageStats', []))
-    );
+    return this.http
+      .get<LanguageStats[]>(`${this.apiUrl}/languages`)
+      .pipe(
+        catchError(this.handleError<LanguageStats[]>('getLanguageStats', [])),
+      );
   }
 
   /**
@@ -64,73 +68,88 @@ export class TranslationService {
     // Vérifier le cache d'abord
     const cacheKey = `word_${wordId}`;
     const cached = this.languageCache.get(cacheKey);
-    
+
     if (cached && this.isCacheValid(cacheKey)) {
       return of(cached);
     }
 
     this.updateState({ loading: true });
 
-    return this.http.get<AvailableLanguage[]>(`${this.apiUrl}/${wordId}/languages`).pipe(
-      tap(languages => {
-        // Mettre en cache
-        this.languageCache.set(cacheKey, languages);
-        
-        // Mettre à jour l'état
-        this.updateState({ 
-          loading: false, 
-          availableLanguages: languages,
-          error: null 
-        });
-      }),
-      catchError(error => {
-        this.updateState({ loading: false, error: this.getErrorMessage(error) });
-        return of([]);
-      }),
-      shareReplay(1)
-    );
+    return this.http
+      .get<AvailableLanguage[]>(`${this.apiUrl}/${wordId}/languages`)
+      .pipe(
+        tap((languages) => {
+          // Mettre en cache
+          this.languageCache.set(cacheKey, languages);
+
+          // Mettre à jour l'état
+          this.updateState({
+            loading: false,
+            availableLanguages: languages,
+            error: null,
+          });
+        }),
+        catchError((error) => {
+          this.updateState({
+            loading: false,
+            error: this.getErrorMessage(error),
+          });
+          return of([]);
+        }),
+        shareReplay(1),
+      );
   }
 
   /**
    * Récupère la traduction d'un mot vers une langue spécifique
    */
-  getTranslation(wordId: string, targetLanguage: string): Observable<Translation[]> {
+  getTranslation(
+    wordId: string,
+    targetLanguage: string,
+  ): Observable<Translation[]> {
     this.updateState({ loading: true, selectedLanguage: targetLanguage });
 
-    return this.http.get<Translation[]>(`${this.apiUrl}/${wordId}/${targetLanguage}`).pipe(
-      tap(translations => {
-        this.updateState({ 
-          loading: false, 
-          translations,
-          error: null 
-        });
-      }),
-      catchError(error => {
-        this.updateState({ loading: false, error: this.getErrorMessage(error) });
-        return of([]);
-      })
-    );
+    return this.http
+      .get<Translation[]>(`${this.apiUrl}/${wordId}/${targetLanguage}`)
+      .pipe(
+        tap((translations) => {
+          this.updateState({
+            loading: false,
+            translations,
+            error: null,
+          });
+        }),
+        catchError((error) => {
+          this.updateState({
+            loading: false,
+            error: this.getErrorMessage(error),
+          });
+          return of([]);
+        }),
+      );
   }
 
   /**
    * Crée une nouvelle traduction avec détection intelligente
    */
-  createTranslation(request: CreateTranslationRequest): Observable<ValidationResult> {
+  createTranslation(
+    request: CreateTranslationRequest,
+  ): Observable<ValidationResult> {
     this.updateState({ loading: true });
 
     return this.http.post<ValidationResult>(`${this.apiUrl}`, request).pipe(
-      tap(result => {
+      tap((result) => {
         this.updateState({ loading: false, error: null });
-        
+
         // Notifier le succès
         if (result.success) {
           this.showNotification({
             type: 'success',
             message: result.message,
             action: result.action as 'merge' | 'separate' | 'vote' | 'create',
-            autoHide: true
+            autoHide: true,
           });
-          
+
           // Invalider le cache pour ce mot
           this.invalidateWordCache(request.sourceWordId);
         } else if (result.action === 'uncertain') {
@@ -138,108 +157,125 @@ export class TranslationService {
             type: 'warning',
             message: result.message,
             action: 'uncertain' as 'merge' | 'separate' | 'vote' | 'create',
-            autoHide: false
+            autoHide: false,
           });
         }
       }),
-      catchError(error => {
-        this.updateState({ loading: false, error: this.getErrorMessage(error) });
+      catchError((error) => {
+        this.updateState({
+          loading: false,
+          error: this.getErrorMessage(error),
+        });
         this.showNotification({
           type: 'error',
           message: 'Erreur lors de la création de la traduction',
           details: this.getErrorMessage(error),
-          autoHide: true
+          autoHide: true,
         });
         return throwError(error);
-      })
+      }),
     );
   }
 
   /**
    * Recherche des suggestions intelligentes
    */
-  searchSuggestions(request: SearchTranslationRequest): Observable<TranslationSuggestion[]> {
+  searchSuggestions(
+    request: SearchTranslationRequest,
+  ): Observable<TranslationSuggestion[]> {
     this.updateState({ loading: true });
 
-    return this.http.post<TranslationSuggestion[]>(`${this.apiUrl}/suggest`, request).pipe(
-      tap(suggestions => {
-        this.updateState({ 
-          loading: false, 
-          suggestions,
-          error: null 
-        });
-      }),
-      catchError(error => {
-        this.updateState({ loading: false, error: this.getErrorMessage(error) });
-        return of([]);
-      })
-    );
+    return this.http
+      .post<TranslationSuggestion[]>(`${this.apiUrl}/suggest`, request)
+      .pipe(
+        tap((suggestions) => {
+          this.updateState({
+            loading: false,
+            suggestions,
+            error: null,
+          });
+        }),
+        catchError((error) => {
+          this.updateState({
+            loading: false,
+            error: this.getErrorMessage(error),
+          });
+          return of([]);
+        }),
+      );
   }
 
   /**
    * Valide une traduction (fusion ou séparation)
    */
   validateTranslation(
-    translationId: string, 
-    request: ValidateTranslationRequest
+    translationId: string,
+    request: ValidateTranslationRequest,
   ): Observable<ValidationResult> {
-    return this.http.put<ValidationResult>(`${this.apiUrl}/${translationId}/validate`, request).pipe(
-      tap(result => {
-        this.showNotification({
-          type: 'success',
-          message: `Traduction ${request.action === 'merge' ? 'fusionnée' : 'séparée'} avec succès`,
-          action: request.action as 'merge' | 'separate' | 'vote' | 'create',
-          translationId,
-          autoHide: true
-        });
-      }),
-      catchError(error => {
-        this.showNotification({
-          type: 'error',
-          message: 'Erreur lors de la validation',
-          details: this.getErrorMessage(error),
-          autoHide: true
-        });
-        return throwError(error);
-      })
-    );
+    return this.http
+      .put<ValidationResult>(
+        `${this.apiUrl}/${translationId}/validate`,
+        request,
+      )
+      .pipe(
+        tap((result) => {
+          this.showNotification({
+            type: 'success',
+            message: `Traduction ${request.action === 'merge' ? 'fusionnée' : 'séparée'} avec succès`,
+            action: request.action as 'merge' | 'separate' | 'vote' | 'create',
+            translationId,
+            autoHide: true,
+          });
+        }),
+        catchError((error) => {
+          this.showNotification({
+            type: 'error',
+            message: 'Erreur lors de la validation',
+            details: this.getErrorMessage(error),
+            autoHide: true,
+          });
+          return throwError(error);
+        }),
+      );
   }
 
   /**
    * Vote pour une traduction
    */
   voteForTranslation(
-    translationId: string, 
-    request: VoteTranslationRequest
+    translationId: string,
+    request: VoteTranslationRequest,
   ): Observable<{ success: boolean; newVoteCount: number }> {
-    return this.http.post<{ success: boolean; newVoteCount: number }>(
-      `${this.apiUrl}/${translationId}/vote`, 
-      request
-    ).pipe(
-      tap(result => {
-        if (result.success) {
-          this.showNotification({
-            type: 'success',
-            message: `Vote ${request.voteValue > 0 ? 'positif' : 'négatif'} enregistré`,
-            action: 'vote',
-            translationId,
-            autoHide: true
-          });
+    return this.http
+      .post<{
+        success: boolean;
+        newVoteCount: number;
+      }>(`${this.apiUrl}/${translationId}/vote`, request)
+      .pipe(
+        tap((result) => {
+          if (result.success) {
+            this.showNotification({
+              type: 'success',
+              message: `Vote ${request.voteValue > 0 ? 'positif' : 'négatif'} enregistré`,
+              action: 'vote',
+              translationId,
+              autoHide: true,
+            });
 
-          // Mettre à jour le vote dans l'état local
-          this.updateTranslationVote(translationId, result.newVoteCount);
-        }
-      }),
-      catchError(error => {
-        this.showNotification({
-          type: 'error',
-          message: 'Erreur lors du vote',
-          details: this.getErrorMessage(error),
-          autoHide: true
-        });
-        return throwError(error);
-      })
-    );
+            // Mettre à jour le vote dans l'état local
+            this.updateTranslationVote(translationId, result.newVoteCount);
+          }
+        }),
+        catchError((error) => {
+          this.showNotification({
+            type: 'error',
+            message: 'Erreur lors du vote',
+            details: this.getErrorMessage(error),
+            autoHide: true,
+          });
+          return throwError(error);
+        }),
+      );
   }
 
   // ===== MÉTHODES D'ADMINISTRATION =====
@@ -248,44 +284,58 @@ export class TranslationService {
    * Récupère les insights d'apprentissage (admin)
    */
   getLearningInsights(limit?: number): Observable<LearningInsights> {
-    const params = limit ? new HttpParams().set('limit', limit.toString()) : undefined;
-    
-    return this.http.get<LearningInsights>(`${this.apiUrl}/admin/insights`, { params }).pipe(
-      catchError(this.handleError<LearningInsights>('getLearningInsights', {
-        categoryAccuracy: 0,
-        semanticAccuracy: 0,
-        overallAccuracy: 0,
-        recommendedThresholds: {
-          autoMerge: 0.8,
-          askUser: 0.6,
-          autoSeparate: 0.4
-        },
-        commonPatterns: []
-      }))
-    );
+    const params = limit
+      ? new HttpParams().set('limit', limit.toString())
+      : undefined;
+
+    return this.http
+      .get<LearningInsights>(`${this.apiUrl}/admin/insights`, { params })
+      .pipe(
+        catchError(
+          this.handleError<LearningInsights>('getLearningInsights', {
+            categoryAccuracy: 0,
+            semanticAccuracy: 0,
+            overallAccuracy: 0,
+            recommendedThresholds: {
+              autoMerge: 0.8,
+              askUser: 0.6,
+              autoSeparate: 0.4,
+            },
+            commonPatterns: [],
+          }),
+        ),
+      );
   }
 
   /**
    * Met à jour les seuils d'auto-validation (admin)
    */
-  updateAutoValidationThresholds(): Observable<{ success: boolean; message: string }> {
-    return this.http.put<{ success: boolean; message: string }>(`${this.apiUrl}/admin/thresholds`, {}).pipe(
-      tap(() => {
-        this.showNotification({
-          type: 'success',
-          message: 'Seuils d\'auto-validation mis à jour',
-          autoHide: true
-        });
-      }),
-      catchError(error => {
-        this.showNotification({
-          type: 'error',
-          message: 'Erreur lors de la mise à jour des seuils',
-          autoHide: true
-        });
-        return throwError(error);
-      })
-    );
+  updateAutoValidationThresholds(): Observable<{
+    success: boolean;
+    message: string;
+  }> {
+    return this.http
+      .put<{
+        success: boolean;
+        message: string;
+      }>(`${this.apiUrl}/admin/thresholds`, {})
+      .pipe(
+        tap(() => {
+          this.showNotification({
+            type: 'success',
+            message: "Seuils d'auto-validation mis à jour",
+            autoHide: true,
+          });
+        }),
+        catchError((error) => {
+          this.showNotification({
+            type: 'error',
+            message: 'Erreur lors de la mise à jour des seuils',
+            autoHide: true,
+          });
+          return throwError(error);
+        }),
+      );
   }
 
   /**
@@ -295,23 +345,37 @@ export class TranslationService {
     totalTranslations: number;
     averageProcessingTime: number;
     successRate: number;
-    dailyStats: Array<{ date: string; translations: number; averageTime: number }>;
+    dailyStats: Array<{
+      date: string;
+      translations: number;
+      averageTime: number;
+    }>;
   }> {
-    const params = days ? new HttpParams().set('days', days.toString()) : undefined;
-    
-    return this.http.get<{
-      totalTranslations: number;
-      averageProcessingTime: number;
-      successRate: number;
-      dailyStats: Array<{ date: string; translations: number; averageTime: number }>;
-    }>(`${this.apiUrl}/admin/performance`, { params }).pipe(
-      catchError(this.handleError('getPerformanceStats', {
-        totalTranslations: 0,
-        averageProcessingTime: 0,
-        successRate: 0,
-        dailyStats: []
-      }))
-    );
+    const params = days
+      ? new HttpParams().set('days', days.toString())
+      : undefined;
+
+    return this.http
+      .get<{
+        totalTranslations: number;
+        averageProcessingTime: number;
+        successRate: number;
+        dailyStats: Array<{
+          date: string;
+          translations: number;
+          averageTime: number;
+        }>;
+      }>(`${this.apiUrl}/admin/performance`, { params })
+      .pipe(
+        catchError(
+          this.handleError('getPerformanceStats', {
+            totalTranslations: 0,
+            averageProcessingTime: 0,
+            successRate: 0,
+            dailyStats: [],
+          }),
+        ),
+      );
   }
 
   // ===== MÉTHODES UTILITAIRES =====
@@ -331,29 +395,49 @@ export class TranslationService {
       { code: 'ar', name: 'العربية', flag: '🇸🇦' },
       { code: 'zh', name: '中文', flag: '🇨🇳' },
       { code: 'ja', name: '日本語', flag: '🇯🇵' },
-      { code: 'ko', name: '한국어', flag: '🇰🇷' }
+      { code: 'ko', name: '한국어', flag: '🇰🇷' },
     ];
   }
 
   /**
    * Filtre les options de langue par langues disponibles
    */
-  filterAvailableLanguageOptions(availableLanguages: AvailableLanguage[]): LanguageOption[] {
-    const allOptions = this.getLanguageOptions();
-    const availableCodes = new Set(availableLanguages.map(lang => lang.code));
-    
-    return allOptions
-      .map(option => ({
+  filterAvailableLanguageOptions(
+    availableLanguages: AvailableLanguage[],
+  ): LanguageOption[] {
+    const baseOptions = this.getLanguageOptions();
+    const baseByCode = new Map(
+      baseOptions.map((option) => [option.code, option]),
+    );
+
+    // 1) Toujours inclure les langues réellement renvoyées par l'API
+    const dynamicOptions: LanguageOption[] = availableLanguages.map((lang) => {
+      const base = baseByCode.get(lang.code);
+      return {
+        code: lang.code,
+        name: lang.name || base?.name || lang.code.toUpperCase(),
+        flag: base?.flag || '🌍',
+        hasTranslations: true,
+        translationCount: lang.translationCount || 0,
+      };
+    });
+
+    // 2) Conserver les options statiques non présentes dans l'API (ajout manuel)
+    const dynamicCodes = new Set(dynamicOptions.map((option) => option.code));
+    const staticFallbackOptions: LanguageOption[] = baseOptions
+      .filter((option) => !dynamicCodes.has(option.code))
+      .map((option) => ({
         ...option,
-        hasTranslations: availableCodes.has(option.code),
-        translationCount: availableLanguages.find(lang => lang.code === option.code)?.translationCount || 0
-      }))
-      .sort((a, b) => {
-        // Langues avec traductions d'abord
-        if (a.hasTranslations && !b.hasTranslations) return -1;
-        if (!a.hasTranslations && b.hasTranslations) return 1;
-        return (b.translationCount || 0) - (a.translationCount || 0);
-      });
+        hasTranslations: false,
+        translationCount: 0,
+      }));
+
+    return [...dynamicOptions, ...staticFallbackOptions].sort((a, b) => {
+      // Langues avec traductions d'abord
+      if (a.hasTranslations && !b.hasTranslations) return -1;
+      if (!a.hasTranslations && b.hasTranslations) return 1;
+      return (b.translationCount || 0) - (a.translationCount || 0);
+    });
   }
 
   /**
@@ -373,7 +457,7 @@ export class TranslationService {
       translations: [],
       availableLanguages: [],
       suggestions: [],
-      selectedLanguage: null
+      selectedLanguage: null,
     });
   }
 
@@ -383,27 +467,30 @@ export class TranslationService {
     const currentState = this.translationStateSubject.value;
     this.translationStateSubject.next({
       ...currentState,
-      ...partialState
+      ...partialState,
     });
   }
 
   private showNotification(notification: TranslationNotification): void {
     this.notificationSubject.next(notification);
-    
+
     // Auto-hide après 5 secondes si demandé
     if (notification.autoHide) {
       setTimeout(() => this.clearNotifications(), 5000);
     }
   }
 
-  private updateTranslationVote(translationId: string, newVoteCount: number): void {
+  private updateTranslationVote(
+    translationId: string,
+    newVoteCount: number,
+  ): void {
     const currentState = this.translationStateSubject.value;
-    const updatedTranslations = currentState.translations.map(translation => 
-      translation.id === translationId 
+    const updatedTranslations = currentState.translations.map((translation) =>
+      translation.id === translationId
         ? { ...translation, votes: newVoteCount }
-        : translation
+        : translation,
     );
-    
+
     this.updateState({ translations: updatedTranslations });
   }
 
@@ -427,7 +514,7 @@ export class TranslationService {
         return errorObj.message;
       }
     }
-    return 'Une erreur inattendue s\'est produite';
+    return "Une erreur inattendue s'est produite";
   }
 
   private handleError<T>(operation = 'operation', result?: T) {
