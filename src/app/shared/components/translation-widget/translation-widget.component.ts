@@ -68,7 +68,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
     private dictionaryService: DictionaryService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -117,7 +117,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
     if (state.availableLanguages.length > 0) {
       this.availableLanguages =
         this.translationService.filterAvailableLanguageOptions(
-          state.availableLanguages
+          state.availableLanguages,
         );
     }
 
@@ -139,14 +139,14 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
           // Si aucune langue n'est trouvée par l'API backend, essayer la détection bidirectionnelle
           if (this.availableLanguages.length === 0) {
             console.log(
-              "Aucune langue trouvée par l'API backend, essai de détection bidirectionnelle..."
+              "Aucune langue trouvée par l'API backend, essai de détection bidirectionnelle...",
             );
             this.loadBidirectionalLanguages();
           } else {
             // Sélectionner automatiquement la première langue si disponible
             if (!this.selectedLanguage) {
               const firstAvailable = this.availableLanguages.find(
-                (lang) => lang.hasTranslations
+                (lang) => lang.hasTranslations,
               );
               if (firstAvailable) {
                 this.selectLanguage(firstAvailable.code);
@@ -158,7 +158,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error(
             'Erreur API backend, fallback vers détection bidirectionnelle:',
-            error
+            error,
           );
           // En cas d'erreur de l'API backend, utiliser la détection bidirectionnelle
           this.loadBidirectionalLanguages();
@@ -217,7 +217,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
                 hasTranslations: true,
                 translationCount: 1,
               };
-            }
+            },
           );
 
           // Ajouter aussi les langues standard supportées
@@ -253,7 +253,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
           // Sélectionner automatiquement la première langue avec traductions
           if (this.availableLanguages.length > 0 && !this.selectedLanguage) {
             const firstAvailable = this.availableLanguages.find(
-              (lang) => lang.hasTranslations
+              (lang) => lang.hasTranslations,
             );
             if (firstAvailable) {
               this.selectLanguage(firstAvailable.code);
@@ -265,7 +265,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error(
             'Erreur lors du chargement des langues bidirectionnelles:',
-            error
+            error,
           );
           this.isLoading = false;
           // Fallback vers la méthode originale
@@ -288,7 +288,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
         // Sélectionner automatiquement la première langue si disponible
         if (this.availableLanguages.length > 0 && !this.selectedLanguage) {
           const firstAvailable = this.availableLanguages.find(
-            (lang) => lang.hasTranslations
+            (lang) => lang.hasTranslations,
           );
           if (firstAvailable) {
             this.selectLanguage(firstAvailable.code);
@@ -324,7 +324,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
     // 2. Similarité dans les définitions
     if (candidateWord.meanings && sourceWord.meanings) {
       const candidateDefinitions = this.extractDefinitions(
-        candidateWord.meanings
+        candidateWord.meanings,
       );
       const sourceDefinitions = this.extractDefinitions(sourceWord.meanings);
 
@@ -336,7 +336,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
 
     // 3. Longueur similaire (heuristique simple)
     const lengthDiff = Math.abs(
-      candidateWord.word.length - sourceWord.word.length
+      candidateWord.word.length - sourceWord.word.length,
     );
     if (lengthDiff <= 3 && candidateWord.word.length >= 3) {
       return true;
@@ -367,7 +367,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
    */
   private hasCommonKeywords(
     definitions1: string[],
-    definitions2: string[]
+    definitions2: string[],
   ): boolean {
     const allText1 = definitions1.join(' ').toLowerCase();
     const allText2 = definitions2.join(' ').toLowerCase();
@@ -378,7 +378,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
 
     // Vérifier s'il y a des mots-clés communs
     const commonKeywords = keywords1.filter((keyword) =>
-      keywords2.includes(keyword)
+      keywords2.includes(keyword),
     );
     return commonKeywords.length > 0;
   }
@@ -458,7 +458,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
               this.currentTranslations.length === 0
             ) {
               console.log(
-                "Aucune traduction trouvée par l'API backend, essai de détection bidirectionnelle..."
+                "Aucune traduction trouvée par l'API backend, essai de détection bidirectionnelle...",
               );
               this.loadBidirectionalTranslations();
             }
@@ -467,7 +467,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error(
             'Erreur API backend pour traductions, fallback vers détection bidirectionnelle:',
-            error
+            error,
           );
           // En cas d'erreur de l'API backend, utiliser la détection bidirectionnelle
           this.loadBidirectionalTranslations();
@@ -494,7 +494,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error(
             'Erreur lors du chargement des traductions bidirectionnelles:',
-            error
+            error,
           );
           this.isLoading = false;
           // Fallback vers la méthode originale
@@ -507,7 +507,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
    * Recherche les traductions dans la langue cible
    */
   private findTranslationsInTargetLanguage(
-    targetLanguage: string
+    targetLanguage: string,
   ): Observable<Translation[]> {
     const wordText = this.word.word;
 
@@ -538,7 +538,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
                   context: this.extractContextFromWord(targetWord),
                   confidence: this.calculateConfidenceScore(
                     targetWord,
-                    this.word
+                    this.word,
                   ),
                   votes: 0, // Par défaut, pourrait être récupéré d'une vraie DB de traductions
                   validationType: 'auto', // Détection automatique
@@ -561,7 +561,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
         catchError((error) => {
           console.error('Erreur dans findTranslationsInTargetLanguage:', error);
           return of([]);
-        })
+        }),
       );
   }
 
@@ -627,7 +627,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
 
     // Bonus pour longueur similaire
     const lengthDiff = Math.abs(
-      targetWord.word.length - sourceWord.word.length
+      targetWord.word.length - sourceWord.word.length,
     );
     if (lengthDiff <= 2) {
       score += 0.1; // +10% pour longueur similaire
@@ -731,6 +731,11 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
    * Retourne le nom lisible d'une langue
    */
   getLanguageName(code: string): string {
+    const available = this.availableLanguages.find(
+      (lang) => lang.code === code,
+    );
+    if (available?.name) return available.name;
+
     const option = this.translationService
       .getLanguageOptions()
       .find((opt) => opt.code === code);
@@ -741,6 +746,11 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
    * Retourne l'emoji du drapeau pour une langue
    */
   getLanguageFlag(code: string): string {
+    const available = this.availableLanguages.find(
+      (lang) => lang.code === code,
+    );
+    if (available?.flag) return available.flag;
+
     const option = this.translationService
       .getLanguageOptions()
       .find((opt) => opt.code === code);
@@ -820,7 +830,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
 
     // On pourrait implémenter une modal de confirmation ici
     console.log(
-      'Similarité détectée - implémentation de la modal de confirmation à faire'
+      'Similarité détectée - implémentation de la modal de confirmation à faire',
     );
   }
 
@@ -881,7 +891,7 @@ export class TranslationWidgetComponent implements OnInit, OnDestroy {
                 (word) =>
                   word.word.toLowerCase() ===
                     translation.translatedWord.toLowerCase() &&
-                  word.language === translation.language
+                  word.language === translation.language,
               );
 
               if (exactMatch) {
