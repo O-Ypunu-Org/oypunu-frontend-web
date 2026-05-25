@@ -96,7 +96,7 @@ export interface Comment {
 export interface PostFormData {
   title: string;
   content: string;
-  postType:
+  type:
     | 'question'
     | 'explanation'
     | 'etymology'
