@@ -14,6 +14,7 @@ export interface Community {
   language?: CommunityLanguage;
   description?: string;
   memberCount: number;
+  postCount?: number;
   createdBy: {
     _id: string;
     username: string;

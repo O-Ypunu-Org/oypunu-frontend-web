@@ -38,7 +38,7 @@ export class CommunityPostsComponent implements OnInit {
   newPostForm: PostFormData = {
     title: '',
     content: '',
-    postType: 'discussion',
+    type: 'discussion',
     languages: [],
     tags: [],
     targetWord: '',
@@ -215,7 +215,7 @@ export class CommunityPostsComponent implements OnInit {
     const postData: PostFormData = {
       title: this.newPostForm.title.trim(),
       content: this.newPostForm.content.trim(),
-      postType: this.newPostForm.postType,
+      type: this.newPostForm.type,
       languages: this.newPostForm.languages?.filter((l) => l.trim()) || [],
       tags: this.newPostForm.tags?.filter((t) => t.trim()) || [],
       targetWord: this.newPostForm.targetWord?.trim() || undefined,
@@ -253,7 +253,7 @@ export class CommunityPostsComponent implements OnInit {
     this.newPostForm = {
       title: '',
       content: '',
-      postType: 'discussion',
+      type: 'discussion',
       languages: [],
       tags: [],
       targetWord: '',
