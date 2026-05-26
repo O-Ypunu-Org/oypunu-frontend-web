@@ -32,8 +32,10 @@
           <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
             <li>Mots et définitions ajoutés</li>
             <li>Traductions proposées</li>
-            <li>Commentaires et discussions</li>
+            <li>Publications et discussions dans les communautés</li>
             <li>Fichiers audio de prononciation</li>
+            <li>Messages privés et fichiers partagés via la messagerie</li>
+            <li>Photo de profil (optionnel)</li>
           </ul>
 
           <h3 class="text-lg font-medium text-blue-400">1.3 Données d'utilisation</h3>
@@ -76,16 +78,51 @@
 
       <!-- Section 3 -->
       <section>
-        <h2 class="text-2xl font-semibold mb-4 text-purple-400">3. Partage des données</h2>
+        <h2 class="text-2xl font-semibold mb-4 text-purple-400">3. Partage des données et sous-traitants</h2>
         <p class="text-gray-300 leading-relaxed mb-4">
           Nous ne vendons jamais vos données personnelles. Nous pouvons partager certaines informations dans
           les cas suivants :
         </p>
         <ul class="list-disc list-inside text-gray-300 space-y-2 ml-4">
-          <li><strong>Contenu public :</strong> Vos contributions linguistiques sont visibles par la communauté</li>
-          <li><strong>Prestataires de services :</strong> Hébergement, analytics (avec des garanties de protection)</li>
+          <li><strong>Contenu public :</strong> Vos contributions linguistiques (mots, définitions, publications communautaires) sont visibles par la communauté</li>
+          <li><strong>Prestataires de services :</strong> Nos sous-traitants techniques opèrent uniquement sur instruction d'O'Ypunu et sont soumis à des garanties contractuelles</li>
           <li><strong>Obligations légales :</strong> Si requis par la loi ou pour protéger nos droits</li>
         </ul>
+
+        <h3 class="text-lg font-medium text-blue-400 mt-4 mb-2">3.1 Sous-traitants techniques</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-gray-300 border-collapse">
+            <thead>
+              <tr class="border-b border-gray-700">
+                <th class="text-left py-2 pr-4 text-gray-400 font-medium">Service</th>
+                <th class="text-left py-2 pr-4 text-gray-400 font-medium">Rôle</th>
+                <th class="text-left py-2 text-gray-400 font-medium">Données transmises</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-800">
+              <tr>
+                <td class="py-2 pr-4 font-medium">MongoDB Atlas (US)</td>
+                <td class="py-2 pr-4">Base de données cloud</td>
+                <td class="py-2">Toutes les données de compte et de contenu</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 font-medium">Cloudinary (US)</td>
+                <td class="py-2 pr-4">Hébergement de médias</td>
+                <td class="py-2">Photos de profil, fichiers audio, images partagées</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 font-medium">Resend (US)</td>
+                <td class="py-2 pr-4">Envoi d'emails transactionnels</td>
+                <td class="py-2">Adresse email uniquement</td>
+              </tr>
+              <tr>
+                <td class="py-2 pr-4 font-medium">Google / Facebook / X (Twitter)</td>
+                <td class="py-2 pr-4">Connexion sociale (OAuth, optionnel)</td>
+                <td class="py-2">Email et identifiant public (si vous choisissez cette méthode)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <!-- Section 4 -->
