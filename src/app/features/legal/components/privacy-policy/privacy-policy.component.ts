@@ -8,8 +8,8 @@ import { Location } from '@angular/common';
   styleUrls: ['./privacy-policy.component.scss']
 })
 export class PrivacyPolicyComponent {
-  lastUpdated = '7 janvier 2025';
-  version = 'v1.0';
+  lastUpdated = '26 mai 2026';
+  version = 'v1.1';
 
   constructor(private location: Location) {}
 
