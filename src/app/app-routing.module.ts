@@ -67,6 +67,11 @@ const routes: Routes = [
       import('./features/legal/legal.module').then((m) => m.LegalModule),
   },
   {
+    path: 'account',
+    loadChildren: () =>
+      import('./features/account/account.module').then((m) => m.AccountModule),
+  },
+  {
     path: 'languages',
     loadChildren: () =>
       import('./features/languages/languages.module').then(
