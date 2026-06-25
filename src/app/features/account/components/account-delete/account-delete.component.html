@@ -1,0 +1,184 @@
+<div class="min-h-screen bg-gray-950 text-white py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+
+    <!-- En-tête -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6"
+           style="background-color: #E07048;">
+        <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      </div>
+      <h1 class="text-4xl font-bold mb-3">Supprimer mon compte</h1>
+      <p class="text-gray-400 text-lg">O'Ypunu — Demande de suppression de compte et de données</p>
+    </div>
+
+    <!-- Avertissement -->
+    <div class="bg-red-900/30 border border-red-700/50 rounded-xl p-5 mb-8">
+      <div class="flex items-start gap-3">
+        <svg class="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <div>
+          <p class="font-semibold text-red-300 mb-1">Action irréversible</p>
+          <p class="text-red-200 text-sm">
+            La suppression de votre compte est définitive. Toutes vos données personnelles seront supprimées
+            dans un délai de 30 jours. Vos contributions linguistiques (mots, définitions, enregistrements audio)
+            pourront être conservées de façon anonyme afin de préserver le corpus de langues africaines.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Méthode 1 : In-app -->
+    <div class="bg-gray-900 rounded-xl p-7 mb-6">
+      <h2 class="text-xl font-bold mb-5 flex items-center gap-3">
+        <span class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white"
+              style="background-color: #E07048;">1</span>
+        Supprimer depuis l'application mobile
+      </h2>
+      <p class="text-gray-400 mb-6 text-sm">Méthode recommandée — disponible directement dans l'app O'Ypunu.</p>
+
+      <ol class="space-y-4">
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-700 text-gray-300 text-xs font-bold
+                       flex items-center justify-center mt-0.5">1</span>
+          <div>
+            <p class="font-medium text-white">Ouvrir l'application O'Ypunu</p>
+            <p class="text-gray-400 text-sm">Assurez-vous d'être connecté à votre compte.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-700 text-gray-300 text-xs font-bold
+                       flex items-center justify-center mt-0.5">2</span>
+          <div>
+            <p class="font-medium text-white">Accéder à votre Profil</p>
+            <p class="text-gray-400 text-sm">Appuyez sur l'icône Profil dans la barre de navigation en bas.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-700 text-gray-300 text-xs font-bold
+                       flex items-center justify-center mt-0.5">3</span>
+          <div>
+            <p class="font-medium text-white">Ouvrir les Paramètres</p>
+            <p class="text-gray-400 text-sm">Appuyez sur l'icône ou le lien "Paramètres" dans votre profil.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4">
+          <span class="flex-shrink-0 w-7 h-7 rounded-full bg-gray-700 text-gray-300 text-xs font-bold
+                       flex items-center justify-center mt-0.5">4</span>
+          <div>
+            <p class="font-medium text-white">Supprimer le compte</p>
+            <p class="text-gray-400 text-sm">
+              Faites défiler jusqu'en bas et appuyez sur <span class="text-red-400 font-medium">"Supprimer mon compte"</span>.
+              Confirmez avec votre mot de passe.
+            </p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- Méthode 2 : Email -->
+    <div class="bg-gray-900 rounded-xl p-7 mb-8">
+      <h2 class="text-xl font-bold mb-5 flex items-center gap-3">
+        <span class="flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white"
+              style="background-color: #E07048;">2</span>
+        Demande par email
+      </h2>
+      <p class="text-gray-400 mb-5 text-sm">
+        Si vous n'avez plus accès à l'application, envoyez un email à notre équipe.
+      </p>
+      <a [href]="'mailto:' + contactEmail + '?subject=Demande de suppression de compte O%27Ypunu'"
+         class="inline-flex items-center gap-2 px-5 py-3 rounded-lg font-medium transition-colors text-white"
+         style="background-color: #E07048;">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        {{ contactEmail }}
+      </a>
+      <div class="mt-5 bg-gray-800 rounded-lg p-4">
+        <p class="text-gray-300 text-sm font-medium mb-2">Incluez dans votre email :</p>
+        <ul class="text-gray-400 text-sm space-y-1 ml-4 list-disc">
+          <li>Votre nom d'utilisateur ou adresse email du compte</li>
+          <li>La raison de votre demande (optionnel)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Ce qui est supprimé -->
+    <div class="bg-gray-900 rounded-xl p-7 mb-8">
+      <h2 class="text-xl font-bold mb-5">Ce qui est supprimé</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Supprimé définitivement</p>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              Email et mot de passe
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              Nom d'utilisateur et profil
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              Messages privés
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+              </svg>
+              Notifications et préférences
+            </li>
+          </ul>
+        </div>
+        <div class="space-y-3">
+          <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Conservé (anonymisé)</p>
+          <ul class="space-y-2">
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              Contributions au dictionnaire
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              Enregistrements audio approuvés
+            </li>
+            <li class="flex items-center gap-2 text-sm text-gray-300">
+              <svg class="w-4 h-4 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+              </svg>
+              Définitions validées
+            </li>
+          </ul>
+          <p class="text-xs text-gray-500 mt-2">
+            Ces données sont conservées pour préserver le corpus linguistique africain,
+            conformément à notre <a routerLink="/legal/privacy" class="underline hover:text-gray-300">politique de confidentialité</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Délai -->
+    <div class="text-center text-gray-500 text-sm pb-8">
+      <p>La suppression est effective sous <span class="text-gray-300 font-medium">30 jours</span> à compter de votre demande.</p>
+      <p class="mt-1">
+        Pour toute question :
+        <a [href]="'mailto:' + contactEmail" class="underline hover:text-gray-300">{{ contactEmail }}</a>
+      </p>
+    </div>
+
+  </div>
+</div>
