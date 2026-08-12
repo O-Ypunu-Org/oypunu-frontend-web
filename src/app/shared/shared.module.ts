@@ -22,10 +22,12 @@ import { ToastContainerComponent } from './components/toast-container/toast-cont
 import { LanguageAutocompleteComponent } from './components/language-autocomplete/language-autocomplete.component';
 import { ConfirmationModalComponent } from './components/confirmation-modal/confirmation-modal.component';
 import { NotificationBellComponent } from './components/header/notification-bell/notification-bell.component';
+import { IconComponent } from './components/icon/icon.component';
 // import { IntelligentRecommendationsComponent } from './components/intelligent-recommendations/intelligent-recommendations.component';
 
 @NgModule({
   declarations: [
+    IconComponent,
     HeaderComponent,
     FooterComponent,
     LogoComponent,
@@ -54,6 +56,7 @@ import { NotificationBellComponent } from './components/header/notification-bell
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
+    IconComponent,
     HeaderComponent,
     FooterComponent,
     CustomDropdownComponent,

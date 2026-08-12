@@ -61,7 +61,7 @@
     <!-- Template réutilisable pour une ligne de catégorie -->
     <ng-template #catRow let-cat>
       <div class="flex items-center px-5 py-4">
-        <span class="text-xl w-8 text-center flex-shrink-0 leading-none">{{ cat.icon }}</span>
+        <span class="w-8 text-center flex-shrink-0 flex items-center justify-center"><app-icon [name]="cat.icon" [size]="18"></app-icon></span>
         <div class="flex-1 ml-3 min-w-0">
           <p class="text-sm font-semibold text-white truncate">{{ cat.label }}</p>
           <p class="text-xs text-gray-400 mt-0.5 truncate">{{ getCategoryDescription(cat.contentType) }}</p>

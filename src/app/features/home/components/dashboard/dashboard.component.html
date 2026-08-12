@@ -40,8 +40,8 @@
         <div *ngFor="let action of quickActions; trackBy: trackByActionId" (click)="navigateToAction(action)"
           class="group cursor-pointer p-6 bg-gray-900 hover:bg-gray-800 rounded-2xl border border-gray-800 hover:border-purple-500 transition-all duration-300 transform hover:scale-105">
 
-          <div class="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300">
-            {{ action.icon }}
+          <div class="mb-4 group-hover:scale-110 transition-transform duration-300">
+            <app-icon [name]="action.icon" [size]="36"></app-icon>
           </div>
 
           <h3 class="text-lg font-semibold mb-2 group-hover:text-purple-400 transition-colors">

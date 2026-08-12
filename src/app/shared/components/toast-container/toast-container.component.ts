@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ToastService, Toast } from '../../services/toast.service';
+import { IconName } from '../icon/icon-registry';
 
 @Component({
   selector: 'app-toast-container',
@@ -26,7 +27,7 @@ import { ToastService, Toast } from '../../services/toast.service';
               <div class="flex-shrink-0 mt-0.5">
                 <div class="flex items-center justify-center w-8 h-8 rounded-full"
                      [ngClass]="getIconBackgroundClasses(toast.type)">
-                  <span class="text-sm">{{ getToastIcon(toast.type) }}</span>
+                  <app-icon [name]="getToastIcon(toast.type)" [size]="16"></app-icon>
                 </div>
               </div>
               <div class="ml-3 flex-1">
@@ -43,9 +44,7 @@ import { ToastService, Toast } from '../../services/toast.service';
                   class="rounded-full p-1 transition-colors duration-200 hover:bg-black/10 focus:outline-none focus:ring-2 focus:ring-offset-2"
                   [ngClass]="getCloseButtonClasses(toast.type)">
                   <span class="sr-only">Fermer</span>
-                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                  </svg>
+                  <app-icon name="x-mark" [size]="16"></app-icon>
                 </button>
               </div>
             </div>
@@ -200,18 +199,18 @@ export class ToastContainerComponent implements OnInit, OnDestroy {
     }
   }
 
-  getToastIcon(type: string): string {
+  getToastIcon(type: string): IconName {
     switch (type) {
       case 'success':
-        return '✅';
+        return 'check-circle';
       case 'error':
-        return '❌';
+        return 'x-circle';
       case 'warning':
-        return '⚠️';
+        return 'exclamation-triangle';
       case 'info':
-        return 'ℹ️';
+        return 'information-circle';
       default:
-        return 'ℹ️';
+        return 'information-circle';
     }
   }
 }

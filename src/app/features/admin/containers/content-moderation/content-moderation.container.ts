@@ -39,6 +39,7 @@ import {
   CategoryNavigationEvent,
 } from '../../components/moderation-categories/moderation-categories.component';
 import { ContentModerationAction } from '../../components/content-detail-modal/content-detail-modal.component';
+import { IconName } from '../../../../shared/components/icon/icon-registry';
 import { Permission } from '../../models/permissions.models';
 // import { ModerationAction, BulkModerationAction } from '../../components/moderation-panel/moderation-panel.component';
 
@@ -346,7 +347,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.WORD,
             label: 'Mots',
-            icon: '📝',
+            icon: 'document-text',
             color: 'bg-blue-500',
             totalCount: words?.total || 0,
             pendingCount: words?.total || 0,
@@ -357,7 +358,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.LANGUAGE,
             label: 'Langues',
-            icon: '🌍',
+            icon: 'globe-alt',
             color: 'bg-indigo-500',
             totalCount: languages?.total || 0,
             pendingCount: languages?.total || 0,
@@ -368,7 +369,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.CATEGORY,
             label: 'Catégories',
-            icon: '📂',
+            icon: 'folder',
             color: 'bg-orange-500',
             totalCount: categories?.total || 0,
             pendingCount: categories?.total || 0,
@@ -379,7 +380,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.COMMUNITY_POST,
             label: 'Posts Communauté',
-            icon: '💬',
+            icon: 'chat-bubble-left-right',
             color: 'bg-green-500',
             totalCount: communityPosts?.total || 0,
             pendingCount: communityPosts?.total || 0,
@@ -390,7 +391,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.PRIVATE_MESSAGE,
             label: 'Messages Privés',
-            icon: '📩',
+            icon: 'envelope',
             color: 'bg-purple-500',
             totalCount: privateMessages?.total || 0,
             pendingCount: privateMessages?.total || 0,
@@ -401,7 +402,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.USER_PROFILE,
             label: 'Profils Utilisateurs',
-            icon: '👤',
+            icon: 'user',
             color: 'bg-orange-500',
             totalCount: userProfiles?.total || 0,
             pendingCount: userProfiles?.total || 0,
@@ -412,7 +413,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.COMMENT,
             label: 'Commentaires',
-            icon: '💭',
+            icon: 'chat-bubble-oval-left',
             color: 'bg-yellow-500',
             totalCount: comments?.total || 0,
             pendingCount: comments?.total || 0,
@@ -423,7 +424,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.MEDIA_CONTENT,
             label: 'Contenu Multimédia',
-            icon: '🎵',
+            icon: 'musical-note',
             color: 'bg-pink-500',
             totalCount: mediaContent?.total || 0,
             pendingCount: mediaContent?.total || 0,
@@ -434,7 +435,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.REPORT,
             label: 'IA Auto-détectée',
-            icon: '🤖',
+            icon: 'cpu-chip',
             color: 'bg-red-500',
             totalCount: reports?.total || 0,
             pendingCount: reports?.total || 0,
@@ -445,7 +446,7 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
           {
             contentType: ModerableContentType.CONTRIBUTOR_REQUEST,
             label: 'Demandes de Contributeur',
-            icon: '🤝',
+            icon: 'hand-raised',
             color: 'bg-emerald-500',
             totalCount: contributorRequests?.total || 0,
             pendingCount: contributorRequests?.total || 0,
@@ -491,29 +492,34 @@ export class ContentModerationContainer implements OnInit, OnDestroy {
   private transformBackendStatsToCategories(
     stats: any,
   ): ModerationCategoryStats[] {
-    const defaultCategories = [
+    const defaultCategories: Array<{
+      contentType: ModerableContentType;
+      label: string;
+      icon: IconName;
+      color: string;
+    }> = [
       {
         contentType: ModerableContentType.WORD,
         label: 'Mots',
-        icon: '📝',
+        icon: 'document-text',
         color: 'bg-blue-500',
       },
       {
         contentType: ModerableContentType.COMMENT,
         label: 'Commentaires',
-        icon: '💭',
+        icon: 'chat-bubble-oval-left',
         color: 'bg-yellow-500',
       },
       {
         contentType: ModerableContentType.USER_PROFILE,
         label: 'Profils Utilisateurs',
-        icon: '👤',
+        icon: 'user',
         color: 'bg-orange-500',
       },
       {
         contentType: ModerableContentType.LANGUAGE,
         label: 'Langues',
-        icon: '🌍',
+        icon: 'globe-alt',
         color: 'bg-green-500',
       },
     ];
