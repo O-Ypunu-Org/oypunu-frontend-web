@@ -28,6 +28,7 @@ import {
   ReportedMediaContent,
   AIFlaggedContent,
 } from '../../models/admin.models';
+import { IconName } from '../../../../shared/components/icon/icon-registry';
 
 /**
  * Interface pour les statistiques par catégorie
@@ -35,7 +36,7 @@ import {
 export interface ModerationCategoryStats {
   readonly contentType: ModerableContentType;
   readonly label: string;
-  readonly icon: string;
+  readonly icon: IconName;
   readonly color: string;
   readonly totalCount: number;
   readonly pendingCount: number;
@@ -94,61 +95,61 @@ export class ModerationCategoriesComponent {
     {
       contentType: ModerableContentType.WORD,
       label: 'Mots',
-      icon: '📝',
+      icon: 'document-text',
       color: 'bg-blue-500',
     },
     {
       contentType: ModerableContentType.COMMUNITY_POST,
       label: 'Posts Communauté',
-      icon: '💬',
+      icon: 'chat-bubble-left-right',
       color: 'bg-green-500',
     },
     {
       contentType: ModerableContentType.PRIVATE_MESSAGE,
       label: 'Messages Privés',
-      icon: '📩',
+      icon: 'envelope',
       color: 'bg-purple-500',
     },
     {
       contentType: ModerableContentType.USER_PROFILE,
       label: 'Profils Utilisateurs',
-      icon: '👤',
+      icon: 'user',
       color: 'bg-orange-500',
     },
     {
       contentType: ModerableContentType.COMMENT,
       label: 'Commentaires',
-      icon: '💭',
+      icon: 'chat-bubble-oval-left',
       color: 'bg-yellow-500',
     },
     {
       contentType: ModerableContentType.MEDIA_CONTENT,
       label: 'Contenu Multimédia',
-      icon: '🎵',
+      icon: 'musical-note',
       color: 'bg-pink-500',
     },
     {
       contentType: ModerableContentType.REPORT,
       label: 'IA Auto-détectée',
-      icon: '🤖',
+      icon: 'cpu-chip',
       color: 'bg-red-500',
     },
     {
       contentType: ModerableContentType.LANGUAGE,
       label: 'Langues',
-      icon: '🌍',
+      icon: 'globe-alt',
       color: 'bg-indigo-500',
     },
     {
       contentType: ModerableContentType.CATEGORY,
       label: 'Catégories',
-      icon: '📂',
+      icon: 'folder',
       color: 'bg-orange-500',
     },
     {
       contentType: ModerableContentType.CONTRIBUTOR_REQUEST,
       label: 'Demandes de Contributeur',
-      icon: '🤝',
+      icon: 'hand-raised',
       color: 'bg-emerald-500',
     },
   ];

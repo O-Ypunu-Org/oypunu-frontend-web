@@ -140,9 +140,9 @@
           <!-- Header avec icône et titre -->
           <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center text-lg shadow-lg"
+              <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
                 [ngClass]="defaultCat.color + ' bg-opacity-90'">
-                {{ defaultCat.icon }}
+                <app-icon [name]="defaultCat.icon" [size]="22" color="white"></app-icon>
               </div>
               <div>
                 <h3 class="font-semibold text-white text-lg">{{ defaultCat.label }}</h3>

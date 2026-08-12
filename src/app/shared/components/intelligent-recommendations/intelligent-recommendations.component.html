@@ -42,7 +42,7 @@
           ? 'bg-' + category.color + '-600 text-white' 
           : 'bg-gray-800 text-gray-300 hover:bg-gray-700'"
         class="px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center space-x-2">
-        <span>{{ category.icon }}</span>
+        <app-icon [name]="category.icon" [size]="16"></app-icon>
         <span>{{ category.name }}</span>
       </button>
     </div>
@@ -161,9 +161,10 @@
       <!-- Badge de catégorie -->
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2">
-          <span class="px-2 py-1 rounded-full text-xs" 
+          <span class="px-2 py-1 rounded-full text-xs inline-flex items-center gap-1"
                 [class]="'bg-' + getCategoryInfo(recommendation.category)?.color + '-900/50 text-' + getCategoryInfo(recommendation.category)?.color + '-300'">
-            {{ getCategoryInfo(recommendation.category)?.icon }} {{ getCategoryInfo(recommendation.category)?.name }}
+            <app-icon *ngIf="getCategoryInfo(recommendation.category)?.icon as icon" [name]="icon" [size]="12"></app-icon>
+            {{ getCategoryInfo(recommendation.category)?.name }}
           </span>
         </div>
 

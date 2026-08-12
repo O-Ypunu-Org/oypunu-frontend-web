@@ -1,5 +1,7 @@
 // Types pour les recommandations intelligentes
 
+import { IconName } from '../../shared/components/icon/icon-registry';
+
 export interface RecommendedWord {
   id: string;
   word: string;
@@ -127,7 +129,7 @@ export interface RecommendationCategory {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: IconName;
   color: string;
   gradient: string;
 }
@@ -137,7 +139,7 @@ export const RECOMMENDATION_CATEGORIES: RecommendationCategory[] = [
     id: 'behavioral',
     name: 'Basé sur vos goûts',
     description: 'Recommandations personnalisées selon votre historique',
-    icon: '🧠',
+    icon: 'finger-print',
     color: 'purple',
     gradient: 'from-purple-600 to-purple-800'
   },
@@ -145,7 +147,7 @@ export const RECOMMENDATION_CATEGORIES: RecommendationCategory[] = [
     id: 'semantic',
     name: 'Concepts similaires',
     description: 'Mots liés sémantiquement à vos consultations',
-    icon: '🔗',
+    icon: 'link',
     color: 'blue',
     gradient: 'from-blue-600 to-blue-800'
   },
@@ -153,7 +155,7 @@ export const RECOMMENDATION_CATEGORIES: RecommendationCategory[] = [
     id: 'community',
     name: 'Tendances communauté',
     description: 'Mots populaires dans la communauté',
-    icon: '📈',
+    icon: 'arrow-trending-up',
     color: 'green',
     gradient: 'from-green-600 to-green-800'
   },
@@ -161,7 +163,7 @@ export const RECOMMENDATION_CATEGORIES: RecommendationCategory[] = [
     id: 'linguistic',
     name: 'Apprentissage langues',
     description: 'Mots adaptés à votre niveau linguistique',
-    icon: '🌍',
+    icon: 'globe-alt',
     color: 'orange',
     gradient: 'from-orange-600 to-orange-800'
   },
@@ -169,7 +171,7 @@ export const RECOMMENDATION_CATEGORIES: RecommendationCategory[] = [
     id: 'mixed',
     name: 'Intelligent mixte',
     description: 'Combinaison optimale de tous les algorithmes',
-    icon: '🎯',
+    icon: 'sparkles',
     color: 'indigo',
     gradient: 'from-indigo-600 to-indigo-800'
   }
