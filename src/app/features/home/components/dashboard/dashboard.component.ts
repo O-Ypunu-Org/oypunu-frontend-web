@@ -9,12 +9,13 @@ import { RecommendationService } from '../../../../core/services/recommendation.
 import { RecommendedWord, RecommendationFeedback } from '../../../../core/models/recommendation';
 import { UserRole } from '../../../../core/models/admin';
 import { ToastService } from '../../../../shared/services/toast.service';
+import { IconName } from '../../../../shared/components/icon/icon-registry';
 
 interface QuickAction {
   id: string;
   title: string;
   description: string;
-  icon: string;
+  icon: IconName;
   route: string;
   color: string;
   gradient: string;
@@ -116,7 +117,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: 'search',
         title: 'Rechercher',
         description: 'Explorez notre dictionnaire',
-        icon: '🔍',
+        icon: 'magnifying-glass',
         route: '/dictionary',
         color: 'purple',
         gradient: 'from-purple-500 to-blue-500'
@@ -125,7 +126,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: 'favorites',
         title: 'Mes favoris',
         description: 'Vos mots sauvegardés',
-        icon: '❤️',
+        icon: 'heart',
         route: '/favorites',
         color: 'red',
         gradient: 'from-red-500 to-pink-500'
@@ -134,7 +135,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: 'messaging',
         title: 'Messagerie',
         description: 'Conversations privées',
-        icon: '💬',
+        icon: 'chat-bubble-left-right',
         route: '/messaging',
         color: 'indigo',
         gradient: 'from-indigo-500 to-purple-500'
@@ -143,7 +144,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: 'communities',
         title: 'Communautés',
         description: 'Rejoignez les discussions',
-        icon: '👥',
+        icon: 'user-group',
         route: '/communities',
         color: 'blue',
         gradient: 'from-blue-500 to-cyan-500'
@@ -159,7 +160,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: 'add-word',
         title: 'Ajouter un mot',
         description: 'Contribuez à la communauté',
-        icon: '➕',
+        icon: 'plus',
         route: '/dictionary/add',
         color: 'green',
         gradient: 'from-green-500 to-teal-500'
@@ -170,7 +171,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         id: 'become-contributor',
         title: 'Devenir contributeur',
         description: 'Demandez à contribuer',
-        icon: '✍️',
+        icon: 'pencil-square',
         route: '/contributor-request',
         color: 'emerald',
         gradient: 'from-emerald-500 to-green-500'

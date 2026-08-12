@@ -6,6 +6,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { User, UserStats } from '../../../../core/models/user';
 import { UserRole } from '../../../../core/models/admin';
 import { ProfileRecentWord } from '../sections/contributor-section/contributor-section.component';
+import { IconName } from '../../../../shared/components/icon/icon-registry';
 
 @Component({
   selector: 'app-profile-view',
@@ -188,14 +189,14 @@ export class ProfileViewComponent implements OnInit, OnDestroy {
     return labels[this.user?.role || 'user'] || 'Utilisateur';
   }
 
-  getRoleEmoji(): string {
-    const emojis: Record<string, string> = {
-      superadmin: '👑',
-      admin: '🛡️',
-      contributor: '✏️',
-      user: '👤',
+  getRoleIcon(): IconName {
+    const icons: Record<string, IconName> = {
+      superadmin: 'shield-check',
+      admin: 'shield-exclamation',
+      contributor: 'pencil-square',
+      user: 'user',
     };
-    return emojis[this.user?.role || 'user'] || '👤';
+    return icons[this.user?.role || 'user'] || 'user';
   }
 
   getRoleBadgeClass(): string {
@@ -230,15 +231,15 @@ export class ProfileViewComponent implements OnInit, OnDestroy {
     return 'Actif ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   }
 
-  getContributionLevelInfo(): { name: string; icon: string; minScore: number } | null {
+  getContributionLevelInfo(): { name: string; icon: IconName; minScore: number } | null {
     if (this.contributionScore === undefined) return null;
     const levels = [
-      { name: 'Débutant',     minScore: 0,     maxScore: 99,       icon: '🌱' },
-      { name: 'Apprenti',     minScore: 100,   maxScore: 499,      icon: '🌿' },
-      { name: 'Contributeur', minScore: 500,   maxScore: 1999,     icon: '⭐' },
-      { name: 'Expert',       minScore: 2000,  maxScore: 4999,     icon: '💎' },
-      { name: 'Maître',       minScore: 5000,  maxScore: 9999,     icon: '🏆' },
-      { name: 'Légende',      minScore: 10000, maxScore: Infinity, icon: '👑' },
+      { name: 'Débutant',     minScore: 0,     maxScore: 99,       icon: 'sparkles' as IconName },
+      { name: 'Apprenti',     minScore: 100,   maxScore: 499,      icon: 'light-bulb' as IconName },
+      { name: 'Contributeur', minScore: 500,   maxScore: 1999,     icon: 'star' as IconName },
+      { name: 'Expert',       minScore: 2000,  maxScore: 4999,     icon: 'academic-cap' as IconName },
+      { name: 'Maître',       minScore: 5000,  maxScore: 9999,     icon: 'trophy' as IconName },
+      { name: 'Légende',      minScore: 10000, maxScore: Infinity, icon: 'rocket-launch' as IconName },
     ];
     return levels.find(l => this.contributionScore! >= l.minScore && this.contributionScore! <= l.maxScore) || null;
   }

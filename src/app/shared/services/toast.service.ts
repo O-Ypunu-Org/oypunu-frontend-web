@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { IconName } from '../components/icon/icon-registry';
 
 export interface Toast {
   id: string;
@@ -8,7 +9,7 @@ export interface Toast {
   message?: string;
   duration?: number;
   dismissible?: boolean;
-  icon?: string;
+  icon?: IconName;
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center';
 }
 
@@ -32,7 +33,7 @@ export class ToastService {
       type: 'success',
       title,
       message,
-      icon: '✅',
+      icon: 'check-circle',
       ...options
     });
   }
@@ -45,7 +46,7 @@ export class ToastService {
       type: 'error',
       title,
       message,
-      icon: '❌',
+      icon: 'x-circle',
       duration: 8000, // Plus long pour les erreurs
       ...options
     });
@@ -59,7 +60,7 @@ export class ToastService {
       type: 'warning',
       title,
       message,
-      icon: '⚠️',
+      icon: 'exclamation-triangle',
       ...options
     });
   }
@@ -72,7 +73,7 @@ export class ToastService {
       type: 'info',
       title,
       message,
-      icon: 'ℹ️',
+      icon: 'information-circle',
       ...options
     });
   }
@@ -189,7 +190,7 @@ export class ToastService {
       title: loadingMessage,
       duration: 0, // Pas d'auto-dismiss
       dismissible: false,
-      icon: '⏳'
+      icon: 'clock' as IconName
     };
 
     this.show(loadingToast);

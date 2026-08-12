@@ -24,6 +24,7 @@
     "@types/socket.io-client": "^1.4.36",
     "apexcharts": "^3.45.2",
     "autoprefixer": "^10.4.21",
+    "heroicons": "^2.2.0",
     "ng-apexcharts": "^1.11.0",
     "postcss": "^8.5.4",
     "rxjs": "~7.8.0",

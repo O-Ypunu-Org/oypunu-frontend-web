@@ -4,6 +4,8 @@
  * Miroir de adminNavigation.ts (mobile) adapté à Angular.
  */
 
+import { IconName } from '../../../shared/components/icon/icon-registry';
+
 // ===== ROUTES =====
 
 export const PROFILE_ADMIN_ROUTES = {
@@ -61,7 +63,7 @@ export type AdminNavVariant = 'default' | 'warning';
 export interface AdminNavItem {
   key: string;
   label: string;
-  icon: string;
+  icon: IconName;
   route: string;
   variant?: AdminNavVariant;
 }
@@ -72,19 +74,19 @@ export const ADMIN_NAV_ITEMS: Record<'admin' | 'superadmin', AdminNavItem[]> = {
     {
       key: 'dashboard',
       label: 'Tableau de bord',
-      icon: '🛡️',
+      icon: 'shield-check',
       route: PROFILE_ADMIN_ROUTES.dashboard,
     },
     {
       key: 'languages',
       label: 'Gestion des langues',
-      icon: '🌍',
+      icon: 'globe-alt',
       route: PROFILE_ADMIN_ROUTES.manageLanguages,
     },
     {
       key: 'categories',
       label: 'Gestion des catégories',
-      icon: '🏷️',
+      icon: 'tag',
       route: PROFILE_ADMIN_ROUTES.manageCategories,
     },
   ],
@@ -92,19 +94,19 @@ export const ADMIN_NAV_ITEMS: Record<'admin' | 'superadmin', AdminNavItem[]> = {
     {
       key: 'dashboard',
       label: 'Tableau de bord',
-      icon: '🛡️',
+      icon: 'shield-check',
       route: PROFILE_ADMIN_ROUTES.dashboard,
     },
     {
       key: 'languages',
       label: 'Gestion des langues',
-      icon: '🌍',
+      icon: 'globe-alt',
       route: PROFILE_ADMIN_ROUTES.manageLanguages,
     },
     {
       key: 'categories',
       label: 'Gestion des catégories',
-      icon: '🏷️',
+      icon: 'tag',
       route: PROFILE_ADMIN_ROUTES.manageCategories,
     },
   ],
