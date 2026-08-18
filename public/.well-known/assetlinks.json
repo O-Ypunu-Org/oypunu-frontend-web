@@ -5,7 +5,8 @@
       "namespace": "android_app",
       "package_name": "com.projetx.app",
       "sha256_cert_fingerprints": [
-        "6C:7D:B7:2B:F1:B2:04:89:6C:DB:68:6F:26:DC:B3:27:95:4F:01:5B:51:1C:05:6C:F3:D3:24:B4:F6:E6:30:7F"
+        "6C:7D:B7:2B:F1:B2:04:89:6C:DB:68:6F:26:DC:B3:27:95:4F:01:5B:51:1C:05:6C:F3:D3:24:B4:F6:E6:30:7F",
+        "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
       ]
     }
   }
